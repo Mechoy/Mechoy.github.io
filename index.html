@@ -155,7 +155,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/20/recursion/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/20/hello/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -169,7 +169,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2022/01/20/recursion/" class="post-title-link" itemprop="url">recursion递归算法</a>
+            <a href="/2022/01/20/hello/" class="post-title-link" itemprop="url">Hello</a>
         </h2>
 
         <div class="post-meta">
@@ -180,172 +180,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-01-20 00:49:36 / Modified: 23:01:53" itemprop="dateCreated datePublished" datetime="2022-01-20T00:49:36+08:00">2022-01-20</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>刷codewars的时候，碰到一个字符串的全排列，emmm，不会，然后就去寻找了一下解决方法，发现是用递归进行解决(可能有其他方法，但没发现，调用库函数的不算)。然后看了半天别人的思路发现始终有点迷糊，就重新学习了一下递归(我记着我以前会，emmm,可能也是会的不咋滴)。</p>
-<h3 id="递归算法简述"><a href="#递归算法简述" class="headerlink" title="递归算法简述"></a>递归算法简述</h3><p>**递归算法 ** 是指一种通过重复将问题分解为同类的子问题而解决问题的方法，也是指在定义的函数中调用函数自身的方法。递归算法实际上分为两层意思，一个”递”，一个”归”，这也是在后续使用递归算法中的重要地方。</p>
-<p>本文不会对递归的时间复杂度进行分析，因为不会，只是通过几个例子来学习一下如何使用递归算法。</p>
-<p>**递归算法 ** 通常用来解决结构自相似的问题。所谓结构自相似，是指构成原问题的子问题与原问题在结构上相似，可以用类似的方法解决。而在使用递归时，则是通过将问题分解成相同类型的子问题，然后再通过子问题的结果再反推出问题的结果。</p>
-<p><strong>递归算法</strong> 的三步：</p>
-<ol>
-<li>递归函数的参数以及返回值</li>
-<li>确定终止条件</li>
-<li>单层递归的逻辑</li>
-</ol>
-<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><h4 id="举例1：n的阶乘"><a href="#举例1：n的阶乘" class="headerlink" title="举例1：n的阶乘"></a>举例1：n的阶乘</h4><p>先对n的阶乘进行分析</p>
-<p><code>n! = n * (n-1) * (n-2) * ······* 2 * 1</code>，相当于下式</p>
-<p><img src="/2022/01/20/recursion/1.png" alt="img"></p>
-<p>假设n=1，则n的阶乘等于1；n=2时，n的阶乘等于2*1=2</p>
-<p>首先确定递归函数的参数以及返回值，既然是n的阶乘，那参数肯定毫无疑问是n(递归函数的参数，如果刚开始不能确定所有，则可以在后续进行补充，不影响的。)，再说返回值，求n的阶乘，返回值指定是阶乘的结果</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#求n的阶乘</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">return</span> n!</span><br></pre></td></tr></table></figure>
-
-<p>确定终止条件，已知<code>1!</code>== 1，则可以确定当n==1时，这个递归就可以终止了</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	<span class="keyword">return</span> n!	</span><br></pre></td></tr></table></figure>
-
-<p>确定单层递归的逻辑，已知<code>n! = n * (n-1) * (n-2) * ······* 2 * 1</code>，使用f(n)来表示n的阶乘，<code>f(n)==n*f(n-1)</code>，当n-1等于1时，则可以直接返回已知的结果。则函数就可以写成如下形式:</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	<span class="keyword">return</span> n*f(n-<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-
-<p>要是没理解，先假设n=2</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params"><span class="number">2</span></span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	<span class="keyword">return</span> <span class="number">2</span>*f(<span class="number">2</span>-<span class="number">1</span>)		<span class="comment">#已知f(1)==1，则相当于直接return 2*1</span></span><br></pre></td></tr></table></figure>
-
-<p>再看n=3</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params"><span class="number">3</span></span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	<span class="keyword">return</span> <span class="number">3</span>*f(<span class="number">3</span>-<span class="number">1</span>)		<span class="comment">#return 3*f(2),调用f()，求f(2),也就再返回到上面的式子中</span></span><br></pre></td></tr></table></figure>
-
-<p>再假设n=5，则函数具体的执行流程如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">f(<span class="number">5</span>)</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*f(<span class="number">4</span>)</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*(<span class="number">4</span>*f(<span class="number">3</span>))</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*(<span class="number">4</span>*(<span class="number">3</span>*f(<span class="number">2</span>)))</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*(<span class="number">4</span>*(<span class="number">3</span>*(<span class="number">2</span>*f(<span class="number">1</span>))))</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*((<span class="number">5</span>-<span class="number">1</span>)*((<span class="number">5</span>-<span class="number">2</span>)*((<span class="number">5</span>-<span class="number">3</span>)*f(<span class="number">5</span>-<span class="number">4</span>))))		<span class="comment">#上半部分为递，下半部分为归</span></span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*((<span class="number">5</span>-<span class="number">1</span>)*((<span class="number">5</span>-<span class="number">2</span>)*((<span class="number">5</span>-<span class="number">3</span>)*<span class="number">1</span>)))</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*((<span class="number">5</span>-<span class="number">1</span>)*((<span class="number">5</span>-<span class="number">2</span>)*(<span class="number">2</span>))</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*((<span class="number">5</span>-<span class="number">1</span>)*(<span class="number">6</span>)</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">5</span>*(<span class="number">24</span>)</span><br><span class="line">f(<span class="number">5</span>)=<span class="number">120</span></span><br></pre></td></tr></table></figure>
-
-<p>则可以得出最终程序，如下：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">    	<span class="keyword">return</span> n*f(n-<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
-
-<h4 id="举例2：斐波那契数列"><a href="#举例2：斐波那契数列" class="headerlink" title="举例2：斐波那契数列"></a>举例2：斐波那契数列</h4><p>1、1、2、3、5、8、13、21、34·······  简单点说就是第n项的值为前两项之和</p>
-<p>首先对该数列进行分析，由于第一项和第二项没有前两项，则可以知道其值直接为1，假设f(n)为第n项的值，则可以推出下式：</p>
-<p><img src="/2022/01/20/recursion/2.png" alt="img"></p>
-<p>先确定函数的参数、返回值，求第n项的值，则n毫无疑问是参数</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">return</span> s <span class="comment"># 假设s是第n项的值</span></span><br></pre></td></tr></table></figure>
-
-<p>确定终止条件，已知n=1或者n=2时，其值为1，则可以确定当n=1或者n=2时递归就可以结束了</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">elif</span>(n==<span class="number">2</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> s	<span class="comment"># 假设s是第n项的值</span></span><br></pre></td></tr></table></figure>
-
-<p>确定单层函数的逻辑，先假设n=3，则第三项的值<code>f(3)=f(2)+f(1)</code>，也就相当于<code>f(n)=f(n-1)+f(n-2)</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f</span>(<span class="params">n</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">elif</span>(n==<span class="number">2</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> f(n-<span class="number">1</span>)+f(n-<span class="number">2</span>)	<span class="comment"># 完工</span></span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="举例-3-汉诺塔"><a href="#举例-3-汉诺塔" class="headerlink" title="举例 3 汉诺塔"></a>举例 3 汉诺塔</h4><p>求汉诺塔的挪动顺序(不是需要挪动的次数)</p>
-<p>具体玩法这就不啰嗦了，反正就是把一堆圆片片从一个柱子上面挪到另外一个柱子上面，唯一的要求就是小的要在大的上面。</p>
-<p>假设圆片片的数量为n,则当n=1时，可以直接将A移动到C柱上，</p>
-<p><img src="/2022/01/20/recursion/tower1.gif"></p>
-<p>当n=2时，具体挪动状态如下:</p>
-<p>A –&gt; B</p>
-<p>A –&gt; C</p>
-<p>B –&gt; C</p>
-<p><img src="/2022/01/20/recursion/tower2.gif"></p>
-<p>当n=3时</p>
-<p>A –&gt; C</p>
-<p>A –&gt; B</p>
-<p>C –&gt; B</p>
-<p>A –&gt; C</p>
-<p>B –&gt; A</p>
-<p>B –&gt; C</p>
-<p>A –&gt; C</p>
-<p><img src="/2022/01/20/recursion/tower3.gif"></p>
-<p>不难看出，当n=2时，主要就是分三步(对圆片进行标号，从下往上，N-&gt;1)</p>
-<p>1、1(N-1)号圆片从起始位置移动到缓冲区</p>
-<p>2、将2(N)号圆片从起始位置移动到终点</p>
-<p>3、最后将1(N-1)号圆片从缓冲区移动到终点</p>
-<p>当然，在圆片数量较多时的起始位置，终点与缓冲区是相对的，并不是指定的某一个柱子，因为需要不停的交换位置，所以起始位置、缓冲区与终点可以是任何一个柱子。</p>
-<p>先假设只有两个圆片，也就是n=2(要先将最小子问题求出)按照递归三步，首先确定参数以及返回值，n个圆片(n)，起始柱子(A)，缓冲柱子(B)，终止位置(C)</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tower</span>(<span class="params">n,A,B,C</span>):</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">print</span>(<span class="string">&quot;圆片的变动情况&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>确定终止条件，已知当只有一个圆片时，可以直接从起始位置直接到终止位置</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tower</span>(<span class="params">n,A,B,C</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">print</span>(A +<span class="string">&quot; --&gt; &quot;</span>+C)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">print</span>(<span class="string">&quot;圆片的变动情况&quot;</span>)</span><br></pre></td></tr></table></figure>
-
-<p>确定单层循环的逻辑，单层的逻辑在上面已经写清楚，所以可以直接写出</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># n = 2的情况下</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tower</span>(<span class="params">n,A,B,C</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="built_in">print</span>(A +<span class="string">&quot; --&gt; &quot;</span>+C)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="built_in">print</span>(A +<span class="string">&quot; --&gt; &quot;</span>+B)</span><br><span class="line">        <span class="built_in">print</span>(A +<span class="string">&quot; --&gt; &quot;</span>+C)</span><br><span class="line">        <span class="built_in">print</span>(B +<span class="string">&quot; --&gt; &quot;</span>+C)</span><br></pre></td></tr></table></figure>
-
-<p>而当n=3时，就要继续调用tower()进行排列，所以可以写成如下</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 再假设n = 3的情况下</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">tower</span>(<span class="params">n,A,B,C</span>):</span></span><br><span class="line">    <span class="keyword">if</span>(n==<span class="number">1</span>):</span><br><span class="line">        <span class="built_in">print</span>(A +<span class="string">&quot; --&gt; &quot;</span>+C)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        tower(n-<span class="number">1</span>,A,C,B) <span class="comment">#因为现在是将圆片从A移动到B，所以B和C调换位置</span></span><br><span class="line">        <span class="built_in">print</span>(A +<span class="string">&quot; --&gt; &quot;</span>+C)	<span class="comment"># 可以假设1号圆片上面的柱子都已经移动到了缓冲区，则可以直接A-&gt;C</span></span><br><span class="line">        tower(n-<span class="number">1</span>,B,A,C) <span class="comment"># 现在将缓冲区上的圆片移动至终点</span></span><br></pre></td></tr></table></figure>
-
-<p>n&gt;1的其他情况同理</p>
-<h4 id="举例4-字符串的全排列"><a href="#举例4-字符串的全排列" class="headerlink" title="举例4 字符串的全排列"></a>举例4 字符串的全排列</h4><p>就是将字符串中的所有字符进行排列组合，得到所有的排列组合结果，并去重</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 例题</span></span><br><span class="line"><span class="comment"># 题目来源：codewars.Permutations</span></span><br><span class="line">permutations(<span class="string">&#x27;a&#x27;</span>); <span class="comment"># [&#x27;a&#x27;]</span></span><br><span class="line">permutations(<span class="string">&#x27;ab&#x27;</span>); <span class="comment"># [&#x27;ab&#x27;, &#x27;ba&#x27;]</span></span><br><span class="line">permutations(<span class="string">&#x27;aabb&#x27;</span>); <span class="comment"># [&#x27;aabb&#x27;, &#x27;abab&#x27;, &#x27;abba&#x27;, &#x27;baab&#x27;, &#x27;baba&#x27;, &#x27;bbaa&#x27;]</span></span><br></pre></td></tr></table></figure>
-
-<p>题目的意思很好理解，所以可以直接上递归</p>
-<p>确定递归的参数及返回值，是对字符串的全排列，所以字符串一定是参数，返回值则是排列组合的结果，并且要去重，则可以用一个数组在加上set()去重即可</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">permutations</span>(<span class="params">string</span>):</span></span><br><span class="line">    result = [] 	<span class="comment"># 存放排列组合的结果</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">set</span>(result)</span><br></pre></td></tr></table></figure>
-
-<p>确定递归的结束点，由例子可知，当字符串中只有一个字母时，结果只有一个(它自己本身)，此时可以直接返回</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">permutations</span>(<span class="params">string</span>):</span></span><br><span class="line">    result = [] 	<span class="comment"># 存放排列组合的结果</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">len</span>(string)==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> string</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">set</span>(result)</span><br></pre></td></tr></table></figure>
-
-<p>确定单层递归逻辑，可以先假设字符串为”ab”,这个算是全排列中最小子问题了</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 字符串长度为2时</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">permutations</span>(<span class="params">string</span>):</span></span><br><span class="line">    result = [] 	<span class="comment"># 存放排列组合的结果</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">len</span>(string)==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> string</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(string)):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> string[:i]+string[i+<span class="number">1</span>:]: <span class="comment"># 全排列的情况下,不能与自身进行排列组合</span></span><br><span class="line">            <span class="comment"># 也就是说，在&quot;ab&quot;的情况下，选取&quot;a&quot;之后就不能再选取了，当然&quot;aab&quot;的情况下，a可以出现两次</span></span><br><span class="line">            	result.append(string[i]+j)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">set</span>(result)</span><br></pre></td></tr></table></figure>
-
-<p>而当字符串的长度大于2时，只需要在第二个for循环处再次调用<code>permutations()</code>,使得其对当前字符串长度小移位的字符串进行排列组合，然后返回给 j ，再与<code>string[i]</code>进行拼接，所以程序可以写成如下</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">permutations</span>(<span class="params">string</span>):</span></span><br><span class="line">    result = []	<span class="comment"># 存放排列组合的结果</span></span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">len</span>(string)==<span class="number">1</span>):</span><br><span class="line">        <span class="keyword">return</span> string</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(string)):</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> permutations(string[<span class="number">0</span>:i]+string[i+<span class="number">1</span>:]):</span><br><span class="line">                result.append(string[i]+j)</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">set</span>(result)</span><br></pre></td></tr></table></figure>
-
-<h3 id="End"><a href="#End" class="headerlink" title="End"></a>End</h3><p>本文可能会有写错的地方，请见谅，我只是个捡垃圾，要是有好心的大哥愿意指出错误的地方，我会尽快进行修改，先感谢大哥~</p>
-<h3 id="参考："><a href="#参考：" class="headerlink" title="参考："></a>参考：</h3><blockquote>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/94748605">https://zhuanlan.zhihu.com/p/94748605</a></p>
-<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/24385418">https://www.zhihu.com/question/24385418</a></p>
-<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u011562123/article/details/81984470">https://blog.csdn.net/u011562123/article/details/81984470</a></p>
-</blockquote>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/20/Hello/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Mechoy">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Mechoy's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2022/01/20/Hello/" class="post-title-link" itemprop="url">Hello</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2022-01-20 00:44:22 / Modified: 22:37:33" itemprop="dateCreated datePublished" datetime="2022-01-20T00:44:22+08:00">2022-01-20</time>
+              <time title="Created: 2022-01-20 23:26:37 / Modified: 23:27:32" itemprop="dateCreated datePublished" datetime="2022-01-20T23:26:37+08:00">2022-01-20</time>
             </span>
 
           
@@ -370,7 +205,7 @@
 <blockquote>
 <p>刈除杂草 才有新生</p>
 </blockquote>
-<p><img src="/2022/01/20/Hello/hello.jfif"></p>
+<p><img src="/2022/01/20/hello/hello.jfif"></p>
 
       
     </div>
@@ -452,12 +287,12 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">1</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">1</span>
         <span class="site-state-item-name">tags</span>
       </div>
   </nav>
