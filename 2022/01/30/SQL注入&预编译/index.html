@@ -1,32 +1,28 @@
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 6.0.0">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="SQL注入&amp;预编译这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q  拼接很久很久以前，用户的传参是能够直接拼接到sql的查询语句中去，例如： 123456789101112131415161718">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="mechoy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="SQL注入&amp;预编译这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q  拼接很久很久以前，用户的传参是能够直接拼接到sql的查询语句中去，例如： 123456789101112131415161718">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SQL注入&amp;预编译">
 <meta property="og:url" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/index.html">
 <meta property="og:site_name" content="Mechoy&#39;s Blog">
 <meta property="og:description" content="SQL注入&amp;预编译这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q  拼接很久很久以前，用户的传参是能够直接拼接到sql的查询语句中去，例如： 123456789101112131415161718">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png">
 <meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/2.png">
 <meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/3.png">
@@ -44,214 +40,276 @@
 <meta property="article:modified_time" content="2022-04-28T15:44:29.969Z">
 <meta property="article:author" content="Mechoy">
 <meta property="article:tag" content="为了多捡点垃圾">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png">
+  
+  
+  <title>SQL注入&amp;预编译 - Mechoy&#39;s Blog</title>
 
-<link rel="canonical" href="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/">
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
 
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'en'
-  };
-</script>
 
-  <title>SQL注入&预编译 | Mechoy's Blog</title>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
   
 
 
 
 
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
 
 
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
+<body>
+  
 
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
+  <header>
+    
 
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">Mechoy's Blog</h1>
-      <span class="logo-line-after"><i></i></span>
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
     </a>
-  </div>
 
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
     </div>
   </div>
-</div>
-
-
-
-
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/home/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-  </ul>
 </nav>
 
+  
 
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="SQL注入&amp;预编译"></span>
+          
+        </div>
 
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-01-30 23:38" pubdate>
+          2022年1月30日 晚上
+        </time>
+      </span>
+    
+  </div>
 
-</div>
-    </header>
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          13k 字
+        
+      </span>
+    
 
     
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          110 分钟
+        
+      </span>
+    
+
+    
+    
   </div>
 
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
-            
-
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Mechoy">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Mechoy's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          SQL注入&预编译
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-01-30 23:38:54" itemprop="dateCreated datePublished" datetime="2022-01-30T23:38:54+08:00">2022-01-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-04-28 23:44:29" itemprop="dateModified" datetime="2022-04-28T23:44:29+08:00">2022-04-28</time>
-              </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+        
+      </div>
 
       
-        <h2 id="SQL注入-amp-预编译"><a href="#SQL注入-amp-预编译" class="headerlink" title="SQL注入&amp;预编译"></a>SQL注入&amp;预编译</h2><p>这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png"></p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">SQL注入&amp;预编译</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="SQL注入-amp-预编译"><a href="#SQL注入-amp-预编译" class="headerlink" title="SQL注入&amp;预编译"></a>SQL注入&amp;预编译</h2><p>这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q</p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png" srcset="/img/loading.gif" lazyload></p>
 <h3 id="拼接"><a href="#拼接" class="headerlink" title="拼接"></a>拼接</h3><p>很久很久以前，用户的传参是能够直接拼接到sql的查询语句中去，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">// index.php</span><br><span class="line">&lt;?php</span><br><span class="line">$username = $_POST[&#x27;username&#x27;];</span><br><span class="line">mysqli_select_db($conn,sort) or die ( &quot;Unable to connect to the database: test&quot;);	</span><br><span class="line"># 选择数据库</span><br><span class="line"></span><br><span class="line">$sql = &quot;select fraction from fraction where name = &#x27;$username&#x27;;&quot;;		# 直接将用户输入拼接进字符串</span><br><span class="line">$result = mysqli_query($conn,$sql);</span><br><span class="line">echo &#x27;&lt;br/&gt;&#x27;.$sql.&#x27;&lt;br/&gt;&#x27;;	# 打印sql语句</span><br><span class="line"></span><br><span class="line">if($fraction = mysqli_fetch_assoc( $result ))&#123;</span><br><span class="line">    echo &#x27;查询成功&#x27;;</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    mysqli_error($conn);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">echo &#x27;&lt;br/&gt;&#x27;;</span><br><span class="line">echo &#x27;学生:&#x27;.$username;</span><br><span class="line">echo &#x27;&lt;br/&gt;&#x27;;</span><br><span class="line">echo &#x27;分数:&#x27;.$fraction[&#x27;fraction&#x27;];</span><br><span class="line"></span><br><span class="line">$conn-&gt;close();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs php+HTML">// index.php<br>&lt;?php<br>$username = $_POST[&#x27;username&#x27;];<br>mysqli_select_db($conn,sort) or die ( &quot;Unable to connect to the database: test&quot;);	<br># 选择数据库<br><br>$sql = &quot;select fraction from fraction where name = &#x27;$username&#x27;;&quot;;		# 直接将用户输入拼接进字符串<br>$result = mysqli_query($conn,$sql);<br>echo &#x27;&lt;br/&gt;&#x27;.$sql.&#x27;&lt;br/&gt;&#x27;;	# 打印sql语句<br><br>if($fraction = mysqli_fetch_assoc( $result ))&#123;<br>    echo &#x27;查询成功&#x27;;<br>&#125;<br>else&#123;<br>    mysqli_error($conn);<br>&#125;<br><br>echo &#x27;&lt;br/&gt;&#x27;;<br>echo &#x27;学生:&#x27;.$username;<br>echo &#x27;&lt;br/&gt;&#x27;;<br>echo &#x27;分数:&#x27;.$fraction[&#x27;fraction&#x27;];<br><br>$conn-&gt;close();<br>?&gt;<br></code></pre></td></tr></table></figure>
 
 <p>这里构建了一个简单的查询分数的功能，可以看到直接将用户的输入带入到了sql语句中，这sql注入很明显了</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/2.png" alt="分数表"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/2.png" srcset="/img/loading.gif" lazyload alt="分数表"></p>
 <p>这里可以直接构造payload来实现注入</p>
 <p>payload:<code>1&#39;union select database();#</code></p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/3.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/3.png" srcset="/img/loading.gif" lazyload></p>
 <p>这种情况下，如果做安全防护的话，也只能是从效验用户的输入入手了，但是效验规则大概率都能进行绕过，只不过是绕的难易不一样罢了。但是现在已经进入到了预编译的时代，拼接的情况虽然有，但较少了，再加上防护设备的广泛应用，</p>
 <h3 id="预编译"><a href="#预编译" class="headerlink" title="预编译"></a>预编译</h3><p>据听说，预编译一开始是为了提高MySQL的运行效率而诞生，但是由于其先构建语法树，后带入查询参数的特性导致其具有了防止SQL注入的特性。这里简单说一下MySQL的预处理语句的使用，以及防止SQL的注入的原因(因为其他数据库一点不会)</p>
 <h4 id="MySQL预编译"><a href="#MySQL预编译" class="headerlink" title="MySQL预编译"></a>MySQL预编译</h4><p>MySQL预编译执行分为三步：</p>
 <p>1.执行预编译语句，构建语法树，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">prepare sel from &quot;select fraction from fraction where name = ?&quot;;</span><br><span class="line"># 使用PREPARE stmt_name FROM preparable_stm语法</span><br><span class="line"># stmt_name是语句名，preparable_stm是具体要执行的语句，变量先由 ？ 进行占位</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mysql">prepare sel from &quot;select fraction from fraction where name = ?&quot;;<br># 使用PREPARE stmt_name FROM preparable_stm语法<br># stmt_name是语句名，preparable_stm是具体要执行的语句，变量先由 ？ 进行占位<br></code></pre></td></tr></table></figure>
 
 <p>2.设置变量，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set @a=&#x27;mechoy&#x27;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">set @a=&#x27;mechoy&#x27;;<br></code></pre></td></tr></table></figure>
 
 <p>3.执行，将设置的变量代入到已经构建好的语句中进行执行</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">execute sel using @a;</span><br><span class="line"># 使用EXECUTE stmt_name [USING @var_name [, @var_name] ...]语法</span><br><span class="line"># 变量位置与占位符一一对应</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mysql">execute sel using @a;<br># 使用EXECUTE stmt_name [USING @var_name [, @var_name] ...]语法<br># 变量位置与占位符一一对应<br></code></pre></td></tr></table></figure>
 
 <p>执行结束后查看数据库日志：</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/4.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/4.png" srcset="/img/loading.gif" lazyload></p>
 <p>可以看到在使用预处理语句时，数据库共进行了四步操作：1.构建预处理语句；2.设置变量；3.绑定变量；4.执行查询</p>
 <p>预编译的优势在于其不用每一次都构建语法树，以上面为例，当有<code>@b=&#39;admin&#39;</code>时，执行<code>execute sel using @b;</code>时，数据库会直接去fraction表中查询<code>name=admin</code>的fraction值，而不用再一次构建语法树，这可能也就是预编译语句为何能提高MySQL效率的原因</p>
 <p>而预编译语句在防止SQL注入上，看下面这张图：</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/5.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/5.png" srcset="/img/loading.gif" lazyload></p>
 <p>在@b和@c的情况下返回都为空，也就是将@b和@c的值只是当做一个变量，去寻找name字段中与其相同的</p>
 <p>如果在数据库中插入一条<code>name=xx union select database()</code>数据，再次执行就会获得相应的值</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/6.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/6.png" srcset="/img/loading.gif" lazyload></p>
 <p>再执行就会得到如下结果</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; execute sel using @c;</span><br><span class="line">+----------+</span><br><span class="line">| fraction |</span><br><span class="line">+----------+</span><br><span class="line">|      100 |</span><br><span class="line">+----------+</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs mysql">mysql&gt; execute sel using @c;<br>+----------+<br>| fraction |<br>+----------+<br>|      100 |<br>+----------+<br></code></pre></td></tr></table></figure>
 
 <p>所以这里变量只是一个变量，只是用来比较name字段中是否存在相同的值，存在则返回fraction的值，不存在则返回空，这就是预编译为什么能防止SQL注入的原因。</p>
 <h4 id="PHP-MySQL-预处理语句"><a href="#PHP-MySQL-预处理语句" class="headerlink" title="PHP+MySQL 预处理语句"></a>PHP+MySQL 预处理语句</h4><p>在使用PHP编写预处理语句时，会遇到预编译和模拟预编译(这里先提一下)</p>
@@ -263,306 +321,497 @@
 <p>这里先说一下使用Mysqli的预编译语句进行数据的查询</p>
 <h5 id="Mysqli"><a href="#Mysqli" class="headerlink" title="Mysqli"></a>Mysqli</h5><p><code>Mysqli</code>扩展允许我们访问MySQL 4.1及以上版本提供的功能。</p>
 <p>使用PHP的Mysqli实现预编译如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># index1.php</span><br><span class="line"># $conn为与mysql数据库建立的链接，同时选择</span><br><span class="line">&lt;?php</span><br><span class="line">$username = $_POST[&#x27;username&#x27;];</span><br><span class="line"></span><br><span class="line"># $stmt = $conn-&gt;prepare(&quot;select fraction from fraction where name = ?&quot;);   预处理以及绑定</span><br><span class="line">$stmt = mysqli_stmt_init($conn);    # 分配并初始化一个语句对象用于mysqli_stmt_prepare()。</span><br><span class="line">mysqli_stmt_prepare($stmt,&quot;select fraction from fraction where name = ?&quot;);  # 预处理</span><br><span class="line">mysqli_stmt_bind_param($stmt,&quot;s&quot;, $username);   # 绑定</span><br><span class="line"></span><br><span class="line"># $stmt-&gt;execute();	# 执行</span><br><span class="line">mysqli_stmt_execute($stmt);</span><br><span class="line">mysqli_stmt_bind_result($stmt,$fraction);   # 将查询结果绑定至$fraction</span><br><span class="line"></span><br><span class="line">if(mysqli_stmt_fetch($stmt))&#123;</span><br><span class="line">    echo &#x27;查询成功&#x27;;</span><br><span class="line">	echo &#x27;&lt;br/&gt;&#x27;;</span><br><span class="line">	echo &#x27;学生:&#x27;.$username;</span><br><span class="line">	echo &#x27;&lt;br/&gt;&#x27;;</span><br><span class="line">	# echo &#x27;分数:&#x27;.$fraction;</span><br><span class="line">	print(&quot;分数: &quot;.$fraction.&quot;\n&quot;);</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line">    mysqli_stmt_errno($stmt);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$conn-&gt;close();</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs php+HTML"># index1.php<br># $conn为与mysql数据库建立的链接，同时选择<br>&lt;?php<br>$username = $_POST[&#x27;username&#x27;];<br><br># $stmt = $conn-&gt;prepare(&quot;select fraction from fraction where name = ?&quot;);   预处理以及绑定<br>$stmt = mysqli_stmt_init($conn);    # 分配并初始化一个语句对象用于mysqli_stmt_prepare()。<br>mysqli_stmt_prepare($stmt,&quot;select fraction from fraction where name = ?&quot;);  # 预处理<br>mysqli_stmt_bind_param($stmt,&quot;s&quot;, $username);   # 绑定<br><br># $stmt-&gt;execute();	# 执行<br>mysqli_stmt_execute($stmt);<br>mysqli_stmt_bind_result($stmt,$fraction);   # 将查询结果绑定至$fraction<br><br>if(mysqli_stmt_fetch($stmt))&#123;<br>    echo &#x27;查询成功&#x27;;<br>	echo &#x27;&lt;br/&gt;&#x27;;<br>	echo &#x27;学生:&#x27;.$username;<br>	echo &#x27;&lt;br/&gt;&#x27;;<br>	# echo &#x27;分数:&#x27;.$fraction;<br>	print(&quot;分数: &quot;.$fraction.&quot;\n&quot;);<br>&#125;<br>else&#123;<br>    mysqli_stmt_errno($stmt);<br>&#125;<br><br>$conn-&gt;close();<br>?&gt;<br></code></pre></td></tr></table></figure>
 
 <p>执行查询<code>name=&quot;mechoy&quot;</code>，查看数据库日志：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Connect	root@localhost on sort using TCP/IP</span><br><span class="line">Prepare	select fraction from fraction where name = ?</span><br><span class="line">Execute	select fraction from fraction where name = &#x27;mechoy&#x27;</span><br><span class="line"># 可以看到这里共分成了三步：1.建立连接；2.构建语法树；3.执行</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">Connect	root@localhost on sort using TCP/IP<br>Prepare	select fraction from fraction where name = ?<br>Execute	select fraction from fraction where name = &#x27;mechoy&#x27;<br># 可以看到这里共分成了三步：1.建立连接；2.构建语法树；3.执行<br></code></pre></td></tr></table></figure>
 
 <p>这里看起来跟MySQL的预处理语句基本相同，只不过因为这里少了设置变量和将变量绑定进预编译的两步。</p>
 <p>执行查询<code>name=&quot;mechoy&#39; union select database();#&quot;</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">4 Connect	root@localhost on sort using TCP/IP</span><br><span class="line">4 Prepare	select fraction from fraction where name = ?</span><br><span class="line">4 Execute	select fraction from fraction where name = &#x27;mechoy\&#x27; union select database();#&#x27;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mysql">4 Connect	root@localhost on sort using TCP/IP<br>4 Prepare	select fraction from fraction where name = ?<br>4 Execute	select fraction from fraction where name = &#x27;mechoy\&#x27; union select database();#&#x27;<br></code></pre></td></tr></table></figure>
 
 <p>发现这里输入的单引号被转义了，预编译+转义，好像跟SQL注入说再见了，对于我这个只会Sqlmap一把梭的人，好像跟全世界再见了</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/8.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/8.png" srcset="/img/loading.gif" lazyload></p>
 <h5 id="PDO"><a href="#PDO" class="headerlink" title="PDO"></a>PDO</h5><ul>
 <li>PHP 数据对象 （PDO） 扩展为PHP访问数据库定义了一个轻量级的一致接口。</li>
 <li>PDO 提供了一个数据访问抽象层，这意味着，不管使用哪种数据库，都可以用相同的函数（方法）来查询和获取数据。</li>
 <li>PDO随PHP5.1发行，在PHP5.0的PECL扩展中也可以使用，无法运行于之前的PHP版本。</li>
 </ul>
 <p>使用PDO实现预编译如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"># index2.php</span><br><span class="line">&lt;?php</span><br><span class="line">$username = $_POST[&#x27;username&#x27;]; // 接收username</span><br><span class="line"></span><br><span class="line"># 建立数据库连接</span><br><span class="line">header(&quot;Content-Type:text/html;charset=utf-8&quot;);</span><br><span class="line">$dbs = &quot;mysql:host=127.0.0.1;dbname=sort&quot;;</span><br><span class="line">$dbname = &quot;root&quot;;</span><br><span class="line">$passwd = &quot;root&quot;;</span><br><span class="line"></span><br><span class="line">// 创建连接,选择数据库,检测连接</span><br><span class="line">try&#123;</span><br><span class="line">    $conn = new PDO($dbs, $dbname, $passwd);</span><br><span class="line">    echo &quot;连接成功&lt;br/&gt;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">catch (PDOException $e)&#123;</span><br><span class="line">    die (&quot;Error!: &quot; . $e-&gt;getMessage() . &quot;&lt;br/&gt;&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 设置预编译语句，绑定参数，这里使用命名占位符</span><br><span class="line">$stmt = $conn-&gt;prepare(&quot;select fraction from fraction where name = :username&quot;);</span><br><span class="line">$stmt-&gt;bindParam(&quot;:username&quot;,$username);</span><br><span class="line">$stmt-&gt;execute();</span><br><span class="line"></span><br><span class="line">if($fraction = $stmt-&gt;fetch(PDO::FETCH_ASSOC))&#123;</span><br><span class="line">    echo &#x27;查询成功&#x27;;</span><br><span class="line">	echo &#x27;&lt;br/&gt;&#x27;;</span><br><span class="line">	echo &#x27;学生:&#x27;.$username;</span><br><span class="line">	echo &#x27;&lt;br/&gt;&#x27;;</span><br><span class="line">	# echo &#x27;分数:&#x27;.$fraction;</span><br><span class="line">	print_r(&quot;分数&quot;.$fraction[fraction]);</span><br><span class="line">&#125;</span><br><span class="line">else&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">$conn=null; # 关闭链接</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs php+HTML"># index2.php<br>&lt;?php<br>$username = $_POST[&#x27;username&#x27;]; // 接收username<br><br># 建立数据库连接<br>header(&quot;Content-Type:text/html;charset=utf-8&quot;);<br>$dbs = &quot;mysql:host=127.0.0.1;dbname=sort&quot;;<br>$dbname = &quot;root&quot;;<br>$passwd = &quot;root&quot;;<br><br>// 创建连接,选择数据库,检测连接<br>try&#123;<br>    $conn = new PDO($dbs, $dbname, $passwd);<br>    echo &quot;连接成功&lt;br/&gt;&quot;;<br>&#125;<br>catch (PDOException $e)&#123;<br>    die (&quot;Error!: &quot; . $e-&gt;getMessage() . &quot;&lt;br/&gt;&quot;);<br>&#125;<br><br># 设置预编译语句，绑定参数，这里使用命名占位符<br>$stmt = $conn-&gt;prepare(&quot;select fraction from fraction where name = :username&quot;);<br>$stmt-&gt;bindParam(&quot;:username&quot;,$username);<br>$stmt-&gt;execute();<br><br>if($fraction = $stmt-&gt;fetch(PDO::FETCH_ASSOC))&#123;<br>    echo &#x27;查询成功&#x27;;<br>	echo &#x27;&lt;br/&gt;&#x27;;<br>	echo &#x27;学生:&#x27;.$username;<br>	echo &#x27;&lt;br/&gt;&#x27;;<br>	# echo &#x27;分数:&#x27;.$fraction;<br>	print_r(&quot;分数&quot;.$fraction[fraction]);<br>&#125;<br>else&#123;<br><br>&#125;<br>$conn=null; # 关闭链接<br>?&gt;<br></code></pre></td></tr></table></figure>
 
 <p>执行查询<code>name=&quot;mechoy&quot;</code>，查看数据库日志：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">27 Connect	root@localhost on sort using TCP/IP						# 简历连接</span><br><span class="line">27 Query	select fraction from fraction where name = &#x27;mechoy&#x27;		# 执行查询</span><br><span class="line">27 Quit																# 结束</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mysql">27 Connect	root@localhost on sort using TCP/IP						# 简历连接<br>27 Query	select fraction from fraction where name = &#x27;mechoy&#x27;		# 执行查询<br>27 Quit																# 结束<br></code></pre></td></tr></table></figure>
 
 <p>从日志来看，没有prepare和execute，只是执行了一个查询的SQL语句，并没有进行预编译。显然，PDO默认情况下使用的是模拟预编译。</p>
 <blockquote>
 <p>模拟预编译是防止某些数据库不支持预编译而设置的(如sqllite与低版本MySQL)。如果模拟预处理开启，那么客户端程序内部会模拟MySQL数据库中的参数绑定这一过程。也就是说，程序会在内部模拟prepare的过程，当执行execute时，再将拼接后的完整SQL语句发送给MySQL数据库执行。</p>
 </blockquote>
 <p>而想要真正使用预编译，首先需要数据库支持预编译，再在代码中加入</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$conn</span> -&gt; setAttribute(PDO::ATTR_EMULATE_PREPARES, <span class="literal">false</span>);</span><br><span class="line"><span class="comment"># bool PDO::setAttribute ( int $attribute , mixed  $value )	设置数据库句柄属性。</span></span><br><span class="line"><span class="comment"># PDO::ATTR_EMULATE_PREPARES 启用或禁用预处理语句的模拟。 有些驱动不支持或有限度地支持本地预处理。使用此设置强制PDO总是模拟预处理语句（如果为 TRUE  ），或试着使用本地预处理语句（如果为 FALSE ）。如果驱动不能成功预处理当前查询，它将总是回到模拟预处理语句上。需要 bool  类型。 </span></span><br><span class="line"><span class="comment">#这里在PHP5.2.17时无效，暂未找到原因</span></span><br><span class="line"><span class="comment">#更改版本为PHP5.6.9时生效</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$conn</span> -&gt; setAttribute(PDO::ATTR_EMULATE_PREPARES, <span class="hljs-literal">false</span>);<br><span class="hljs-comment"># bool PDO::setAttribute ( int $attribute , mixed  $value )	设置数据库句柄属性。</span><br><span class="hljs-comment"># PDO::ATTR_EMULATE_PREPARES 启用或禁用预处理语句的模拟。 有些驱动不支持或有限度地支持本地预处理。使用此设置强制PDO总是模拟预处理语句（如果为 TRUE  ），或试着使用本地预处理语句（如果为 FALSE ）。如果驱动不能成功预处理当前查询，它将总是回到模拟预处理语句上。需要 bool  类型。 </span><br><span class="hljs-comment">#这里在PHP5.2.17时无效，暂未找到原因</span><br><span class="hljs-comment">#更改版本为PHP5.6.9时生效</span><br></code></pre></td></tr></table></figure>
 
 <p>再执行查询<code>name=&quot;mechoy&quot;</code>，查看数据库日志：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">4 Connect	root@localhost on sort using TCP/IP</span><br><span class="line">4 Prepare	select fraction from fraction where name = ?</span><br><span class="line">4 Execute	select fraction from fraction where name = &#x27;mechoy&#x27;</span><br><span class="line">4 Close 	stmt	</span><br><span class="line">4 Quit</span><br><span class="line"># 可以看到当PDO::ATTR_EMULATE_PREPARES设置为false时，取消了模拟预处理，采用本地预处理</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs mysql">4 Connect	root@localhost on sort using TCP/IP<br>4 Prepare	select fraction from fraction where name = ?<br>4 Execute	select fraction from fraction where name = &#x27;mechoy&#x27;<br>4 Close 	stmt	<br>4 Quit<br># 可以看到当PDO::ATTR_EMULATE_PREPARES设置为false时，取消了模拟预处理，采用本地预处理<br></code></pre></td></tr></table></figure>
 
 <h3 id="预编译所不能防范的注入"><a href="#预编译所不能防范的注入" class="headerlink" title="预编译所不能防范的注入"></a>预编译所不能防范的注入</h3><h4 id="PDO模拟预处理-宽字节"><a href="#PDO模拟预处理-宽字节" class="headerlink" title="PDO模拟预处理+宽字节"></a>PDO模拟预处理+宽字节</h4><p>模拟代码如下</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># index3.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// PHP5.2.17+MySQL5.7.26+Apache2.4.39环境下</span></span><br><span class="line"><span class="comment">// PHP5.6.9时无法实现</span></span><br><span class="line"><span class="variable">$username</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;username&#x27;</span>]; <span class="comment">// 接收username</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 建立数据库连接</span></span><br><span class="line"><span class="variable">$dbs</span> = <span class="string">&quot;mysql:host=127.0.0.1;dbname=sort1;charset=gbk&quot;</span>;	<span class="comment">// 设置数据库字符编码</span></span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$passwd</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建连接,选择数据库,检测连接</span></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="variable">$conn</span> = <span class="keyword">new</span> PDO(<span class="variable">$dbs</span>, <span class="variable">$dbname</span>, <span class="variable">$passwd</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;Sucussful&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (PDOException <span class="variable">$e</span>)&#123;</span><br><span class="line"><span class="keyword">die</span> (<span class="string">&quot;Error!: &quot;</span> . <span class="variable">$e</span>-&gt;getMessage() . <span class="string">&quot;&lt;br/&gt;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置模拟预编译语句，绑定参数，这里使用命名占位符</span></span><br><span class="line"><span class="variable">$conn</span>-&gt;query(<span class="string">&#x27;SET NAMES GBK&#x27;</span>);</span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$conn</span>-&gt;prepare(<span class="string">&quot;select fraction from fraction where name = :username&quot;</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;bindParam(<span class="string">&quot;:username&quot;</span>,<span class="variable">$username</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;execute();</span><br><span class="line"><span class="variable">$fraction</span> = <span class="variable">$stmt</span>-&gt;fetch();</span><br><span class="line">var_dump(<span class="variable">$fraction</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$conn</span>=<span class="literal">null</span>; <span class="comment"># 关闭链接</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-comment"># index3.php</span><br><span class="hljs-meta">&lt;?php</span><br><span class="hljs-comment">// PHP5.2.17+MySQL5.7.26+Apache2.4.39环境下</span><br><span class="hljs-comment">// PHP5.6.9时无法实现</span><br><span class="hljs-variable">$username</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;username&#x27;</span>]; <span class="hljs-comment">// 接收username</span><br><br><span class="hljs-comment"># 建立数据库连接</span><br><span class="hljs-variable">$dbs</span> = <span class="hljs-string">&quot;mysql:host=127.0.0.1;dbname=sort1;charset=gbk&quot;</span>;	<span class="hljs-comment">// 设置数据库字符编码</span><br><span class="hljs-variable">$dbname</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><span class="hljs-variable">$passwd</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><br><span class="hljs-comment">// 创建连接,选择数据库,检测连接</span><br><span class="hljs-keyword">try</span>&#123;<br><span class="hljs-variable">$conn</span> = <span class="hljs-keyword">new</span> PDO(<span class="hljs-variable">$dbs</span>, <span class="hljs-variable">$dbname</span>, <span class="hljs-variable">$passwd</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Sucussful&lt;br/&gt;&quot;</span>;<br>&#125;<br><span class="hljs-keyword">catch</span> (PDOException <span class="hljs-variable">$e</span>)&#123;<br><span class="hljs-keyword">die</span> (<span class="hljs-string">&quot;Error!: &quot;</span> . <span class="hljs-variable">$e</span>-&gt;getMessage() . <span class="hljs-string">&quot;&lt;br/&gt;&quot;</span>);<br>&#125;<br><br><span class="hljs-comment"># 设置模拟预编译语句，绑定参数，这里使用命名占位符</span><br><span class="hljs-variable">$conn</span>-&gt;query(<span class="hljs-string">&#x27;SET NAMES GBK&#x27;</span>);<br><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select fraction from fraction where name = :username&quot;</span>);<br><span class="hljs-variable">$stmt</span>-&gt;bindParam(<span class="hljs-string">&quot;:username&quot;</span>,<span class="hljs-variable">$username</span>);<br><span class="hljs-variable">$stmt</span>-&gt;execute();<br><span class="hljs-variable">$fraction</span> = <span class="hljs-variable">$stmt</span>-&gt;fetch();<br>var_dump(<span class="hljs-variable">$fraction</span>);<br><br><span class="hljs-variable">$conn</span>=<span class="hljs-literal">null</span>; <span class="hljs-comment"># 关闭链接</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>当传入<code>username=&quot;1&#39; union select database();#&quot;</code>时，看数据库日志：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">28 Connect	root@localhost on sort using TCP/IP</span><br><span class="line">28 Query	select fraction from fraction where name = &#x27;mechoy\&#x27; union select database()#&#x27;		</span><br><span class="line">28 Quit	</span><br><span class="line"># 将单引号进行转义</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">28 Connect	root@localhost on sort using TCP/IP<br>28 Query	select fraction from fraction where name = &#x27;mechoy\&#x27; union select database()#&#x27;		<br>28 Quit	<br># 将单引号进行转义<br></code></pre></td></tr></table></figure>
 
 <blockquote>
 <p>模拟预处理防止sql注入的本质是在参数绑定过程中对参数值进行转义与过滤,这一点与真正的sql数据库预处理是不一样的。理论上，sql数据库预编译更加安全一些。</p>
 </blockquote>
 <p>当传入<code>1%df%27%20union%20select%20database();#</code>时，再查看数据库日志</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">15 Connect	root@localhost on sort1 using TCP/IP</span><br><span class="line">15 Query	SET NAMES GBK</span><br><span class="line">15 Query	select fraction from fraction where name = &#x27;1運&#x27; union select database();</span><br><span class="line">//可以看到成功利用%df吃掉斜杠，造成宽字节注入</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">15 Connect	root@localhost on sort1 using TCP/IP<br>15 Query	SET NAMES GBK<br>15 Query	select fraction from fraction where name = &#x27;1運&#x27; union select database();<br>//可以看到成功利用%df吃掉斜杠，造成宽字节注入<br></code></pre></td></tr></table></figure>
 
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/9.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/9.png" srcset="/img/loading.gif" lazyload></p>
 <h4 id="PDO的错误使用"><a href="#PDO的错误使用" class="headerlink" title="PDO的错误使用"></a>PDO的错误使用</h4><p>一些稍微欠缺经验的开发人员，可能会错误的使用PDO，如下：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// index4.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$username</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;username&#x27;</span>]; <span class="comment">// 接收username</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 建立数据库连接</span></span><br><span class="line"><span class="variable">$dbs</span> = <span class="string">&quot;mysql:host=127.0.0.1;dbname=sort1&quot;</span>;</span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$passwd</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建连接,选择数据库,检测连接</span></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="variable">$conn</span> = <span class="keyword">new</span> PDO(<span class="variable">$dbs</span>, <span class="variable">$dbname</span>, <span class="variable">$passwd</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;Sucussful&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (PDOException <span class="variable">$e</span>)&#123;</span><br><span class="line"><span class="keyword">die</span> (<span class="string">&quot;Error!: &quot;</span> . <span class="variable">$e</span>-&gt;getMessage() . <span class="string">&quot;&lt;br/&gt;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 感觉用了预编译语句，但又好像没完全用</span></span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$conn</span>-&gt;prepare(<span class="string">&quot;select fraction from fraction where name = &#x27;<span class="subst">$username</span>&#x27;&quot;</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;execute();</span><br><span class="line"><span class="variable">$fraction</span> = <span class="variable">$stmt</span>-&gt;fetch();</span><br><span class="line">var_dump(<span class="variable">$fraction</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$conn</span>=<span class="literal">null</span>; <span class="comment"># 关闭链接</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-comment">// index4.php</span><br><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$username</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;username&#x27;</span>]; <span class="hljs-comment">// 接收username</span><br><br><span class="hljs-comment"># 建立数据库连接</span><br><span class="hljs-variable">$dbs</span> = <span class="hljs-string">&quot;mysql:host=127.0.0.1;dbname=sort1&quot;</span>;<br><span class="hljs-variable">$dbname</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><span class="hljs-variable">$passwd</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><br><span class="hljs-comment">// 创建连接,选择数据库,检测连接</span><br><span class="hljs-keyword">try</span>&#123;<br><span class="hljs-variable">$conn</span> = <span class="hljs-keyword">new</span> PDO(<span class="hljs-variable">$dbs</span>, <span class="hljs-variable">$dbname</span>, <span class="hljs-variable">$passwd</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Sucussful&lt;br/&gt;&quot;</span>;<br>&#125;<br><span class="hljs-keyword">catch</span> (PDOException <span class="hljs-variable">$e</span>)&#123;<br><span class="hljs-keyword">die</span> (<span class="hljs-string">&quot;Error!: &quot;</span> . <span class="hljs-variable">$e</span>-&gt;getMessage() . <span class="hljs-string">&quot;&lt;br/&gt;&quot;</span>);<br>&#125;<br><br><span class="hljs-comment"># 感觉用了预编译语句，但又好像没完全用</span><br><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select fraction from fraction where name = &#x27;<span class="hljs-subst">$username</span>&#x27;&quot;</span>);<br><span class="hljs-variable">$stmt</span>-&gt;execute();<br><span class="hljs-variable">$fraction</span> = <span class="hljs-variable">$stmt</span>-&gt;fetch();<br>var_dump(<span class="hljs-variable">$fraction</span>);<br><br><span class="hljs-variable">$conn</span>=<span class="hljs-literal">null</span>; <span class="hljs-comment"># 关闭链接</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>这种看似用了prepare进行预处理，但没有关键性的占位符、参数绑定，所以等同于直接拼接</p>
 <h4 id="PDO中的多条执行"><a href="#PDO中的多条执行" class="headerlink" title="PDO中的多条执行"></a>PDO中的多条执行</h4><p>PDO有一个有趣的特性：默认可以支持多条SQL执行。这就造成了堆叠注入的可能，如下例子：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$id= $_GET[&#x27;id&#x27;]; // 接收username</span><br><span class="line"></span><br><span class="line"># 建立数据库连接</span><br><span class="line">$dbs = &quot;mysql:host=127.0.0.1;dbname=sort&quot;;</span><br><span class="line">$dbname = &quot;root&quot;;</span><br><span class="line">$passwd = &quot;root&quot;;</span><br><span class="line"></span><br><span class="line">// 创建连接,选择数据库,检测连接</span><br><span class="line">try&#123;</span><br><span class="line">$conn = new PDO($dbs, $dbname, $passwd);</span><br><span class="line">echo &quot;Sucussful&lt;br/&gt;&quot;;</span><br><span class="line">&#125;</span><br><span class="line">catch (PDOException $e)&#123;</span><br><span class="line">die (&quot;Error!: &quot; . $e-&gt;getMessage() . &quot;&lt;br/&gt;&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># 感觉用了预编译语句，但又好像没完全用</span><br><span class="line">$stmt = $conn-&gt;prepare(&quot;select fraction from fraction where id=$id&quot;);</span><br><span class="line">$stmt-&gt;execute();</span><br><span class="line">$fraction = $stmt-&gt;fetch();</span><br><span class="line">print_r($fraction[fraction]);</span><br><span class="line"></span><br><span class="line">$conn=null; # 关闭链接</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs mysql">&lt;?php<br>$id= $_GET[&#x27;id&#x27;]; // 接收username<br><br># 建立数据库连接<br>$dbs = &quot;mysql:host=127.0.0.1;dbname=sort&quot;;<br>$dbname = &quot;root&quot;;<br>$passwd = &quot;root&quot;;<br><br>// 创建连接,选择数据库,检测连接<br>try&#123;<br>$conn = new PDO($dbs, $dbname, $passwd);<br>echo &quot;Sucussful&lt;br/&gt;&quot;;<br>&#125;<br>catch (PDOException $e)&#123;<br>die (&quot;Error!: &quot; . $e-&gt;getMessage() . &quot;&lt;br/&gt;&quot;);<br>&#125;<br><br># 感觉用了预编译语句，但又好像没完全用<br>$stmt = $conn-&gt;prepare(&quot;select fraction from fraction where id=$id&quot;);<br>$stmt-&gt;execute();<br>$fraction = $stmt-&gt;fetch();<br>print_r($fraction[fraction]);<br><br>$conn=null; # 关闭链接<br>?&gt;<br></code></pre></td></tr></table></figure>
 
 <p>当输入<code>id=1;select%20database()</code>时，查看数据库日志</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">5 Connect	root@localhost on sort using TCP/IP</span><br><span class="line">5 Query	select fraction from fraction where id=1;</span><br><span class="line">5 Query	select database()</span><br><span class="line"># 数据库执行了两条查询语句</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">5 Connect	root@localhost on sort using TCP/IP<br>5 Query	select fraction from fraction where id=1;<br>5 Query	select database()<br># 数据库执行了两条查询语句<br></code></pre></td></tr></table></figure>
 
 <p>但这样有个问题是，回显位置只有1个，无法回显出第二条查询语句的结果，但可以通过先将内容插入到数据库中，然后再通过查询做出来</p>
 <p>先执行：<code>?id=1;insert into fraction(id,name,fraction) values(111,database(),user()) </code></p>
 <p>查看数据库日志以及数据库是否插入内容</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">10 Connect	root@localhost on sort using TCP/IP</span><br><span class="line">10 Query	select fraction from fraction where id=1;</span><br><span class="line">10 Query	insert into fraction(id,name,fraction) values(111,database(),user())</span><br><span class="line"># 可以看到执行了两条语句</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">10 Connect	root@localhost on sort using TCP/IP<br>10 Query	select fraction from fraction where id=1;<br>10 Query	insert into fraction(id,name,fraction) values(111,database(),user())<br># 可以看到执行了两条语句<br></code></pre></td></tr></table></figure>
 
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/10.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/10.png" srcset="/img/loading.gif" lazyload></p>
 <p>再执行：<code>id=111</code>，能够看到成功查询，但有个问题是当回显位置的值是有个数字型时，就无法直接将我们想要获取的内容存入到数据库的相应字段中了，但好像也有办法，可以尝试一下</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/11.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/11.png" srcset="/img/loading.gif" lazyload></p>
 <h4 id="预编译不生效"><a href="#预编译不生效" class="headerlink" title="预编译不生效"></a>预编译不生效</h4><p>不是所有的地方都能使用预编译语句，有些位置可能会存在使用预编译之后，sql语句不生效，而这些位置又不得不使用拼接。</p>
-<h5 id="like位置"><a href="#like位置" class="headerlink" title="like位置"></a>like位置</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">index6.php</span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$username</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;username&#x27;</span>]; <span class="comment">// 接收username</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 建立数据库连接</span></span><br><span class="line"><span class="variable">$dbs</span> = <span class="string">&quot;mysql:host=127.0.0.1;dbname=sort&quot;</span>;</span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$passwd</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建连接,选择数据库,检测连接</span></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="variable">$conn</span> = <span class="keyword">new</span> PDO(<span class="variable">$dbs</span>, <span class="variable">$dbname</span>, <span class="variable">$passwd</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;Sucussful&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (PDOException <span class="variable">$e</span>)&#123;</span><br><span class="line"><span class="keyword">die</span> (<span class="string">&quot;Error!: &quot;</span> . <span class="variable">$e</span>-&gt;getMessage() . <span class="string">&quot;&lt;br/&gt;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 感觉用了预编译语句，但又好像没完全用</span></span><br><span class="line"><span class="variable">$conn</span> -&gt; setAttribute(PDO::ATTR_EMULATE_PREPARES, <span class="literal">false</span>);</span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$conn</span>-&gt;prepare(<span class="string">&quot;select * from fraction where name like &#x27;%:username%&#x27;&quot;</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;bindParam(<span class="string">&quot;:username&quot;</span>,<span class="variable">$username</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;execute();</span><br><span class="line"><span class="variable">$fraction</span> = <span class="variable">$stmt</span>-&gt;fetchAll(PDO::FETCH_ASSOC);</span><br><span class="line">print_r(<span class="variable">$fraction</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$conn</span>=<span class="literal">null</span>; <span class="comment"># 关闭链接</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<h5 id="like位置"><a href="#like位置" class="headerlink" title="like位置"></a>like位置</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs php">index6.php<br><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$username</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;username&#x27;</span>]; <span class="hljs-comment">// 接收username</span><br><br><span class="hljs-comment"># 建立数据库连接</span><br><span class="hljs-variable">$dbs</span> = <span class="hljs-string">&quot;mysql:host=127.0.0.1;dbname=sort&quot;</span>;<br><span class="hljs-variable">$dbname</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><span class="hljs-variable">$passwd</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><br><span class="hljs-comment">// 创建连接,选择数据库,检测连接</span><br><span class="hljs-keyword">try</span>&#123;<br><span class="hljs-variable">$conn</span> = <span class="hljs-keyword">new</span> PDO(<span class="hljs-variable">$dbs</span>, <span class="hljs-variable">$dbname</span>, <span class="hljs-variable">$passwd</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Sucussful&lt;br/&gt;&quot;</span>;<br>&#125;<br><span class="hljs-keyword">catch</span> (PDOException <span class="hljs-variable">$e</span>)&#123;<br><span class="hljs-keyword">die</span> (<span class="hljs-string">&quot;Error!: &quot;</span> . <span class="hljs-variable">$e</span>-&gt;getMessage() . <span class="hljs-string">&quot;&lt;br/&gt;&quot;</span>);<br>&#125;<br><br><span class="hljs-comment"># 感觉用了预编译语句，但又好像没完全用</span><br><span class="hljs-variable">$conn</span> -&gt; setAttribute(PDO::ATTR_EMULATE_PREPARES, <span class="hljs-literal">false</span>);<br><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select * from fraction where name like &#x27;%:username%&#x27;&quot;</span>);<br><span class="hljs-variable">$stmt</span>-&gt;bindParam(<span class="hljs-string">&quot;:username&quot;</span>,<span class="hljs-variable">$username</span>);<br><span class="hljs-variable">$stmt</span>-&gt;execute();<br><span class="hljs-variable">$fraction</span> = <span class="hljs-variable">$stmt</span>-&gt;fetchAll(PDO::FETCH_ASSOC);<br>print_r(<span class="hljs-variable">$fraction</span>);<br><br><span class="hljs-variable">$conn</span>=<span class="hljs-literal">null</span>; <span class="hljs-comment"># 关闭链接</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>传入：<code>username=t</code>，查看数据库日志</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">21 Connect	root@localhost on sort using TCP/IP</span><br><span class="line">21 Prepare	select * from fraction where name like &#x27;%:username%&#x27;</span><br><span class="line">21 Execute	select * from fraction where name like &#x27;%:username%&#x27;</span><br><span class="line">21 Close stmt	</span><br><span class="line">21 Quit	</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs mysql">21 Connect	root@localhost on sort using TCP/IP<br>21 Prepare	select * from fraction where name like &#x27;%:username%&#x27;<br>21 Execute	select * from fraction where name like &#x27;%:username%&#x27;<br>21 Close stmt	<br>21 Quit	<br></code></pre></td></tr></table></figure>
 
 <p>发现这里没有把我们传的<code>username=t</code>绑定到查询语句中去，这是因为在绑定参数时包含％,而不是在SQL本身(预先准备好的语句)中,这是不起作用。所以这种情况下，开发可能会选择直接使用拼接语句，这就给了SQL注入的可能。</p>
 <p>但是，也不是没有办法在使用like的情况下进行预编译，需要调用一些，MySQL的内置函数，例如将上述的查询语句更改为如下形式：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from fraction where name like concat(&#x27;%&#x27;,:username,&#x27;%&#x27;)</span><br><span class="line"># 这种情况下就能够进行在使用预编译的情况下进行like模糊查询</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs mysql">select * from fraction where name like concat(&#x27;%&#x27;,:username,&#x27;%&#x27;)<br># 这种情况下就能够进行在使用预编译的情况下进行like模糊查询<br></code></pre></td></tr></table></figure>
 
 <h5 id="order-by后传入字段名"><a href="#order-by后传入字段名" class="headerlink" title="order by后传入字段名"></a>order by后传入字段名</h5><p>order by 简单用法</p>
 <p><strong>作用</strong>：用于对结果集进行排序。</p>
 <p><strong>语法：</strong>顺序：SELECT * from 表名 ORDER BY 排序的字段名 倒序：SELECT * from 表名 ORDER BY 排序的字段名 DESC</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[ORDER BY &#123;col_name | expr | position&#125;  </span><br><span class="line">[ASC | DESC], ...]  </span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs mysql">[ORDER BY &#123;col_name | expr | position&#125;  <br>[ASC | DESC], ...]  <br></code></pre></td></tr></table></figure>
 
 <p><strong>注</strong>：ORDER BY 语句用于根据指定的列对结果集进行排序。ORDER BY 语句默认按照升序对记录进行排序。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">select * from fraction order by fraction DESC;	# 根据字段fraction进行降序排列</span><br><span class="line">select * from fraction order by fraction ASC;	# 根据字段fraction进行升序排列</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs mysql">select * from fraction order by fraction DESC;	# 根据字段fraction进行降序排列<br>select * from fraction order by fraction ASC;	# 根据字段fraction进行升序排列<br></code></pre></td></tr></table></figure>
 
 <p><code>order by</code>位置的注入点，其实跟平常的注入点类似，目前感觉区别不大，例如：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">select * from fraction order by 1 and 1=updatexml(0,concat(&#x27;~&#x27;,user(),&#x27;~&#x27;),1)# asc;	-- 报错注入</span><br><span class="line">select * from fraction order by updatexml(0,concat(&#x27;~&#x27;,user(),&#x27;~&#x27;),1)# asc;			-- 报错注入</span><br><span class="line">select * from fraction order by if(1,sleep(3),sleep(0))# asc;	-- 延时盲注，但这个延时了33秒，离谱</span><br><span class="line">select * from fraction order by if((user()=&#x27;root@localhost&#x27;),fraction,id);# asc;	-- 布尔盲注</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">select * from fraction order by 1 and 1=updatexml(0,concat(&#x27;~&#x27;,user(),&#x27;~&#x27;),1)# asc;	-- 报错注入<br>select * from fraction order by updatexml(0,concat(&#x27;~&#x27;,user(),&#x27;~&#x27;),1)# asc;			-- 报错注入<br>select * from fraction order by if(1,sleep(3),sleep(0))# asc;	-- 延时盲注，但这个延时了33秒，离谱<br>select * from fraction order by if((user()=&#x27;root@localhost&#x27;),fraction,id);# asc;	-- 布尔盲注<br></code></pre></td></tr></table></figure>
 
 <p>ok，回归正题，有时ORDER BY后的表名动态传入的SQL语句；渗透测试中允许用户传入按某个字段进行排序的行为，这很有可能是直接拼接的。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$col</span> = <span class="variable">$_GET</span>[<span class="string">&#x27;col&#x27;</span>]; <span class="comment">// 接收username</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 建立数据库连接</span></span><br><span class="line"><span class="variable">$dbs</span> = <span class="string">&quot;mysql:host=127.0.0.1;dbname=sort&quot;</span>;</span><br><span class="line"><span class="variable">$dbname</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"><span class="variable">$passwd</span> = <span class="string">&quot;root&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建连接,选择数据库,检测连接</span></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="variable">$conn</span> = <span class="keyword">new</span> PDO(<span class="variable">$dbs</span>, <span class="variable">$dbname</span>, <span class="variable">$passwd</span>);</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;Sucussful&lt;br/&gt;&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (PDOException <span class="variable">$e</span>)&#123;</span><br><span class="line"><span class="keyword">die</span> (<span class="string">&quot;Error!: &quot;</span> . <span class="variable">$e</span>-&gt;getMessage() . <span class="string">&quot;&lt;br/&gt;&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置本地预编译，绑定参数</span></span><br><span class="line"><span class="variable">$conn</span> -&gt; setAttribute(PDO::ATTR_EMULATE_PREPARES, <span class="literal">false</span>);</span><br><span class="line"><span class="variable">$stmt</span> = <span class="variable">$conn</span>-&gt;prepare(<span class="string">&quot;select * from fraction order by :col&quot;</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;bindParam(<span class="string">&quot;:col&quot;</span>,<span class="variable">$col</span>);</span><br><span class="line"><span class="variable">$stmt</span>-&gt;execute();</span><br><span class="line"><span class="variable">$result</span> = <span class="variable">$stmt</span>-&gt;fetchAll(PDO::FETCH_ASSOC);</span><br><span class="line">print_r(<span class="variable">$result</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$conn</span>=<span class="literal">null</span>; <span class="comment"># 关闭链接</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$col</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;col&#x27;</span>]; <span class="hljs-comment">// 接收username</span><br><br><span class="hljs-comment"># 建立数据库连接</span><br><span class="hljs-variable">$dbs</span> = <span class="hljs-string">&quot;mysql:host=127.0.0.1;dbname=sort&quot;</span>;<br><span class="hljs-variable">$dbname</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><span class="hljs-variable">$passwd</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><br><span class="hljs-comment">// 创建连接,选择数据库,检测连接</span><br><span class="hljs-keyword">try</span>&#123;<br><span class="hljs-variable">$conn</span> = <span class="hljs-keyword">new</span> PDO(<span class="hljs-variable">$dbs</span>, <span class="hljs-variable">$dbname</span>, <span class="hljs-variable">$passwd</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Sucussful&lt;br/&gt;&quot;</span>;<br>&#125;<br><span class="hljs-keyword">catch</span> (PDOException <span class="hljs-variable">$e</span>)&#123;<br><span class="hljs-keyword">die</span> (<span class="hljs-string">&quot;Error!: &quot;</span> . <span class="hljs-variable">$e</span>-&gt;getMessage() . <span class="hljs-string">&quot;&lt;br/&gt;&quot;</span>);<br>&#125;<br><br><span class="hljs-comment"># 设置本地预编译，绑定参数</span><br><span class="hljs-variable">$conn</span> -&gt; setAttribute(PDO::ATTR_EMULATE_PREPARES, <span class="hljs-literal">false</span>);<br><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select * from fraction order by :col&quot;</span>);<br><span class="hljs-variable">$stmt</span>-&gt;bindParam(<span class="hljs-string">&quot;:col&quot;</span>,<span class="hljs-variable">$col</span>);<br><span class="hljs-variable">$stmt</span>-&gt;execute();<br><span class="hljs-variable">$result</span> = <span class="hljs-variable">$stmt</span>-&gt;fetchAll(PDO::FETCH_ASSOC);<br>print_r(<span class="hljs-variable">$result</span>);<br><br><span class="hljs-variable">$conn</span>=<span class="hljs-literal">null</span>; <span class="hljs-comment"># 关闭链接</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
 
 <p>传入<code>col=fraction</code>，查看数据库执行日志，能够发现已经成功绑定参数。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">12 Connect	root@localhost on sort using TCP/IP</span><br><span class="line">12 Prepare	select * from fraction order by ?</span><br><span class="line">12 Execute	select * from fraction order by &#x27;fraction&#x27;</span><br><span class="line">12 Close stmt	</span><br><span class="line">12 Quit</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs mysql">12 Connect	root@localhost on sort using TCP/IP<br>12 Prepare	select * from fraction order by ?<br>12 Execute	select * from fraction order by &#x27;fraction&#x27;<br>12 Close stmt	<br>12 Quit<br></code></pre></td></tr></table></figure>
 
 <p>但把执行的语句代入数据库命令行中再看，发现这结果不是我们想要的啊</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/12.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/12.png" srcset="/img/loading.gif" lazyload></p>
 <p>这是因为在进行参数绑定的时候，$col的值是一个字符串，在将$col的值绑定进sql语句中后，:col仍然是一个字符串，最终代入数据库进行执行的语句是<code>select * from fraction order by &#39;fraction&#39;</code>，而order by之后需要的是一个表名，这个表名不能以字符串的形式存在。因此，该位置大概率会被写成拼接，这就造成了SQL注入的可能。</p>
 <h5 id="order-by后传入ASC-DESC"><a href="#order-by后传入ASC-DESC" class="headerlink" title="order by后传入ASC/DESC"></a>order by后传入ASC/DESC</h5><p>有时，可能会存在根据用户的选择来进行正序或倒叙排列，而这时如果<code>ASC/DESC</code>是从前端动态传入的，那此处大概率使用的是拼接</p>
 <p>举例：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$stmt</span> = <span class="variable">$conn</span>-&gt;prepare(<span class="string">&quot;select * from fraction order by fraction :asc&quot;</span>);</span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select * from fraction order by fraction :asc&quot;</span>);<br></code></pre></td></tr></table></figure>
 
 <p>当使用PDO，将预处理语句写成这样时，会抛出错误</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/13.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/13.png" srcset="/img/loading.gif" lazyload></p>
 <p>在MySQL命令行中，进行该预处理语句</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">prepare sel from &quot;select * from fraction order by fraction ?&quot;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">prepare sel from &quot;select * from fraction order by fraction ?&quot;;<br></code></pre></td></tr></table></figure>
 
 <p>同样会抛出错误</p>
 <p><code>You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;?&#39; at line 1</code></p>
 <p>所以当需要前端传入<code>ASC/DESC</code>时，后端大概率使用的是拼接，用了拼接就造成了SQL注入的可能</p>
 <h4 id="最后的最后"><a href="#最后的最后" class="headerlink" title="最后的最后"></a>最后的最后</h4><p>目前所了解到的基本上就这些，看网上说还有”IN 语句之后”，但是经过测试之后发现<code>IN</code>语句之后能够正常使用预处理，<code>IN</code>语句之后若存在SQL注入的话大概率就是拼接，而拼接的话就跟普通的注入区别不大了，所以就没有写关于<code>IN</code>语句之后的。文章里面估计有一些错误的地方，以及一些没有说清的地方，后面翻看的时候如果发现了就再更新，毕竟现在菜的离谱，写错了也不知道错了；还有就是肯定有一些不能使用预编译或预编译可能存在的问题没有写到，后面如果学习到或者遇到的时候要补充进来的。最后的最后，该去想办法捡点垃圾吃晚饭了</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/14.png"></p>
+<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/14.png" srcset="/img/loading.gif" lazyload></p>
 <h4 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h4><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Cyangsec/p/13067369.html">https://www.cnblogs.com/Cyangsec/p/13067369.html</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.nowcoder.net/n/9d9987c816214f62b9266276da65e11f">https://blog.nowcoder.net/n/9d9987c816214f62b9266276da65e11f</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.nowcoder.net/n/be73b8f592504ae8b1d00368433061be">https://blog.nowcoder.net/n/be73b8f592504ae8b1d00368433061be</a></p>
 <p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/news/378220">https://cloud.tencent.com/developer/news/378220</a></p>
 <p><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/7132#toc-11">https://xz.aliyun.com/t/7132#toc-11</a></p>
 
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E4%B8%BA%E4%BA%86%E5%A4%9A%E6%8D%A1%E7%82%B9%E5%9E%83%E5%9C%BE/">#为了多捡点垃圾</a>
+      
     </div>
-
-    
-    
-    
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E4%B8%BA%E4%BA%86%E5%A4%9A%E6%8D%A1%E7%82%B9%E5%9E%83%E5%9C%BE/" rel="tag"># 为了多捡点垃圾</a>
-          </div>
-
-        
+  
+</div>
 
 
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2022/01/23/010Editor%E7%A0%B4%E8%A7%A3/" rel="prev" title="010 Editor 破解">
-      <i class="fa fa-chevron-left"></i> 010 Editor 破解
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/" rel="next" title="小破站的SQL绕过">
-      小破站的SQL绕过 <i class="fa fa-chevron-right"></i>
-    </a></div>
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>SQL注入&amp;预编译</div>
+      <div>http://example.com/2022/01/30/SQL注入&amp;预编译/</div>
     </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-
-
-          </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>mechoy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年1月30日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
           
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
 
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/" title="小破站的SQL绕过">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">小破站的SQL绕过</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/01/23/010Editor%E7%A0%B4%E8%A7%A3/" title="010 Editor 破解">
+                        <span class="hidden-mobile">010 Editor 破解</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
       }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
     }
   });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
 </script>
 
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
 
-  <aside class="sidebar">
-    <div class="sidebar-inner">
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
 
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
 
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SQL%E6%B3%A8%E5%85%A5-amp-%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">1.</span> <span class="nav-text">SQL注入&amp;预编译</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8B%BC%E6%8E%A5"><span class="nav-number">1.1.</span> <span class="nav-text">拼接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">1.2.</span> <span class="nav-text">预编译</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MySQL%E9%A2%84%E7%BC%96%E8%AF%91"><span class="nav-number">1.2.1.</span> <span class="nav-text">MySQL预编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PHP-MySQL-%E9%A2%84%E5%A4%84%E7%90%86%E8%AF%AD%E5%8F%A5"><span class="nav-number">1.2.2.</span> <span class="nav-text">PHP+MySQL 预处理语句</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Mysqli"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">Mysqli</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PDO"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">PDO</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91%E6%89%80%E4%B8%8D%E8%83%BD%E9%98%B2%E8%8C%83%E7%9A%84%E6%B3%A8%E5%85%A5"><span class="nav-number">1.3.</span> <span class="nav-text">预编译所不能防范的注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PDO%E6%A8%A1%E6%8B%9F%E9%A2%84%E5%A4%84%E7%90%86-%E5%AE%BD%E5%AD%97%E8%8A%82"><span class="nav-number">1.3.1.</span> <span class="nav-text">PDO模拟预处理+宽字节</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PDO%E7%9A%84%E9%94%99%E8%AF%AF%E4%BD%BF%E7%94%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">PDO的错误使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PDO%E4%B8%AD%E7%9A%84%E5%A4%9A%E6%9D%A1%E6%89%A7%E8%A1%8C"><span class="nav-number">1.3.3.</span> <span class="nav-text">PDO中的多条执行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%84%E7%BC%96%E8%AF%91%E4%B8%8D%E7%94%9F%E6%95%88"><span class="nav-number">1.3.4.</span> <span class="nav-text">预编译不生效</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#like%E4%BD%8D%E7%BD%AE"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">like位置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#order-by%E5%90%8E%E4%BC%A0%E5%85%A5%E5%AD%97%E6%AE%B5%E5%90%8D"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">order by后传入字段名</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#order-by%E5%90%8E%E4%BC%A0%E5%85%A5ASC-DESC"><span class="nav-number">1.3.4.3.</span> <span class="nav-text">order by后传入ASC&#x2F;DESC</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E7%9A%84%E6%9C%80%E5%90%8E"><span class="nav-number">1.3.5.</span> <span class="nav-text">最后的最后</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5%EF%BC%9A"><span class="nav-number">1.3.6.</span> <span class="nav-text">参考链接：</span></a></li></ol></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
 
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Mechoy</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">5</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">5</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
-  </nav>
-</div>
+      var lang = '';
 
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
 
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2022</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Mechoy</span>
-</div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
-
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-
-<script src="/js/utils.js"></script>
-
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/muse.js"></script>
-
-
-<script src="/js/next-boot.js"></script>
-
-
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
 
 
   
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
 
 
 
 
 
-
-
-
-
-
-
-
-
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
 
 
   
 
-  
-
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>
