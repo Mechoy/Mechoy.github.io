@@ -19,29 +19,29 @@
     <meta name="description" content="SQL注入&amp;预编译这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q  拼接很久很久以前，用户的传参是能够直接拼接到sql的查询语句中去，例如： 123456789101112131415161718">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SQL注入&amp;预编译">
-<meta property="og:url" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/index.html">
+<meta property="og:url" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/index.html">
 <meta property="og:site_name" content="Mechoy&#39;s Blog">
 <meta property="og:description" content="SQL注入&amp;预编译这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q  拼接很久很久以前，用户的传参是能够直接拼接到sql的查询语句中去，例如： 123456789101112131415161718">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/2.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/3.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/4.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/5.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/6.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/8.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/9.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/10.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/11.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/12.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/13.png">
-<meta property="og:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/14.png">
-<meta property="article:published_time" content="2022-01-30T15:38:54.000Z">
-<meta property="article:modified_time" content="2022-04-28T15:44:29.969Z">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/2.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/3.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/4.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/5.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/6.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/8.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/9.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/10.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/11.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/12.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/13.png">
+<meta property="og:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/14.png">
+<meta property="article:published_time" content="2022-02-05T15:38:54.000Z">
+<meta property="article:modified_time" content="2022-06-23T15:30:53.989Z">
 <meta property="article:author" content="Mechoy">
 <meta property="article:tag" content="为了多捡点垃圾">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png">
+<meta name="twitter:image" content="http://example.com/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png">
   
   
   <title>SQL注入&amp;预编译 - Mechoy&#39;s Blog</title>
@@ -217,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-01-30 23:38" pubdate>
-          2022年1月30日 晚上
+        <time datetime="2022-02-05 23:38" pubdate>
+          2022年2月5日 晚上
         </time>
       </span>
     
@@ -283,15 +283,15 @@
             <div class="markdown-body">
               
               <h2 id="SQL注入-amp-预编译"><a href="#SQL注入-amp-预编译" class="headerlink" title="SQL注入&amp;预编译"></a>SQL注入&amp;预编译</h2><p>这篇文章来源于被预编译搞的头疼，捡垃圾的我只是想捡个注入，然鹅随着使用预编译的广泛使用，让我这个捡垃圾的捡不到注入了。但听说预编译防止不了排序处的注入，于是乎想自己看一下，然后就又能多个捡垃圾的路子了。多捡点垃圾的话晚上就能加个蛋了Q_A_Q</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/1.png" srcset="/img/loading.gif" lazyload></p>
 <h3 id="拼接"><a href="#拼接" class="headerlink" title="拼接"></a>拼接</h3><p>很久很久以前，用户的传参是能够直接拼接到sql的查询语句中去，例如：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs php+HTML">// index.php<br>&lt;?php<br>$username = $_POST[&#x27;username&#x27;];<br>mysqli_select_db($conn,sort) or die ( &quot;Unable to connect to the database: test&quot;);	<br># 选择数据库<br><br>$sql = &quot;select fraction from fraction where name = &#x27;$username&#x27;;&quot;;		# 直接将用户输入拼接进字符串<br>$result = mysqli_query($conn,$sql);<br>echo &#x27;&lt;br/&gt;&#x27;.$sql.&#x27;&lt;br/&gt;&#x27;;	# 打印sql语句<br><br>if($fraction = mysqli_fetch_assoc( $result ))&#123;<br>    echo &#x27;查询成功&#x27;;<br>&#125;<br>else&#123;<br>    mysqli_error($conn);<br>&#125;<br><br>echo &#x27;&lt;br/&gt;&#x27;;<br>echo &#x27;学生:&#x27;.$username;<br>echo &#x27;&lt;br/&gt;&#x27;;<br>echo &#x27;分数:&#x27;.$fraction[&#x27;fraction&#x27;];<br><br>$conn-&gt;close();<br>?&gt;<br></code></pre></td></tr></table></figure>
 
 <p>这里构建了一个简单的查询分数的功能，可以看到直接将用户的输入带入到了sql语句中，这sql注入很明显了</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/2.png" srcset="/img/loading.gif" lazyload alt="分数表"></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/2.png" srcset="/img/loading.gif" lazyload alt="分数表"></p>
 <p>这里可以直接构造payload来实现注入</p>
 <p>payload:<code>1&#39;union select database();#</code></p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/3.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/3.png" srcset="/img/loading.gif" lazyload></p>
 <p>这种情况下，如果做安全防护的话，也只能是从效验用户的输入入手了，但是效验规则大概率都能进行绕过，只不过是绕的难易不一样罢了。但是现在已经进入到了预编译的时代，拼接的情况虽然有，但较少了，再加上防护设备的广泛应用，</p>
 <h3 id="预编译"><a href="#预编译" class="headerlink" title="预编译"></a>预编译</h3><p>据听说，预编译一开始是为了提高MySQL的运行效率而诞生，但是由于其先构建语法树，后带入查询参数的特性导致其具有了防止SQL注入的特性。这里简单说一下MySQL的预处理语句的使用，以及防止SQL的注入的原因(因为其他数据库一点不会)</p>
 <h4 id="MySQL预编译"><a href="#MySQL预编译" class="headerlink" title="MySQL预编译"></a>MySQL预编译</h4><p>MySQL预编译执行分为三步：</p>
@@ -305,14 +305,14 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mysql">execute sel using @a;<br># 使用EXECUTE stmt_name [USING @var_name [, @var_name] ...]语法<br># 变量位置与占位符一一对应<br></code></pre></td></tr></table></figure>
 
 <p>执行结束后查看数据库日志：</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/4.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/4.png" srcset="/img/loading.gif" lazyload></p>
 <p>可以看到在使用预处理语句时，数据库共进行了四步操作：1.构建预处理语句；2.设置变量；3.绑定变量；4.执行查询</p>
 <p>预编译的优势在于其不用每一次都构建语法树，以上面为例，当有<code>@b=&#39;admin&#39;</code>时，执行<code>execute sel using @b;</code>时，数据库会直接去fraction表中查询<code>name=admin</code>的fraction值，而不用再一次构建语法树，这可能也就是预编译语句为何能提高MySQL效率的原因</p>
 <p>而预编译语句在防止SQL注入上，看下面这张图：</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/5.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/5.png" srcset="/img/loading.gif" lazyload></p>
 <p>在@b和@c的情况下返回都为空，也就是将@b和@c的值只是当做一个变量，去寻找name字段中与其相同的</p>
 <p>如果在数据库中插入一条<code>name=xx union select database()</code>数据，再次执行就会获得相应的值</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/6.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/6.png" srcset="/img/loading.gif" lazyload></p>
 <p>再执行就会得到如下结果</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs mysql">mysql&gt; execute sel using @c;<br>+----------+<br>| fraction |<br>+----------+<br>|      100 |<br>+----------+<br></code></pre></td></tr></table></figure>
 
@@ -336,7 +336,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mysql">4 Connect	root@localhost on sort using TCP/IP<br>4 Prepare	select fraction from fraction where name = ?<br>4 Execute	select fraction from fraction where name = &#x27;mechoy\&#x27; union select database();#&#x27;<br></code></pre></td></tr></table></figure>
 
 <p>发现这里输入的单引号被转义了，预编译+转义，好像跟SQL注入说再见了，对于我这个只会Sqlmap一把梭的人，好像跟全世界再见了</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/8.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/8.png" srcset="/img/loading.gif" lazyload></p>
 <h5 id="PDO"><a href="#PDO" class="headerlink" title="PDO"></a>PDO</h5><ul>
 <li>PHP 数据对象 （PDO） 扩展为PHP访问数据库定义了一个轻量级的一致接口。</li>
 <li>PDO 提供了一个数据访问抽象层，这意味着，不管使用哪种数据库，都可以用相同的函数（方法）来查询和获取数据。</li>
@@ -370,7 +370,7 @@
 <p>当传入<code>1%df%27%20union%20select%20database();#</code>时，再查看数据库日志</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">15 Connect	root@localhost on sort1 using TCP/IP<br>15 Query	SET NAMES GBK<br>15 Query	select fraction from fraction where name = &#x27;1運&#x27; union select database();<br>//可以看到成功利用%df吃掉斜杠，造成宽字节注入<br></code></pre></td></tr></table></figure>
 
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/9.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/9.png" srcset="/img/loading.gif" lazyload></p>
 <h4 id="PDO的错误使用"><a href="#PDO的错误使用" class="headerlink" title="PDO的错误使用"></a>PDO的错误使用</h4><p>一些稍微欠缺经验的开发人员，可能会错误的使用PDO，如下：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-comment">// index4.php</span><br><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$username</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;username&#x27;</span>]; <span class="hljs-comment">// 接收username</span><br><br><span class="hljs-comment"># 建立数据库连接</span><br><span class="hljs-variable">$dbs</span> = <span class="hljs-string">&quot;mysql:host=127.0.0.1;dbname=sort1&quot;</span>;<br><span class="hljs-variable">$dbname</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><span class="hljs-variable">$passwd</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><br><span class="hljs-comment">// 创建连接,选择数据库,检测连接</span><br><span class="hljs-keyword">try</span>&#123;<br><span class="hljs-variable">$conn</span> = <span class="hljs-keyword">new</span> PDO(<span class="hljs-variable">$dbs</span>, <span class="hljs-variable">$dbname</span>, <span class="hljs-variable">$passwd</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Sucussful&lt;br/&gt;&quot;</span>;<br>&#125;<br><span class="hljs-keyword">catch</span> (PDOException <span class="hljs-variable">$e</span>)&#123;<br><span class="hljs-keyword">die</span> (<span class="hljs-string">&quot;Error!: &quot;</span> . <span class="hljs-variable">$e</span>-&gt;getMessage() . <span class="hljs-string">&quot;&lt;br/&gt;&quot;</span>);<br>&#125;<br><br><span class="hljs-comment"># 感觉用了预编译语句，但又好像没完全用</span><br><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select fraction from fraction where name = &#x27;<span class="hljs-subst">$username</span>&#x27;&quot;</span>);<br><span class="hljs-variable">$stmt</span>-&gt;execute();<br><span class="hljs-variable">$fraction</span> = <span class="hljs-variable">$stmt</span>-&gt;fetch();<br>var_dump(<span class="hljs-variable">$fraction</span>);<br><br><span class="hljs-variable">$conn</span>=<span class="hljs-literal">null</span>; <span class="hljs-comment"># 关闭链接</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
 
@@ -386,9 +386,9 @@
 <p>查看数据库日志以及数据库是否插入内容</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs mysql">10 Connect	root@localhost on sort using TCP/IP<br>10 Query	select fraction from fraction where id=1;<br>10 Query	insert into fraction(id,name,fraction) values(111,database(),user())<br># 可以看到执行了两条语句<br></code></pre></td></tr></table></figure>
 
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/10.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/10.png" srcset="/img/loading.gif" lazyload></p>
 <p>再执行：<code>id=111</code>，能够看到成功查询，但有个问题是当回显位置的值是有个数字型时，就无法直接将我们想要获取的内容存入到数据库的相应字段中了，但好像也有办法，可以尝试一下</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/11.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/11.png" srcset="/img/loading.gif" lazyload></p>
 <h4 id="预编译不生效"><a href="#预编译不生效" class="headerlink" title="预编译不生效"></a>预编译不生效</h4><p>不是所有的地方都能使用预编译语句，有些位置可能会存在使用预编译之后，sql语句不生效，而这些位置又不得不使用拼接。</p>
 <h5 id="like位置"><a href="#like位置" class="headerlink" title="like位置"></a>like位置</h5><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs php">index6.php<br><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$username</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;username&#x27;</span>]; <span class="hljs-comment">// 接收username</span><br><br><span class="hljs-comment"># 建立数据库连接</span><br><span class="hljs-variable">$dbs</span> = <span class="hljs-string">&quot;mysql:host=127.0.0.1;dbname=sort&quot;</span>;<br><span class="hljs-variable">$dbname</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><span class="hljs-variable">$passwd</span> = <span class="hljs-string">&quot;root&quot;</span>;<br><br><span class="hljs-comment">// 创建连接,选择数据库,检测连接</span><br><span class="hljs-keyword">try</span>&#123;<br><span class="hljs-variable">$conn</span> = <span class="hljs-keyword">new</span> PDO(<span class="hljs-variable">$dbs</span>, <span class="hljs-variable">$dbname</span>, <span class="hljs-variable">$passwd</span>);<br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Sucussful&lt;br/&gt;&quot;</span>;<br>&#125;<br><span class="hljs-keyword">catch</span> (PDOException <span class="hljs-variable">$e</span>)&#123;<br><span class="hljs-keyword">die</span> (<span class="hljs-string">&quot;Error!: &quot;</span> . <span class="hljs-variable">$e</span>-&gt;getMessage() . <span class="hljs-string">&quot;&lt;br/&gt;&quot;</span>);<br>&#125;<br><br><span class="hljs-comment"># 感觉用了预编译语句，但又好像没完全用</span><br><span class="hljs-variable">$conn</span> -&gt; setAttribute(PDO::ATTR_EMULATE_PREPARES, <span class="hljs-literal">false</span>);<br><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select * from fraction where name like &#x27;%:username%&#x27;&quot;</span>);<br><span class="hljs-variable">$stmt</span>-&gt;bindParam(<span class="hljs-string">&quot;:username&quot;</span>,<span class="hljs-variable">$username</span>);<br><span class="hljs-variable">$stmt</span>-&gt;execute();<br><span class="hljs-variable">$fraction</span> = <span class="hljs-variable">$stmt</span>-&gt;fetchAll(PDO::FETCH_ASSOC);<br>print_r(<span class="hljs-variable">$fraction</span>);<br><br><span class="hljs-variable">$conn</span>=<span class="hljs-literal">null</span>; <span class="hljs-comment"># 关闭链接</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
 
@@ -417,14 +417,14 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs mysql">12 Connect	root@localhost on sort using TCP/IP<br>12 Prepare	select * from fraction order by ?<br>12 Execute	select * from fraction order by &#x27;fraction&#x27;<br>12 Close stmt	<br>12 Quit<br></code></pre></td></tr></table></figure>
 
 <p>但把执行的语句代入数据库命令行中再看，发现这结果不是我们想要的啊</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/12.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/12.png" srcset="/img/loading.gif" lazyload></p>
 <p>这是因为在进行参数绑定的时候，$col的值是一个字符串，在将$col的值绑定进sql语句中后，:col仍然是一个字符串，最终代入数据库进行执行的语句是<code>select * from fraction order by &#39;fraction&#39;</code>，而order by之后需要的是一个表名，这个表名不能以字符串的形式存在。因此，该位置大概率会被写成拼接，这就造成了SQL注入的可能。</p>
 <h5 id="order-by后传入ASC-DESC"><a href="#order-by后传入ASC-DESC" class="headerlink" title="order by后传入ASC/DESC"></a>order by后传入ASC/DESC</h5><p>有时，可能会存在根据用户的选择来进行正序或倒叙排列，而这时如果<code>ASC/DESC</code>是从前端动态传入的，那此处大概率使用的是拼接</p>
 <p>举例：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-variable">$stmt</span> = <span class="hljs-variable">$conn</span>-&gt;prepare(<span class="hljs-string">&quot;select * from fraction order by fraction :asc&quot;</span>);<br></code></pre></td></tr></table></figure>
 
 <p>当使用PDO，将预处理语句写成这样时，会抛出错误</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/13.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/13.png" srcset="/img/loading.gif" lazyload></p>
 <p>在MySQL命令行中，进行该预处理语句</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs mysql">prepare sel from &quot;select * from fraction order by fraction ?&quot;;<br></code></pre></td></tr></table></figure>
 
@@ -432,7 +432,7 @@
 <p><code>You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near &#39;?&#39; at line 1</code></p>
 <p>所以当需要前端传入<code>ASC/DESC</code>时，后端大概率使用的是拼接，用了拼接就造成了SQL注入的可能</p>
 <h4 id="最后的最后"><a href="#最后的最后" class="headerlink" title="最后的最后"></a>最后的最后</h4><p>目前所了解到的基本上就这些，看网上说还有”IN 语句之后”，但是经过测试之后发现<code>IN</code>语句之后能够正常使用预处理，<code>IN</code>语句之后若存在SQL注入的话大概率就是拼接，而拼接的话就跟普通的注入区别不大了，所以就没有写关于<code>IN</code>语句之后的。文章里面估计有一些错误的地方，以及一些没有说清的地方，后面翻看的时候如果发现了就再更新，毕竟现在菜的离谱，写错了也不知道错了；还有就是肯定有一些不能使用预编译或预编译可能存在的问题没有写到，后面如果学习到或者遇到的时候要补充进来的。最后的最后，该去想办法捡点垃圾吃晚饭了</p>
-<p><img src="/2022/01/30/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/14.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/02/05/SQL%E6%B3%A8%E5%85%A5&%E9%A2%84%E7%BC%96%E8%AF%91/14.png" srcset="/img/loading.gif" lazyload></p>
 <h4 id="参考链接："><a href="#参考链接：" class="headerlink" title="参考链接："></a>参考链接：</h4><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Cyangsec/p/13067369.html">https://www.cnblogs.com/Cyangsec/p/13067369.html</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.nowcoder.net/n/9d9987c816214f62b9266276da65e11f">https://blog.nowcoder.net/n/9d9987c816214f62b9266276da65e11f</a></p>
 <p><a target="_blank" rel="noopener" href="https://blog.nowcoder.net/n/be73b8f592504ae8b1d00368433061be">https://blog.nowcoder.net/n/be73b8f592504ae8b1d00368433061be</a></p>
@@ -462,7 +462,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>SQL注入&amp;预编译</div>
-      <div>http://example.com/2022/01/30/SQL注入&amp;预编译/</div>
+      <div>http://example.com/2022/02/05/SQL注入&amp;预编译/</div>
     </div>
     <div class="license-meta">
       
@@ -474,7 +474,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年1月30日</div>
+          <div>2022年2月5日</div>
         </div>
       
       
@@ -504,7 +504,7 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/02/05/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/" title="小破站的SQL绕过">
+                      <a href="/2022/02/12/%E5%B0%8F%E7%A0%B4%E7%AB%99%E7%9A%84SQL%E7%BB%95%E8%BF%87/" title="小破站的SQL绕过">
                         <i class="iconfont icon-arrowleft"></i>
                         <span class="hidden-mobile">小破站的SQL绕过</span>
                         <span class="visible-mobile">上一篇</span>
